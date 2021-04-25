@@ -1,0 +1,7 @@
+dist/js/*
+node_modules/
+.idea
+.husky
+*.zip
+roadmap.md
+yarn-error.log
