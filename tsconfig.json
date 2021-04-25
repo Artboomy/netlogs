@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "target": "es6",
+        "module": "commonjs",
+        "jsx": "react",
+        "strict": true,
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "baseUrl": "src"
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+}
