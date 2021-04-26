@@ -4,6 +4,8 @@ This is custom network request viewer extension for Chrome.
 
 You can change the way you view parameters and results the way you want, using plain javascript.
 
+[Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
+
 ## 💡 Features
 
 The extension will appear in devtools as a "Net logs" tab, near other tabs like "Network" or "Console".
@@ -17,6 +19,11 @@ The extension will appear in devtools as a "Net logs" tab, near other tabs like 
 ![main.png](./img/main.png)
 
 ## 🚀 Installation
+
+### From store
+[Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
+
+### From zip release
 
 1. Grab the latest release from [Github](https://github.com/Artboomy/netlogs/releases). Download `netlogs.zip`.
 
