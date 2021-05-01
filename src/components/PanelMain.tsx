@@ -15,7 +15,8 @@ import { DropContainer } from './list/DropContainer';
 const useStyles = createUseStyles({
     '@global': {
         html: {
-            height: '100%'
+            height: '100%',
+            backgroundColor: 'white'
         },
         body: {
             height: '100%',
