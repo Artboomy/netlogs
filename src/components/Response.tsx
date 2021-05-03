@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { IContentItem } from 'models/types';
 import { InspectorWrapper } from './InspectorWrapper';
 
@@ -6,22 +6,13 @@ export const Response: React.FC<{
     item: IContentItem<unknown>;
     className?: string;
 }> = ({ item, className }) => {
-    const [data, setData] = useState<unknown | null>(null);
-    useEffect(() => {
-        if (!data) {
-            item.getContent().then((result) => {
-                setData(result);
-            });
-        }
-    });
+    const data = item.getContent();
     return (
         <div className={className}>
-            {!data ? (
-                <InspectorWrapper data={{ data: 'Loading...' }} />
-            ) : typeof data === 'string' ? (
+            {typeof data === 'string' ? (
                 <div>{data}</div>
             ) : (
-                <InspectorWrapper data={data} />
+                <InspectorWrapper data={item.getContent()} />
             )}
         </div>
     );

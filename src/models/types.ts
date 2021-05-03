@@ -10,11 +10,11 @@ export enum ItemType {
 export interface IContentItem<T> {
     getTag(): string;
     isError(): boolean;
-    getContent(): Promise<T>;
+    getContent(): T;
     getMeta(): PropTreeProps['data'] | null;
 }
 
-export type NetworkRequest = chrome.devtools.network.Request | Entry;
+export type NetworkRequest = Entry;
 
 export interface IItemContentOnlyCfg {
     timestamp: number;
@@ -35,3 +35,9 @@ export interface IItemTransactionCfg {
 export interface IItemNetworkCfg {
     request: NetworkRequest;
 }
+
+export type SearchConfig = {
+    searchValue?: string;
+    filterValue?: string;
+    symbol?: symbol;
+};

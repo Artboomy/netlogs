@@ -173,6 +173,7 @@ export const Options: FC = () => {
     const handleReset = () => {
         if (window.confirm('This will wipe all custom settings. Continue?')) {
             localStorage.removeItem(CURRENT_PROFILE_KEY);
+            setCurrentProfile('default');
             resetSettings();
         }
     };

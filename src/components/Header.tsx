@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import { google } from 'base16';
 import cn from 'classnames';
 import { useListStore } from '../controllers/network';
 import runtime from '../api/runtime';
-import settings from '../controllers/settings';
 
 const useStyles = createUseStyles({
     root: {
@@ -29,7 +28,7 @@ interface IProps {
     onSearchChange: (value: string) => void;
 }
 
-export const Header: React.FC<IProps> = ({
+export const Header: FC<IProps> = ({
     className,
     searchValue,
     onSearchChange
@@ -42,7 +41,7 @@ export const Header: React.FC<IProps> = ({
             <button onClick={clear}>Clear</button>
             <input
                 type='text'
-                placeholder='highlight'
+                placeholder='Search in params/result'
                 value={searchValue}
                 onChange={(e) => onSearchChange(e.target.value)}
             />

@@ -1,5 +1,10 @@
 import { nanoid } from 'nanoid';
-import { IContentItem, IItemTransactionCfg, ItemType } from 'models/types';
+import {
+    IContentItem,
+    IItemTransactionCfg,
+    ItemType,
+    SearchConfig
+} from 'models/types';
 import { PropTreeProps } from '../components/PropTree';
 
 export abstract class TransactionItemAbstract implements IContentItem<unknown> {
@@ -10,7 +15,7 @@ export abstract class TransactionItemAbstract implements IContentItem<unknown> {
     abstract getTag(): string;
     abstract isError(): boolean;
     abstract getParams(): Record<string, unknown>;
-    abstract getContent(): Promise<unknown>;
+    abstract getContent(): unknown;
     abstract getMeta(): PropTreeProps['data'] | null;
 }
 
@@ -36,7 +41,7 @@ export default class TransactionItem
         this._meta = cfg.meta || null;
     }
 
-    shouldShow(): boolean {
+    shouldShow(_cfg: SearchConfig = {}): boolean {
         return true;
     }
 
@@ -60,7 +65,7 @@ export default class TransactionItem
         return this._meta;
     }
 
-    async getContent(): Promise<TContent> {
+    getContent(): TContent {
         return this._result;
     }
 }

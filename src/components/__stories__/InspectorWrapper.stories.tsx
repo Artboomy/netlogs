@@ -1,9 +1,7 @@
 import React, { FC, useState } from 'react';
 
-import { InspectorWrapper as Component } from './InspectorWrapper';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { HighlightContext } from 'react-inspector';
+import { InspectorWrapper as Component } from '../InspectorWrapper';
+import { SearchContext } from 'react-inspector';
 
 export default {
     title: 'InspectorWrapper',
@@ -278,9 +276,9 @@ const Highlight: FC = () => {
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
             />
-            <HighlightContext.Provider value={value}>
+            <SearchContext.Provider value={value}>
                 <Component data={testData} />
-            </HighlightContext.Provider>
+            </SearchContext.Provider>
         </section>
     );
 };

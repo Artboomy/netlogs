@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { PropTree as Component } from './PropTree';
-import data from '../demo/example.json';
+import { PropTree as Component } from '../PropTree';
+import data from '../../demo/example.json';
 
 export default {
     title: 'PropTree',

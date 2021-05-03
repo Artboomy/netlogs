@@ -66,14 +66,19 @@ const isXml = (data: unknown): data is TXmlData => {
     return Boolean(isMimeType(data) && data.__mimeType.endsWith('xml'));
 };
 
-const isMimeType = (data: unknown): data is WithMimeType => {
+export const isMimeType = (data: unknown): data is WithMimeType => {
     return Boolean(data && typeof data === 'object' && '__mimeType' in data);
 };
 
-export const InspectorWrapper: FC<{
+export interface InspectorWrapperProps {
     data: TData | TAbstractData | unknown;
     tagName?: string;
-}> = ({ data, tagName }) => {
+}
+
+export const InspectorWrapper: FC<InspectorWrapperProps> = ({
+    data,
+    tagName
+}) => {
     if (isImage(data)) {
         return <Image base64={data.__getRaw()} mimeType={data.__mimeType} />;
     }
