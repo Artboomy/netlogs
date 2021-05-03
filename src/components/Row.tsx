@@ -52,7 +52,12 @@ export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
                 {new Date(item.timestamp).toLocaleTimeString('en-GB')}
             </div>
         ),
-        tag: tag ? <Tag content={tag} color={google.base0B} /> : null
+        tag: tag ? (
+            <Tag
+                content={tag}
+                color={item.isError() ? google.base08 : google.base0B}
+            />
+        ) : null
     };
     return item instanceof ContentOnlyItem ? (
         <ContentOnly item={item} {...commonProps} />

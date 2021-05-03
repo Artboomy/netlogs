@@ -1,39 +1,28 @@
-# Net logs
+# 📜 Net logs
+
+![license](https://img.shields.io/github/license/Artboomy/netlogs)
+![chrome installs](https://img.shields.io/chrome-web-store/users/cjdmhjppaehhblekcplokfdhikmalnaf)
+
+[Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
 
 This is custom network request viewer extension for Chrome.
 
-You can change the way you view parameters and results the way you want, using plain javascript.
-
-[Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
-
 ## 💡 Features
 
-The extension will appear in devtools as a "Net logs" tab, near other tabs like "Network" or "Console".
+The extension will appear in devtools as a `📜 Net logs` tab.
 
-* **Concise.** It shows the info you need faster and with fewer clicks.
-* **Zero-config.** It reduces the request clutter out of the box.
-* **Universal.** View live request log or load from [`*.har` file](https://developer.chrome.com/docs/devtools/network/reference/#save-as-har).  
-* **Customizable.** Transform name, parameters, and response however you want.
-* **Team-friendly.** Export and share your profile with others.
+* 🔍 **Search:** Filter by url and search by params/result.
+* 🛠️ **Customization:** Transform name, parameters, and response with javascript.
+* ✨ **Universal:** View live logs or load from [`*.har` file](https://developer.chrome.com/docs/devtools/network/reference/#save-as-har).
+* 🤝 **Team-friendly:** Export and share your profile with others.
 
-![main.png](./img/main.png)
+![main.gif](./img/main.gif)
 
 ## 🚀 Installation
 
-### From store
-[Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
+You can find a version for chrome [here](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf).
 
-### From zip release
-
-1. Grab the latest release from [Github](https://github.com/Artboomy/netlogs/releases). Download `netlogs.zip`.
-
-2. Unzip it.
-
-3. Open chrome://extensions/ and toggle developer mode in the header.
-
-4. Click **"Load unpacked"** and select folder from step 2.
-
-5. You are ready to go! If you don't see the tab in devtools - just reopen it.
+To install from zip or source, see [local development](#local-development) section.
 
 ## 🛠️ Configuration
 
@@ -108,3 +97,15 @@ I may or may not fix it 😉.
 Run `yarn run package`. This will generate .zip archive, which can be unpacked and installed as development extensions.
 
 Alternatively, run `yarn run bild:prod` and archive `dist` folder manually.
+
+## 🗜️ Zip installation
+
+1. Grab the latest release from [Github](https://github.com/Artboomy/netlogs/releases). Download `netlogs.zip`.
+
+2. Unzip it.
+
+3. Open chrome://extensions/ and toggle developer mode in the header.
+
+4. Click **"Load unpacked"** and select folder from step 2.
+
+5. You are ready to go! If you don't see the tab in devtools - just reopen it.
