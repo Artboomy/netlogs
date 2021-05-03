@@ -5,7 +5,7 @@
 
 [Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
 
-This is custom network request viewer extension for Chrome.
+This is network request viewer extension for Chromium-based browsers.
 
 ## 💡 Features
 
@@ -20,7 +20,7 @@ The extension will appear in devtools as a `📜 Net logs` tab.
 
 ## 🚀 Installation
 
-You can find a version for chrome [here](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf).
+You can find a version for Chrome/Edge [here](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf).
 
 To install from zip or source, see [local development](#local-development) section.
 
