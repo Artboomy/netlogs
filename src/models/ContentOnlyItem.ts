@@ -1,6 +1,12 @@
 import { nanoid } from 'nanoid';
-import { IContentItem, IItemContentOnlyCfg, ItemType } from './types';
+import {
+    IContentItem,
+    IItemContentOnlyCfg,
+    ItemType,
+    SearchConfig
+} from './types';
 import { PropTreeProps } from '../components/PropTree';
+import { markMatches } from 'react-inspector';
 
 type TContent = IItemContentOnlyCfg['content'];
 export default class ContentOnlyItem implements IContentItem<TContent> {
@@ -19,8 +25,21 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
         this._meta = cfg.meta || null;
     }
 
-    shouldShow(): boolean {
-        return true;
+    shouldShow(cfg: SearchConfig = {}): boolean {
+        const { symbol, searchValue } = cfg;
+        if (!symbol || !searchValue) {
+            return true;
+        }
+        return typeof this._content === 'string'
+            ? this._content.includes(searchValue)
+            : markMatches(
+                  { content: this._content },
+                  'content',
+                  (k, v) =>
+                      String(k).includes(searchValue) ||
+                      String(v).includes(searchValue),
+                  symbol
+              );
     }
 
     getTag(): string {
@@ -35,7 +54,7 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
         return null;
     }
 
-    async getContent(): Promise<TContent> {
+    getContent(): TContent {
         return typeof this._content === 'string'
             ? this._content
             : {

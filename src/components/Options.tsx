@@ -19,6 +19,7 @@ import { createUseStyles } from 'react-jss';
 import {
     IProfile,
     IProfileSerialized,
+    ISettings,
     ISettingsSerialized
 } from '../controllers/settings/types';
 import downloadAsFile from '../utils';
@@ -108,10 +109,14 @@ const handleExport = (name: string, data: IProfile | IProfileSerialized) => {
 };
 const CURRENT_PROFILE_KEY = 'CURRENT_PROFILE_KEY';
 
+function getInitialProfileName(profiles: ISettings['profiles']): string {
+    const local = localStorage.getItem(CURRENT_PROFILE_KEY);
+    return local && profiles.hasOwnProperty(local) ? local : 'default';
+}
 export const Options: FC = () => {
     const [settings, setSettings, resetSettings] = useSettings();
     const [currentProfile, setCurrentProfile] = useState(
-        localStorage.getItem(CURRENT_PROFILE_KEY) || 'default'
+        getInitialProfileName(settings.profiles)
     );
     useEffect(() => {
         setFunctions(
@@ -167,6 +172,8 @@ export const Options: FC = () => {
 
     const handleReset = () => {
         if (window.confirm('This will wipe all custom settings. Continue?')) {
+            localStorage.removeItem(CURRENT_PROFILE_KEY);
+            setCurrentProfile('default');
             resetSettings();
         }
     };
@@ -179,6 +186,7 @@ export const Options: FC = () => {
     const handleDeleteProfile = () => {
         delete settings.profiles[currentProfile];
         setCurrentProfile('default');
+        localStorage.removeItem(CURRENT_PROFILE_KEY);
         setSettings(settings);
     };
 
@@ -188,6 +196,7 @@ export const Options: FC = () => {
             settings.profiles[name] = cloneDeep(settings.profiles.default);
             setSettings(settings);
             setCurrentProfile(name);
+            localStorage.setItem(CURRENT_PROFILE_KEY, name);
         }
     };
 

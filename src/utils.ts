@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { EventName, IframeEvent, Logs } from './types';
+import { EventName, IframeEvent } from './types';
 import { nanoid } from 'nanoid';
 
 export const mediaQuerySmallOnly = '@media (max-width: 700px)';
@@ -89,3 +88,13 @@ export function postSandbox(payload: IframeEvent): void {
 export function isSandbox(): boolean {
     return location.pathname.includes('sandbox');
 }
+
+export const nameTrimmer = (value: string, limit = 100): string =>
+    value.length > limit ? value.slice(0, limit) + '…' : value;
+
+export const createSearchMarker = (searchValue: string) => (
+    k: unknown,
+    v: unknown
+): boolean => {
+    return String(k).includes(searchValue) || String(v).includes(searchValue);
+};

@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
-import { Row as Component } from './Row';
-import har from '../demo/example.json';
-import NetworkItem from '../models/NetworkItem';
+import { Row as Component } from '../Row';
+import har from '../../demo/example.json';
+import NetworkItem from '../../models/NetworkItem';
 import { Entry } from 'har-format';
-import ContentOnlyItem from '../models/ContentOnlyItem';
+import ContentOnlyItem from '../../models/ContentOnlyItem';
 
 export default {
     title: 'Row',

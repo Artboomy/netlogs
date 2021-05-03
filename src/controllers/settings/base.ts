@@ -1,7 +1,6 @@
 import { NetworkRequest } from '../../models/types';
 import { ISettings } from './types';
 import { PropTreeProps } from '../../components/PropTree';
-import { Entry } from 'har-format';
 
 export const defaultProfile = {
     functions: {

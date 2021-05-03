@@ -1,14 +1,14 @@
 {
     "name": "Net logs",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "manifest_version": 2,
     "description": "Web extension for custom network logs representation",
     "devtools_page": "devtools.html",
     "author": "artboomy",
     "icons": {
-        "16": "icons/16-1.png",
-        "48": "icons/48-1.png",
-        "128": "icons/128-1.png"
+        "16": "icons/16.png",
+        "48": "icons/48.png",
+        "128": "icons/128.png"
     },
     "permissions": [
         "storage"
@@ -19,6 +19,7 @@
             "sandboxSettings.html"
         ]
     },
-    "options_page": "options.html"
+    "options_page": "options.html",
+    "homepage_url": "https://github.com/Artboomy/netlogs"
 }
   

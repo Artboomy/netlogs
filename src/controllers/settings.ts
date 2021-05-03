@@ -63,7 +63,9 @@ function deserialize(strSettings: string): ISettings {
                     ([key, profile]) => ({
                         [key]: deserializeProfile(profile)
                     })
-                )
+                ),
+                // default should always be latest, not from storage
+                { default: defaultProfile }
             )
         }
     };

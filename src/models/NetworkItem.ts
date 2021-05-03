@@ -6,21 +6,13 @@ import {
     IContentItem,
     IItemNetworkCfg,
     ItemType,
-    NetworkRequest
+    NetworkRequest,
+    SearchConfig
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
-
-function extractContent(request: NetworkRequest): Promise<string | undefined> {
-    return new Promise((resolve) => {
-        if ('getContent' in request) {
-            request.getContent((content) => {
-                resolve(content);
-            });
-        } else {
-            resolve(request.response.content.text);
-        }
-    });
-}
+import { markMatches } from 'react-inspector';
+import { createSearchMarker } from '../utils';
+import { isMimeType } from '../components/InspectorWrapper';
 
 function injectMimeType<T>(obj: T, mimeType: string): void {
     Object.defineProperty(obj, '__mimeType', {
@@ -60,8 +52,41 @@ export default class NetworkItem
         return this.getFunctions().isError(this._request);
     }
 
-    shouldShow(): boolean {
-        return this.getFunctions().shouldShow(this._request);
+    // TODO: refactor multireturn
+    shouldShow(cfg: SearchConfig = {}): boolean {
+        const baseShouldShow = this.getFunctions().shouldShow(this._request);
+        const { searchValue, symbol, filterValue } = cfg;
+        if (!baseShouldShow) {
+            return false;
+        }
+        const byFilterValue = filterValue
+            ? this.getName().includes(filterValue)
+            : true;
+        if (searchValue && symbol) {
+            //2 params match
+            // TODO mutation is bad
+            const content = this.getContent();
+            return (
+                byFilterValue &&
+                (markMatches(
+                    { params: this.getParams() },
+                    'params',
+                    createSearchMarker(searchValue),
+                    symbol
+                ) ||
+                    markMatches(
+                        {
+                            content: isMimeType(content)
+                                ? content.__getRaw()
+                                : content
+                        },
+                        'content',
+                        createSearchMarker(searchValue),
+                        symbol
+                    ))
+            );
+        }
+        return byFilterValue;
     }
 
     getParams(): Record<string, unknown> {
@@ -72,32 +97,28 @@ export default class NetworkItem
         return this.getFunctions().getMeta(this._request);
     }
 
-    async getContent(): Promise<TContent> {
-        return new Promise((resolve) => {
-            if (!this.shouldShow()) {
-                resolve({});
-            } else if (this._request.response) {
-                extractContent(this._request).then((content) => {
-                    const mimeType = this._request.response.content.mimeType;
-                    const obj = {};
-                    const convertedContent = this.getFunctions().getResult(
-                        this._request,
-                        content
-                    );
-                    Object.defineProperty(obj, '__getRaw', {
-                        enumerable: false,
-                        writable: false,
-                        value: () => convertedContent
-                    });
-                    injectMimeType(obj, mimeType);
-                    resolve(obj);
-                });
-            } else {
-                resolve({
-                    __message__: 'NETLOGS: no response yet'
-                });
-            }
-            return undefined;
-        });
+    getContent(): TContent {
+        let result;
+        if (this._request.response) {
+            const content = this._request.response.content.text;
+            const mimeType = this._request.response.content.mimeType;
+            const obj = {};
+            const convertedContent = this.getFunctions().getResult(
+                this._request,
+                content
+            );
+            Object.defineProperty(obj, '__getRaw', {
+                enumerable: false,
+                writable: false,
+                value: () => convertedContent
+            });
+            injectMimeType(obj, mimeType);
+            result = obj;
+        } else {
+            result = {
+                __message__: 'NETLOGS: no response yet'
+            };
+        }
+        return result;
     }
 }
