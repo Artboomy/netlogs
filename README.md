@@ -5,7 +5,7 @@
 
 [Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
 
-This is network request viewer extension for Chromium-based browsers.
+This is extendable network request viewer extension for Chromium-based browsers.
 
 ## 💡 Features
 
