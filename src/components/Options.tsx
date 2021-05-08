@@ -5,11 +5,7 @@ import React, {
     useEffect,
     useState
 } from 'react';
-import {
-    deserializeFunctionsRaw,
-    serialize,
-    useSettings
-} from '../controllers/settings';
+import { deserializeFunctionsRaw, serialize } from '../controllers/settings';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/javascript/javascript';
@@ -28,6 +24,7 @@ import { parseFile } from '../controllers/file';
 import { ModalContainer } from './modal/Container';
 import { Instructions } from './options/Instructions';
 import { Demo } from './options/Demo';
+import { useSettings } from '../hooks/useSettings';
 
 const useStyles = createUseStyles({
     '@global': {

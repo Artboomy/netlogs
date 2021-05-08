@@ -9,7 +9,7 @@ import { SearchContext } from 'react-inspector';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DropContainer } from './list/DropContainer';
-import { useDebounce } from 'react-use';
+import useDebounce from 'react-use/lib/useDebounce';
 import { Footer } from './Footer';
 import { FilterContext } from '../context/FilterContext';
 

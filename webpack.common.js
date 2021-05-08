@@ -7,10 +7,19 @@ module.exports = {
     target: ['web', 'es6'],
     entry: {
         'react-vendors': {
-            import: ['react', 'react-dom', 'react-jss', 'classnames', 'base16']
+            import: [
+                'react',
+                'react-dom',
+                'react-jss',
+                'react-dnd',
+                'react-dnd-html5-backend',
+                'react-inspector',
+                'classnames',
+                'base16'
+            ]
         },
         devtools: './src/app/devtools.ts',
-        panel: './src/app/panel.tsx',
+        panel: './src/app/panel.ts',
         sandbox: {
             import: './src/app/sandbox.tsx',
             dependOn: ['react-vendors', 'settings']

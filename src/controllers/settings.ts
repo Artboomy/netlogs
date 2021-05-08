@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
     IProfile,
     IProfileSerialized,
@@ -168,21 +167,3 @@ class Settings {
 const instance = new Settings();
 export default instance;
 
-export const useSettings = (): [
-    settings: ISettings,
-    setSettings: (newSettings: ISettings | ISettingsSerialized) => void,
-    resetSettings: () => void
-] => {
-    const [settings, setSettings] = useState<ISettings>(instance.get());
-    useEffect(() => {
-        instance.addListener((newSettings) => {
-            //pass
-            setSettings(newSettings);
-        });
-    }, []);
-    return [
-        settings,
-        (newSettings) => instance.set(newSettings),
-        () => instance.reset().then(() => setSettings(instance.get()))
-    ];
-};
