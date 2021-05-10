@@ -23,12 +23,15 @@ type NetworkEventName =
 
 type DevtoolsEventName = 'devtools.inspectedWindow.reload';
 
+type CustomEventName = 'newItem';
+
 export type EventName =
     | 'onIframeReady'
     | StorageEventName
     | RuntimeEventName
     | NetworkEventName
-    | DevtoolsEventName;
+    | DevtoolsEventName
+    | CustomEventName;
 
 export type IframeEvent = {
     type: EventName;

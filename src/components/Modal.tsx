@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
+import { mediaQuerySmallOnly } from '../utils';
 
 const useStyles = createUseStyles({
     root: {
@@ -14,7 +15,10 @@ const useStyles = createUseStyles({
         zIndex: 10,
         backgroundColor: 'white',
         paddingLeft: '8px',
-        borderLeft: '1px solid #eaeaea'
+        borderLeft: '1px solid #eaeaea',
+        [mediaQuerySmallOnly]: {
+            left: '60px'
+        }
     },
     header: {
         padding: '2px',

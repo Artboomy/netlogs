@@ -47,6 +47,8 @@ const useStyles = createUseStyles(() => {
             paddingTop: '4px',
             position: 'relative',
             wordBreak: 'break-all',
+            whiteSpace: 'pre-wrap',
+            overflow: 'hidden',
             [mediaQuerySmallOnly]: {
                 paddingBottom: '4px',
                 paddingLeft: '8px',

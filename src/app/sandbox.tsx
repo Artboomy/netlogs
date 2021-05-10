@@ -2,6 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { PanelMain } from 'components/PanelMain';
 import { callParent, callParentVoid } from '../utils';
+
+import EventsController from 'controllers/events';
+
+EventsController.subscribe();
+
 callParent('onIframeReady').then(() => {
     ReactDOM.render(<PanelMain />, document.getElementById('root'));
 });

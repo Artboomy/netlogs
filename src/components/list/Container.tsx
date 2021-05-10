@@ -1,11 +1,11 @@
 import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { useListStore } from '../../controllers/network';
-import { useSettings } from '../../controllers/settings';
 import { Row } from '../Row';
 import { List } from '../List';
 import { nanoid } from 'nanoid';
 import { SearchContext } from 'react-inspector';
 import { FilterContext } from '../../context/FilterContext';
+import { useSettings } from '../../hooks/useSettings';
 
 export const ListContainer: FC = () => {
     const { list } = useListStore();
