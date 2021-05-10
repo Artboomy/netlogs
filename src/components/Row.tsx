@@ -9,12 +9,18 @@ import { ModalContext } from './modal/Context';
 import cn from 'classnames';
 import { ContentOnly } from './row/ContentOnly';
 import { Transaction } from './row/Transaction';
+import { mediaQuerySmallOnly } from '../utils';
 
 const useStyles = createUseStyles(() => ({
     date: {
         color: google.base02,
         fontSize: '13px',
         padding: '4px 4px 4px 8px'
+    },
+    dateContentOnly: {
+        [mediaQuerySmallOnly]: {
+            gridColumn: '1/3'
+        }
     },
     dateClickable: {
         cursor: 'pointer',
@@ -45,7 +51,11 @@ export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
             <div
                 className={cn(
                     styles.date,
-                    { [styles.dateClickable]: !!meta },
+                    {
+                        [styles.dateClickable]: !!meta,
+                        [styles.dateContentOnly]:
+                            item instanceof ContentOnlyItem
+                    },
                     className
                 )}
                 onClick={handleClick}>

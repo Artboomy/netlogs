@@ -28,7 +28,7 @@ To install from zip or source, see [local development](#local-development) secti
 
 ## ⛰️ [Next.js](https://nextjs.org/) and [NuxtJS](https://nuxtjs.org/) debugging
 
-![next_example.png](./img/next_example.png)
+![next.png](./img/next.png)
 
 Extension will pull data from `window.__NEXT_DATA__` or `window.__NUXT__`, if available.
 

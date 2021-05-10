@@ -21,11 +21,15 @@ const useStyles = createUseStyles(() => {
             gridColumn: '2/5',
             padding: '4px 8px',
             [mediaQuerySmallOnly]: {
-                gridColumn: '1/3'
+                gridColumn: '1/3',
+                flexDirection: 'column'
             }
         },
         content: {
-            minHeight
+            minHeight,
+            [mediaQuerySmallOnly]: {
+                paddingTop: '4px'
+            }
         }
     };
 });
