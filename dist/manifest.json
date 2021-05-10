@@ -1,7 +1,8 @@
 {
     "name": "Net logs",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "manifest_version": 2,
+    "minimum_chrome_version": "60",
     "description": "Web extension for custom network logs representation",
     "devtools_page": "devtools.html",
     "author": "artboomy",
@@ -20,6 +21,16 @@
         ]
     },
     "options_page": "options.html",
-    "homepage_url": "https://github.com/Artboomy/netlogs"
+    "homepage_url": "https://github.com/Artboomy/netlogs",
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["js/content.js"],
+            "run_at": "document_idle"
+        }
+    ],
+    "web_accessible_resources": [
+        "js/inject.js"
+    ]
 }
   

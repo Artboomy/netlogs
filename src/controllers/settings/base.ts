@@ -117,5 +117,7 @@ export const defaultSettings: ISettings = {
     matcher: (/*request url*/) => 'default',
     profiles: {
         default: defaultProfile
-    }
+    },
+    nextjsIntegration: true,
+    nuxtjsIntegraction: true
 };

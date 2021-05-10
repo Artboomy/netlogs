@@ -13,7 +13,6 @@ module.exports = {
                 'react-jss',
                 'react-dnd',
                 'react-dnd-html5-backend',
-                'react-inspector',
                 'classnames',
                 'base16'
             ]
@@ -35,7 +34,9 @@ module.exports = {
         settings: {
             import: './src/controllers/settings.ts',
             dependOn: ['react-vendors']
-        }
+        },
+        content: './src/content/content.ts',
+        inject: './src/content/inject.ts'
     },
 
     plugins: [

@@ -122,7 +122,11 @@ class Settings {
             storage.local.get(
                 { settings: serialize(defaultSettings) },
                 ({ settings }) => {
-                    this.settings = deserialize(settings);
+                    try {
+                        this.settings = deserialize(settings);
+                    } catch (e) {
+                        this.settings = defaultSettings;
+                    }
                     resolve(this.settings);
                 }
             );
@@ -166,4 +170,3 @@ class Settings {
 
 const instance = new Settings();
 export default instance;
-

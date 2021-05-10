@@ -21,10 +21,10 @@ import {
 import downloadAsFile from '../utils';
 import { CodeEditor } from './options/CodeEditor';
 import { parseFile } from '../controllers/file';
-import { ModalContainer } from './modal/Container';
 import { Instructions } from './options/Instructions';
 import { Demo } from './options/Demo';
 import { useSettings } from '../hooks/useSettings';
+import cn from 'classnames';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -89,6 +89,21 @@ const useStyles = createUseStyles({
     },
     defaultProfileNote: {
         margin: 0
+    },
+    block: {
+        padding: '0 8px'
+    },
+    profilesBlock: {
+        height: '100%'
+    },
+    titleRow: {
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        backgroundColor: '#eee'
+    },
+    checkboxRow: {
+        padding: '4px 0'
     }
 });
 
@@ -221,100 +236,171 @@ export const Options: FC = () => {
 
     const styles = useStyles();
     return (
-        <ModalContainer>
-            <section className={styles.root}>
-                <div className={styles.left}>
-                    <div className={styles.header}>
-                        <h1>Options page</h1>
-                        <section className={styles.section}>
-                            <button onClick={handleSave}>Save</button>
-                            <button onClick={handleReset}>Reset</button>
-                            <label
-                                htmlFor='file-selector'
-                                role='button'
-                                className={styles.importButton}>
-                                Import profile
-                                <input
-                                    type='file'
-                                    id='file-selector'
-                                    accept='.json'
-                                    style={{ display: 'none' }}
-                                    onChange={handleImportProfile}
-                                />
-                            </label>
-
-                            <button onClick={handleNewProfile}>
-                                New profile
-                            </button>
-                        </section>
-                        <section className={styles.section}>
-                            <select
-                                id='profile'
-                                onChange={handleChange}
-                                value={currentProfile}>
-                                {Object.keys(settings.profiles).map((name) => (
-                                    <option key={name} value={name}>
-                                        {name}
-                                    </option>
-                                ))}
-                            </select>
-                            <button
-                                onClick={() =>
-                                    handleExport(currentProfile, profile)
-                                }>
-                                Export profile
-                            </button>
-                            {isDefaultProfile ? (
-                                <h4 className={styles.defaultProfileNote}>
-                                    Default profile is not editable
-                                </h4>
-                            ) : (
-                                <button onClick={handleDeleteProfile}>
-                                    Delete profile
-                                </button>
-                            )}
-                        </section>
-                    </div>
-                    <Instructions />
-                    <section className={styles.codeBlock}>
-                        <h3 id='matcher'>Profile matcher</h3>
-                        <i>
-                            If returned name is not found - default profile will
-                            be used
-                        </i>
-                        <CodeEditor
-                            onBeforeChange={(editor, data, value) => {
-                                setMatcher(value);
-                            }}
-                            value={matcher}
-                        />
-                    </section>
-                    <Demo />
-                </div>
-                <div className={styles.right}>
-                    {Object.entries(functions)
-                        .sort(([a], [b]) => (a > b ? 1 : -1))
-                        .map(([key, value]) => {
-                            return (
-                                <section key={key} className={styles.codeBlock}>
-                                    <h3 id={key}>Function {key}</h3>
-                                    <CodeEditor
-                                        onBeforeChange={(
-                                            editor,
-                                            data,
-                                            value
-                                        ) => {
-                                            functions[key] = value;
-                                            setFunctions(cloneDeep(functions));
-                                        }}
-                                        readOnly={isDefaultProfile}
-                                        value={value}
-                                    />
-                                </section>
-                            );
-                        })}
+        <div>
+            <section className={cn(styles.titleRow, styles.block)}>
+                <h1>Options page</h1>
+                <div>
+                    Links:{' '}
+                    <a
+                        href='https://github.com/Artboomy/netlogs'
+                        target='_blank'
+                        rel='noreferrer'>
+                        Github
+                    </a>{' '}
+                    <a
+                        href='https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf'
+                        target='_blank'
+                        rel='noreferrer'>
+                        Chrome store
+                    </a>{' '}
+                    <a
+                        href='https://twitter.com/Artboomy'
+                        target='_blank'
+                        rel='noreferrer'>
+                        Tweet me
+                    </a>
                 </div>
             </section>
-        </ModalContainer>
+            <section className={styles.block}>
+                <h2>Integrations</h2>
+                <div className={styles.checkboxRow}>
+                    <label>
+                        <input
+                            type='checkbox'
+                            name='nextjsIntegration'
+                            checked={settings.nextjsIntegration}
+                            onChange={(e) =>
+                                setSettings({
+                                    ...settings,
+                                    nextjsIntegration: e.target.checked
+                                })
+                            }
+                        />
+                        Next.js integration{' '}
+                        <span title='Extracts window.__NEXT_DATA__ value'>
+                            ❓
+                        </span>
+                    </label>
+                </div>
+                <div className={styles.checkboxRow}>
+                    <label>
+                        <input
+                            type='checkbox'
+                            name='nuxtjsIntegraction'
+                            checked={settings.nuxtjsIntegraction}
+                            onChange={(e) =>
+                                setSettings({
+                                    ...settings,
+                                    nuxtjsIntegraction: e.target.checked
+                                })
+                            }
+                        />
+                        NuxtJS integration{' '}
+                        <span title='Extracts window.__NUTXT__ value'>❓</span>
+                    </label>
+                </div>
+            </section>
+            <section className={cn(styles.block, styles.profilesBlock)}>
+                <h2>Profiles</h2>
+                <section className={styles.root}>
+                    <div className={styles.left}>
+                        <div className={styles.header}>
+                            <section className={styles.section}>
+                                <button onClick={handleSave}>Save</button>
+                                <button onClick={handleReset}>Reset</button>
+                                <label
+                                    htmlFor='file-selector'
+                                    role='button'
+                                    className={styles.importButton}>
+                                    Import profile
+                                    <input
+                                        type='file'
+                                        id='file-selector'
+                                        accept='.json'
+                                        style={{ display: 'none' }}
+                                        onChange={handleImportProfile}
+                                    />
+                                </label>
+
+                                <button onClick={handleNewProfile}>
+                                    New profile
+                                </button>
+                            </section>
+                            <section className={styles.section}>
+                                <select
+                                    id='profile'
+                                    onChange={handleChange}
+                                    value={currentProfile}>
+                                    {Object.keys(settings.profiles).map(
+                                        (name) => (
+                                            <option key={name} value={name}>
+                                                {name}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                                <button
+                                    onClick={() =>
+                                        handleExport(currentProfile, profile)
+                                    }>
+                                    Export profile
+                                </button>
+                                {isDefaultProfile ? (
+                                    <h4 className={styles.defaultProfileNote}>
+                                        Default profile is not editable
+                                    </h4>
+                                ) : (
+                                    <button onClick={handleDeleteProfile}>
+                                        Delete profile
+                                    </button>
+                                )}
+                            </section>
+                        </div>
+                        <Instructions />
+                        <section className={styles.codeBlock}>
+                            <h3 id='matcher'>Profile matcher</h3>
+                            <i>
+                                If returned name is not found - default profile
+                                will be used
+                            </i>
+                            <CodeEditor
+                                onBeforeChange={(editor, data, value) => {
+                                    setMatcher(value);
+                                }}
+                                value={matcher}
+                            />
+                        </section>
+                        <Demo />
+                    </div>
+                    <div className={styles.right}>
+                        {Object.entries(functions)
+                            .sort(([a], [b]) => (a > b ? 1 : -1))
+                            .map(([key, value]) => {
+                                return (
+                                    <section
+                                        key={key}
+                                        className={styles.codeBlock}>
+                                        <h3 id={key}>Function {key}</h3>
+                                        <CodeEditor
+                                            onBeforeChange={(
+                                                editor,
+                                                data,
+                                                value
+                                            ) => {
+                                                functions[key] = value;
+                                                setFunctions(
+                                                    cloneDeep(functions)
+                                                );
+                                            }}
+                                            readOnly={isDefaultProfile}
+                                            value={value}
+                                        />
+                                    </section>
+                                );
+                            })}
+                    </div>
+                </section>
+            </section>
+        </div>
     );
 };

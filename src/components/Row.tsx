@@ -55,7 +55,7 @@ export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
         tag: tag ? (
             <Tag
                 content={tag}
-                color={item.isError() ? google.base08 : google.base0B}
+                color={item.isError() ? google.base08 : undefined}
             />
         ) : null
     };
