@@ -29,10 +29,11 @@ To install from zip or source, see [local development](#local-development) secti
 ## ⛰️ [Next.js](https://nextjs.org/) and [NuxtJS](https://nuxtjs.org/) debugging
 
 ![next.png](./img/next.png)
+![nuxt.png](./img/nuxt.png)
 
 Extension will pull data from `window.__NEXT_DATA__` or `window.__NUXT__`, if available.
 
-You can disable this in settings.
+*You can disable this in settings.*
 
 ## 🛠️ Configuration
 
