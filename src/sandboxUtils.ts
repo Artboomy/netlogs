@@ -9,6 +9,7 @@ import {
 } from './utils';
 import AreaName = chrome.storage.AreaName;
 import runtime from './api/runtime';
+import JSZip from 'jszip';
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
 // TODO: split into multiple handlers
@@ -122,5 +123,16 @@ export async function wrapSandbox(): Promise<void> {
 
 function downloadAsFile(dataString: string): void {
     const { fileName, data } = JSON.parse(dataString);
-    download(fileName, data);
+    // const blob = new Blob([data], { type: 'application/json' });
+    const zip = new JSZip();
+    zip.file(`${fileName}.har`, data);
+    zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: {
+            level: 9
+        }
+    }).then((content) => {
+        download(`${fileName}.zip`, content);
+    });
 }

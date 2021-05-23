@@ -123,8 +123,7 @@ export const insertSorted = (
     return newArr;
 };
 
-export const download = (fileName: string, text: string): void => {
-    const blob = new Blob([text], { type: 'application/json' });
+export const download = (fileName: string, blob: Blob): void => {
     const a = document.createElement('a');
     document.body.appendChild(a);
 

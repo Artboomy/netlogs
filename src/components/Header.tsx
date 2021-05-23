@@ -40,7 +40,9 @@ export const Header: FC<IProps> = ({
     const { version, name } = runtime.getManifest();
     const { clear, list } = useListStore();
     const handleExport = () => {
-        const entries = list.map((item) => item.toJSON());
+        const entries = list
+            .filter((i) => i.shouldShow())
+            .map((item) => item.toJSON());
         const fileData: Har = {
             log: {
                 version: '1.2',
@@ -56,7 +58,7 @@ export const Header: FC<IProps> = ({
         callParentVoid(
             'download',
             JSON.stringify({
-                fileName: 'test.har',
+                fileName: 'log',
                 data: JSON.stringify(fileData)
             })
         );
