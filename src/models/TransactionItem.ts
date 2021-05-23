@@ -6,6 +6,7 @@ import {
     SearchConfig
 } from 'models/types';
 import { PropTreeProps } from '../components/PropTree';
+import { Entry } from 'har-format';
 
 export abstract class TransactionItemAbstract implements IContentItem<unknown> {
     public readonly id: string = 'someId';
@@ -55,6 +56,63 @@ export default class TransactionItem
 
     isError(): boolean {
         return false;
+    }
+
+    static fromJSON(input: Entry): TransactionItem {
+        return new TransactionItem({
+            tag: input.request.method,
+            timestamp: new Date(input.startedDateTime).getTime(),
+            name: input.request.url,
+            params: input.request.postData?.text
+                ? JSON.parse(input.request.postData.text)
+                : {},
+            result: input.response.content.text
+                ? JSON.parse(input.response.content.text)
+                : {},
+            meta: null // TODO
+        });
+    }
+
+    toJSON(): Entry {
+        return {
+            startedDateTime: new Date(this.timestamp).toISOString(),
+            time: 0,
+            comment: this.type,
+            request: {
+                method: this._tag,
+                url: this._name,
+                httpVersion: '',
+                cookies: [],
+                headers: [],
+                queryString: [],
+                postData: {
+                    mimeType: 'application/json',
+                    text: JSON.stringify(this._params)
+                },
+                headersSize: -1,
+                bodySize: -1
+            },
+            response: {
+                status: 200,
+                statusText: '200 OK',
+                httpVersion: '',
+                cookies: [],
+                headers: [],
+                content: {
+                    size: -1,
+                    mimeType: 'text/plain',
+                    text: JSON.stringify(this._result)
+                },
+                redirectURL: '',
+                headersSize: -1,
+                bodySize: -1
+            },
+            cache: {},
+            timings: {
+                wait: 0,
+                receive: 0
+            }
+        };
     }
 
     getParams(): IItemTransactionCfg['params'] {

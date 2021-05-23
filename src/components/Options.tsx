@@ -25,6 +25,7 @@ import { Instructions } from './options/Instructions';
 import { Demo } from './options/Demo';
 import { useSettings } from '../hooks/useSettings';
 import cn from 'classnames';
+import { theme } from '../theme/light';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -100,7 +101,8 @@ const useStyles = createUseStyles({
         display: 'flex',
         alignItems: 'baseline',
         justifyContent: 'space-between',
-        backgroundColor: '#eee'
+        backgroundColor: theme.panelColor,
+        borderBottom: `1px solid ${theme.borderColor}`
     },
     checkboxRow: {
         padding: '4px 0'

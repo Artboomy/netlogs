@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import settings from '../controllers/settings';
 import { IProfile } from '../controllers/settings/types';
 import { TransactionItemAbstract } from './TransactionItem';
+import { Entry } from 'har-format';
 import {
     IContentItem,
     IItemNetworkCfg,
@@ -52,6 +53,14 @@ export default class NetworkItem
         return this.getFunctions().isError(this._request);
     }
 
+    static fromJSON(request: Entry): NetworkItem {
+        return new NetworkItem({ request });
+    }
+
+    toJSON(): Entry {
+        return this._request;
+    }
+
     // TODO: refactor multireturn
     shouldShow(cfg: SearchConfig = {}): boolean {
         const baseShouldShow = this.getFunctions().shouldShow(this._request);
@@ -60,7 +69,7 @@ export default class NetworkItem
             return false;
         }
         const byFilterValue = filterValue
-            ? this.getName().includes(filterValue)
+            ? this._request.request.url.includes(filterValue)
             : true;
         if (searchValue && symbol) {
             //2 params match

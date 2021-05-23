@@ -1,9 +1,15 @@
 import storage from './api/storage';
 import { serialize } from './controllers/settings';
 import { defaultSettings } from './controllers/settings/base';
-import { createEventPayload, isIframeEvent, postSandbox } from './utils';
+import {
+    createEventPayload,
+    download,
+    isIframeEvent,
+    postSandbox
+} from './utils';
 import AreaName = chrome.storage.AreaName;
 import runtime from './api/runtime';
+import JSZip from 'jszip';
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
 // TODO: split into multiple handlers
@@ -12,7 +18,7 @@ export async function wrapSandbox(): Promise<void> {
         const network = chrome?.devtools?.network;
         window.addEventListener('message', (event) => {
             if (isIframeEvent(event)) {
-                const { type, id } = event.data;
+                const { type, id, data } = event.data;
                 switch (type) {
                     case 'onIframeReady':
                         postSandbox({
@@ -104,10 +110,29 @@ export async function wrapSandbox(): Promise<void> {
                     case 'devtools.inspectedWindow.reload':
                         chrome.devtools.inspectedWindow.reload({});
                         break;
+                    case 'download':
+                        downloadAsFile(data);
+                        break;
                     default:
                         console.warn(`Unrecognized type ${type}`);
                 }
             }
         });
+    });
+}
+
+function downloadAsFile(dataString: string): void {
+    const { fileName, data } = JSON.parse(dataString);
+    // const blob = new Blob([data], { type: 'application/json' });
+    const zip = new JSZip();
+    zip.file(`${fileName}.har`, data);
+    zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: {
+            level: 9
+        }
+    }).then((content) => {
+        download(`${fileName}.zip`, content);
     });
 }

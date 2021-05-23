@@ -16,7 +16,16 @@ export const Empty: FC = () => {
     return (
         <section className={styles.emptyContent}>
             <p>No items.</p>
-            <p>You can drop HAR file here</p>
+            <p>
+                You can find readme{' '}
+                <a
+                    href='https://github.com/Artboomy/netlogs'
+                    target='_blank'
+                    rel='noreferrer'>
+                    here
+                </a>
+            </p>
+            <p>Drop HAR file to see what&apos;s inside</p>
         </section>
     );
 };

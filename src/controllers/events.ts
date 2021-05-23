@@ -1,4 +1,4 @@
-import { subscribeParent } from '../utils';
+import { insertSorted, subscribeParent } from '../utils';
 import { useListStore } from './network';
 import ContentOnlyItem from '../models/ContentOnlyItem';
 import TransactionItem from '../models/TransactionItem';
@@ -15,24 +15,9 @@ class EventsController {
                         ? new ContentOnlyItem(cfg)
                         : new TransactionItem(cfg);
                 if (isDynamic) {
-                    const idx = list.findIndex(
-                        (i) => i.type === ItemType.ContentOnly
-                    );
-                    // TODO: this is done so next/nuxt data will go after navigation event, which is content-only
-                    //  should be refactored on preserve log implementation
-                    if (idx > -1) {
-                        useListStore.setState({
-                            list: [
-                                ...list.slice(0, idx + 1),
-                                item,
-                                ...list.slice(idx + 1)
-                            ]
-                        });
-                    } else {
-                        useListStore.setState({
-                            list: [item, ...list]
-                        });
-                    }
+                    useListStore.setState({
+                        list: insertSorted(item, list)
+                    });
                 }
             } catch (e) {
                 console.warn('Bad data: "', data, '"');

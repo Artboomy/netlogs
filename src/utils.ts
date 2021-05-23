@@ -1,5 +1,6 @@
 import { EventName, IframeEvent } from './types';
 import { nanoid } from 'nanoid';
+import { ItemList } from './controllers/network';
 
 export const mediaQuerySmallOnly = '@media (max-width: 700px)';
 
@@ -97,4 +98,38 @@ export const createSearchMarker = (searchValue: string) => (
     v: unknown
 ): boolean => {
     return String(k).includes(searchValue) || String(v).includes(searchValue);
+};
+
+export const insertSorted = (
+    item: ItemList[number],
+    items: ItemList
+): ItemList => {
+    let newArr: ItemList = [];
+    let isLast = true;
+    if (items.length === 0) {
+        newArr.push(item);
+    } else {
+        for (let i = 0, len = items.length; i < len; i++) {
+            if (item.timestamp < items[i].timestamp) {
+                isLast = false;
+                newArr = [...items.slice(0, i), item, ...items.slice(i)];
+                break;
+            }
+        }
+        if (isLast) {
+            newArr = [...items, item]; //add to the end
+        }
+    }
+    return newArr;
+};
+
+export const download = (fileName: string, blob: Blob): void => {
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+
+    const url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
 };

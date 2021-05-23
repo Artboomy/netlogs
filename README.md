@@ -16,7 +16,7 @@ The extension will appear in devtools as a `📜 Net logs` tab.
 * ⛰️ **Integration:** View Next.js & NuxtJS hydration state.
 * 🛠️ **Customization:** Transform name, parameters, and response with javascript.
 * ✨ **Universality:** View live logs or load from [`*.har` file](https://developer.chrome.com/docs/devtools/network/reference/#save-as-har).
-* 🤝 **Team-friendly:** Export and share your profile with others.
+* 🤝 **Team-friendly:** Export logs and share them with others.
 
 ![main.gif](./img/main.gif)
 
@@ -34,6 +34,14 @@ To install from zip or source, see [local development](#local-development) secti
 Extension will pull data from `window.__NEXT_DATA__` or `window.__NUXT__`, if available.
 
 *You can disable this in settings.*
+
+## 👁️‍🗨️ Loading logs from files
+
+Just drag and drop `*.har` file from browser or `*.zip` file from Netlogs into the devtools.
+
+![load.gif](./img/load.gif)
+
+To export log, click `Export` button in the header.
 
 ## 🛠️ Configuration
 

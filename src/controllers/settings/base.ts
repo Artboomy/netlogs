@@ -12,7 +12,7 @@ export const defaultProfile = {
         getTag: function (networkRequest: NetworkRequest): string {
             // Shown in rounded box
             const { request, response } = networkRequest;
-            return `${request.method} - ${response.status}`;
+            return `${request.method}/${response.status}`;
         },
         getParams: function (request: NetworkRequest): Record<string, unknown> {
             let params;

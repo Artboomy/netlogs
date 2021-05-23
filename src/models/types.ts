@@ -2,9 +2,9 @@ import { Entry } from 'har-format';
 import { PropTreeProps } from '../components/PropTree';
 
 export enum ItemType {
-    ContentOnly,
-    WithName,
-    Transaction
+    ContentOnly = 'ContentOnly',
+    WithName = 'WithName',
+    Transaction = 'Transaction'
 }
 
 export interface IContentItem<T> {

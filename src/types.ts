@@ -23,7 +23,7 @@ type NetworkEventName =
 
 type DevtoolsEventName = 'devtools.inspectedWindow.reload';
 
-type CustomEventName = 'newItem';
+type CustomEventName = 'newItem' | 'download';
 
 export type EventName =
     | 'onIframeReady'

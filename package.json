@@ -27,6 +27,7 @@
         "base16": "1.0.0",
         "classnames": "2.2.6",
         "codemirror": "5.59.4",
+        "jszip": "^3.6.0",
         "lodash.clonedeep": "4.5.0",
         "lodash.isequal": "4.5.0",
         "nanoid": "3.1.22",
