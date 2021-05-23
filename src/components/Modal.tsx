@@ -1,6 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
 import { mediaQuerySmallOnly } from '../utils';
+import { theme } from '../theme/light';
 
 const useStyles = createUseStyles({
     root: {
@@ -22,7 +23,7 @@ const useStyles = createUseStyles({
     },
     header: {
         padding: '2px',
-        borderBottom: '1px solid #eaeaea'
+        borderBottom: `1px solid ${theme.borderColor}`
     },
     wrapper: {
         overflow: 'auto',

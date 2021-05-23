@@ -5,6 +5,7 @@ import ContentOnlyItem from '../models/ContentOnlyItem';
 import network from '../api/network';
 import TransactionItem from '../models/TransactionItem';
 import { NetworkRequest } from '../models/types';
+import { insertSorted } from '../utils';
 
 export type ItemList = Array<NetworkItem | TransactionItem | ContentOnlyItem>;
 
@@ -29,7 +30,7 @@ class Network {
             const { list, isDynamic } = useListStore.getState();
             if (isDynamic) {
                 useListStore.setState({
-                    list: [...list, new NetworkItem({ request })]
+                    list: insertSorted(new NetworkItem({ request }), list)
                 });
             }
         });

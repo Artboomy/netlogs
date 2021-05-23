@@ -14,7 +14,7 @@ import { mediaQuerySmallOnly } from '../utils';
 const useStyles = createUseStyles(() => ({
     date: {
         color: google.base02,
-        fontSize: '13px',
+        fontSize: '12px',
         padding: '4px 4px 4px 8px'
     },
     dateContentOnly: {
@@ -31,6 +31,12 @@ const useStyles = createUseStyles(() => ({
 interface IRowProps {
     className?: string;
     item: ContentOnlyItem | TransactionItemAbstract;
+}
+function timeToString(timestamp: number): string {
+    const date = new Date(timestamp);
+    return `${date.toLocaleTimeString('en-GB')}.${String(
+        date.getMilliseconds()
+    ).padStart(3, '0')}`;
 }
 
 export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
@@ -59,13 +65,14 @@ export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
                     className
                 )}
                 onClick={handleClick}>
-                {new Date(item.timestamp).toLocaleTimeString('en-GB')}
+                {timeToString(item.timestamp)}
             </div>
         ),
         tag: tag ? (
             <Tag
                 content={tag}
                 color={item.isError() ? google.base08 : undefined}
+                type={item.type}
             />
         ) : null
     };

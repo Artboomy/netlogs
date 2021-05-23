@@ -8,6 +8,8 @@ import NetworkItem from '../../models/NetworkItem';
 import cn from 'classnames';
 import { createUseStyles } from 'react-jss';
 import ContentOnlyItem from '../../models/ContentOnlyItem';
+import { ItemType } from '../../models/types';
+import TransactionItem from '../../models/TransactionItem';
 
 const useStyles = createUseStyles({
     dropZone: {
@@ -33,22 +35,40 @@ export const DropContainer: FC = ({ children }) => {
                     parseFile<Har>(file).then(
                         (log) => {
                             if (log?.log?.entries) {
-                                setList(
-                                    [
-                                        new ContentOnlyItem({
-                                            timestamp: new Date().getTime(),
-                                            tag: 'NET LOGS',
-                                            content: `Opened file "${file.name}"`
-                                        }),
-                                        ...log.log.entries.map(
-                                            (request) =>
-                                                new NetworkItem({ request })
-                                        )
-                                    ],
-                                    false
-                                );
+                                try {
+                                    setList(
+                                        [
+                                            new ContentOnlyItem({
+                                                timestamp: new Date().getTime(),
+                                                tag: 'NET LOGS',
+                                                content: `Opened file "${file.name}"`
+                                            }),
+                                            ...log.log.entries.map(
+                                                (request) => {
+                                                    let ItemContstructor;
+                                                    switch (request.comment) {
+                                                        case ItemType.ContentOnly:
+                                                            ItemContstructor = ContentOnlyItem;
+                                                            break;
+                                                        case ItemType.Transaction:
+                                                            ItemContstructor = TransactionItem;
+                                                            break;
+                                                        default:
+                                                            ItemContstructor = NetworkItem;
+                                                    }
+                                                    return ItemContstructor.fromJSON(
+                                                        request
+                                                    );
+                                                }
+                                            )
+                                        ],
+                                        false
+                                    );
+                                } catch (e) {
+                                    window.alert('Invalid har file');
+                                }
                             } else {
-                                window.alert('Not valid har file');
+                                window.alert('Invalid har file');
                             }
                         },
                         (e) => window.alert(`Error parsing file ${e.message}`)

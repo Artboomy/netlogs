@@ -29,6 +29,12 @@ window.addEventListener('message', (event) => {
 });
 
 const netlogs = function (cfg: TransactionOptional | ContentOptional) {
+    // validation
+    // @ts-ignore
+    if (!cfg?.content && !(cfg?.params && cfg?.result)) {
+        console.warn('Either content or params & result must be supplied');
+        return;
+    }
     cfg.timestamp = cfg.timestamp || new Date().getTime();
     window.postMessage({ type: 'FROM_PAGE', event: JSON.stringify(cfg) }, '*');
 };
@@ -42,7 +48,7 @@ netlogs.toString = (): string => {
             `
         %cCall this function to send arbitrary event to Net logs
         
-        %сUsage: netlogs(event);
+        %cUsage: netlogs(event);
         
         %cExample: netlogs({ tag: 'TEST', content: { message: 'Hello world' } });
         

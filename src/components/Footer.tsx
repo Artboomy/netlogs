@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
-import { google } from 'base16';
+import { theme } from '../theme/light';
 
 const useStyles = createUseStyles({
     root: {
-        backgroundColor: google.base06,
+        backgroundColor: theme.panelColor,
+        borderTop: `1px solid ${theme.borderColor}`,
         padding: '2px 4px',
         display: 'flex',
         justifyContent: 'space-between'
