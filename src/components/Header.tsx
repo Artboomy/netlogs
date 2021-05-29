@@ -31,7 +31,9 @@ const useStyles = createUseStyles({
 interface IProps {
     className?: string;
     searchValue: string;
+    hideUnrelated?: boolean;
     onSearchChange: (value: string) => void;
+    onHideUnrelatedChange: (value: boolean) => void;
 }
 
 function getFileName(): string {
@@ -42,7 +44,9 @@ function getFileName(): string {
 export const Header: FC<IProps> = ({
     className,
     searchValue,
-    onSearchChange
+    hideUnrelated,
+    onSearchChange,
+    onHideUnrelatedChange
 }) => {
     const styles = useStyles();
     const { version, name } = runtime.getManifest();
@@ -91,6 +95,18 @@ export const Header: FC<IProps> = ({
                     value={searchValue}
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
+                {searchValue && (
+                    <label>
+                        <input
+                            type='checkbox'
+                            checked={hideUnrelated}
+                            onChange={(e) =>
+                                onHideUnrelatedChange(e.target.checked)
+                            }
+                        />
+                        Hide unrelated
+                    </label>
+                )}
                 <IconButton
                     className={styles.optionsButton}
                     icon={ICONS.settings}

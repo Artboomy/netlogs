@@ -269,6 +269,7 @@ export const InspectorWrapper = (): JSX.Element => (
 InspectorWrapper.storyName = 'InspectorWrapper';
 const Highlight: FC = () => {
     const [value, setValue] = useState('');
+    const [hideUnrelated, setHideUnrelated] = useState(false);
     return (
         <section>
             <input
@@ -276,7 +277,15 @@ const Highlight: FC = () => {
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
             />
-            <SearchContext.Provider value={value}>
+            <label>
+                <input
+                    type='checkbox'
+                    checked={hideUnrelated}
+                    onChange={(e) => setHideUnrelated(e.target.checked)}
+                />
+                hideUnrelated
+            </label>
+            <SearchContext.Provider value={{ value, hideUnrelated }}>
                 <Component data={testData} />
             </SearchContext.Provider>
         </section>
