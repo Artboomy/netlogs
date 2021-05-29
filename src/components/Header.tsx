@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
 import { useListStore } from '../controllers/network';
@@ -10,11 +10,13 @@ import { IconButton, ICONS } from './IconButton';
 
 const useStyles = createUseStyles({
     root: {
+        borderBottom: `1px solid ${theme.borderColor}`,
+        zIndex: 2
+    },
+    row: {
         display: 'flex',
         backgroundColor: theme.panelColor,
-        borderBottom: `1px solid ${theme.borderColor}`,
         padding: '2px 4px',
-        zIndex: 2,
         alignItems: 'center',
         gap: '8px'
     },
@@ -44,7 +46,8 @@ export const Header: FC<IProps> = ({
 }) => {
     const styles = useStyles();
     const { version, name } = runtime.getManifest();
-    const { clear, list } = useListStore();
+    const { clear, list, isPreserve, setPreserve } = useListStore();
+    const [secondRowVisible, setSecondRowVisible] = useState(false);
     const handleExport = () => {
         const entries = list
             .filter((i) => i.shouldShow())
@@ -69,27 +72,50 @@ export const Header: FC<IProps> = ({
             })
         );
     };
+    const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPreserve(e.target.checked);
+    };
     return (
         <header className={cn(styles.root, className)}>
-            <IconButton icon={ICONS.clear} onClick={clear} title='Clear' />
-            <input
-                type='search'
-                placeholder='Search in params/result'
-                value={searchValue}
-                onChange={(e) => onSearchChange(e.target.value)}
-            />
-            <IconButton
-                className={styles.optionsButton}
-                icon={ICONS.settings}
-                onClick={() => runtime.openOptionsPage()}
-                title='Options'
-            />
-            <IconButton
-                icon={ICONS.export}
-                onClick={handleExport}
-                title='Export'
-            />
-            <div className={styles.version}>v.{version}</div>
+            <div className={styles.row}>
+                <IconButton icon={ICONS.clear} onClick={clear} title='Clear' />
+                <IconButton
+                    icon={ICONS.panelDown}
+                    onClick={() => setSecondRowVisible(!secondRowVisible)}
+                    title='Filter options'
+                    active={secondRowVisible}
+                />
+                <input
+                    type='search'
+                    placeholder='Search in params/result'
+                    value={searchValue}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                />
+                <IconButton
+                    className={styles.optionsButton}
+                    icon={ICONS.settings}
+                    onClick={() => runtime.openOptionsPage()}
+                    title='Options'
+                />
+                <IconButton
+                    icon={ICONS.export}
+                    onClick={handleExport}
+                    title='Export'
+                />
+                <div className={styles.version}>v.{version}</div>
+            </div>
+            {secondRowVisible && (
+                <div className={styles.row}>
+                    <label>
+                        <input
+                            type='checkbox'
+                            onChange={handlePreserveChange}
+                            checked={isPreserve}
+                        />
+                        Preserve log
+                    </label>
+                </div>
+            )}
         </header>
     );
 };

@@ -12,16 +12,20 @@ export type ItemList = Array<NetworkItem | TransactionItem | ContentOnlyItem>;
 type TStore = {
     list: ItemList;
     isDynamic: boolean;
+    isPreserve: boolean;
     clear: () => void;
     setList: (newList: ItemList, isDynamic?: boolean) => void;
+    setPreserve: (isPreserve: boolean) => void;
 };
 
 export const useListStore = create<TStore>((set) => ({
     list: [],
     isDynamic: true,
+    isPreserve: false,
     clear: () => set({ list: [], isDynamic: true }),
     setList: (newList: ItemList, isDynamic = true) =>
-        set({ list: newList, isDynamic })
+        set({ list: newList, isDynamic }),
+    setPreserve: (isPreserve) => set({ isPreserve })
 }));
 
 class Network {
@@ -35,9 +39,11 @@ class Network {
             }
         });
         network.onNavigated.addListener((url) => {
+            const { list, isPreserve } = useListStore.getState();
             useListStore.setState({
                 isDynamic: true,
                 list: [
+                    ...(isPreserve ? list : []),
                     new ContentOnlyItem({
                         timestamp: new Date().getTime(),
                         tag: 'NET LOGS',

@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const messageHandler = (e: { type: string; data: string }): void => {
     const type = e.type;
-    console.info('received a message', e.type);
     if (type === 'fromContent') {
         postSandbox(createEventPayload('newItem', e.data));
     }

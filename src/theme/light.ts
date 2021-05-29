@@ -7,5 +7,6 @@ export const theme = {
     },
     section: {
         key: 'rgb(33% 33% 33%)'
-    }
+    },
+    accent: 'rgb(26, 115, 232)'
 };
