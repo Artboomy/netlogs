@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
+import { theme } from '../theme/light';
 
 type TItem = {
     name: string;
@@ -17,6 +18,10 @@ const useStyles = createUseStyles({
     },
     item: {
         marginLeft: '16px'
+    },
+    key: {
+        fontWeight: 'bold',
+        color: theme.section.key
     }
 });
 
@@ -27,9 +32,9 @@ export const Section: FC<TSection> = ({ title, items }) => {
             <summary>
                 <strong>{title}</strong>
             </summary>
-            {items.map(({ name, value }) => (
-                <div key={name} className={styles.item}>
-                    <strong>{name}</strong>: {value}
+            {items.map(({ name, value }, index) => (
+                <div key={`${name}${index}`} className={styles.item}>
+                    <span className={styles.key}>{name}</span>: {value}
                 </div>
             ))}
         </details>

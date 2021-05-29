@@ -6,6 +6,7 @@ import runtime from '../api/runtime';
 import { theme } from '../theme/light';
 import { Har } from 'har-format';
 import { callParentVoid } from '../utils';
+import { IconButton, ICONS } from './IconButton';
 
 const useStyles = createUseStyles({
     root: {
@@ -14,7 +15,7 @@ const useStyles = createUseStyles({
         borderBottom: `1px solid ${theme.borderColor}`,
         padding: '2px 4px',
         zIndex: 2,
-        alignItems: 'baseline',
+        alignItems: 'center',
         gap: '8px'
     },
     version: {
@@ -70,19 +71,24 @@ export const Header: FC<IProps> = ({
     };
     return (
         <header className={cn(styles.root, className)}>
-            <button onClick={clear}>Clear</button>
+            <IconButton icon={ICONS.clear} onClick={clear} title='Clear' />
             <input
-                type='text'
+                type='search'
                 placeholder='Search in params/result'
                 value={searchValue}
                 onChange={(e) => onSearchChange(e.target.value)}
             />
-            <button
+            <IconButton
                 className={styles.optionsButton}
-                onClick={() => runtime.openOptionsPage()}>
-                Options
-            </button>
-            <button onClick={handleExport}>Export</button>
+                icon={ICONS.settings}
+                onClick={() => runtime.openOptionsPage()}
+                title='Options'
+            />
+            <IconButton
+                icon={ICONS.export}
+                onClick={handleExport}
+                title='Export'
+            />
             <div className={styles.version}>v.{version}</div>
         </header>
     );

@@ -4,7 +4,7 @@ import {
     IItemTransactionCfg,
     ItemType,
     SearchConfig
-} from 'models/types';
+} from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { Entry } from 'har-format';
 
