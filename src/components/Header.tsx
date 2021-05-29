@@ -31,6 +31,11 @@ interface IProps {
     onSearchChange: (value: string) => void;
 }
 
+function getFileName(): string {
+    const now = new Date();
+    return now.toISOString().replace(/:/g, '-');
+}
+
 export const Header: FC<IProps> = ({
     className,
     searchValue,
@@ -58,7 +63,7 @@ export const Header: FC<IProps> = ({
         callParentVoid(
             'download',
             JSON.stringify({
-                fileName: 'log',
+                fileName: getFileName(),
                 data: JSON.stringify(fileData)
             })
         );

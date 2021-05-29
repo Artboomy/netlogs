@@ -111,7 +111,7 @@ export async function wrapSandbox(): Promise<void> {
                         chrome.devtools.inspectedWindow.reload({});
                         break;
                     case 'download':
-                        downloadAsFile(data);
+                        downloadAsZip(data);
                         break;
                     default:
                         console.warn(`Unrecognized type ${type}`);
@@ -121,7 +121,7 @@ export async function wrapSandbox(): Promise<void> {
     });
 }
 
-function downloadAsFile(dataString: string): void {
+function downloadAsZip(dataString: string): void {
     const { fileName, data } = JSON.parse(dataString);
     // const blob = new Blob([data], { type: 'application/json' });
     const zip = new JSZip();
@@ -133,6 +133,6 @@ function downloadAsFile(dataString: string): void {
             level: 9
         }
     }).then((content) => {
-        download(`${fileName}.zip`, content);
+        download(`${fileName}.netlogs.zip`, content);
     });
 }
