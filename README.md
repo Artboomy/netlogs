@@ -43,6 +43,12 @@ Just drag and drop `*.har` file from browser or `*.zip` file from Netlogs into t
 
 To export log, click `Export` button in the header.
 
+## ⛓️ Preserve log
+
+If you want to preserve logs on page reload - click `expand` button in the header, then mark checkbox.
+
+![presrve logs](./img/preserve.png)
+
 ## 🛠️ Configuration
 
 Open the devtools in any webpage, and navigate to "Net logs" tab.

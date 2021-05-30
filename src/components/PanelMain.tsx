@@ -41,7 +41,7 @@ const useStyles = createUseStyles({
 export const PanelMain: React.FC = () => {
     const styles = useStyles();
     const [searchValue, setSearchValue] = useState('');
-    const [hideUnrelated, setHideUnrelated] = useState(false);
+    const [hideUnrelated, setHideUnrelated] = useState(true);
     const [debSearchValue, setDebSearchValue] = useState('');
     useDebounce(() => setDebSearchValue(searchValue), 100, [searchValue]);
     const [filterValue, setFilterValue] = useState('');

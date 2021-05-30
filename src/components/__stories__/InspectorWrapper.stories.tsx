@@ -269,7 +269,7 @@ export const InspectorWrapper = (): JSX.Element => (
 InspectorWrapper.storyName = 'InspectorWrapper';
 const Highlight: FC = () => {
     const [value, setValue] = useState('');
-    const [hideUnrelated, setHideUnrelated] = useState(false);
+    const [hideUnrelated, setHideUnrelated] = useState(true);
     return (
         <section>
             <input
