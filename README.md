@@ -35,13 +35,15 @@ Extension will pull data from `window.__NEXT_DATA__` or `window.__NUXT__`, if av
 
 *You can disable this in settings.*
 
-## 👁️‍🗨️ Loading logs from files
+## 💾 Saving and loading logs
 
-Just drag and drop `*.har` file from browser or `*.zip` file from Netlogs into the devtools.
+![saveload.gif](./img/saveload.gif)
 
-![load.gif](./img/load.gif)
+To export logs, click ⬇️ button in the header.
 
-To export log, click `Export` button in the header.
+To load logs, simply drag and drop the file in the extension.
+
+Extension supports `*.netlogs.zip` and `*.har` files.
 
 ## ⛓️ Preserve log
 
