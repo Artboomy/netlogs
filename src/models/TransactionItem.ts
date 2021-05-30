@@ -7,6 +7,9 @@ import {
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { Entry } from 'har-format';
+import { markMatches } from 'react-inspector';
+import { createSearchMarker } from '../utils';
+import { isMimeType } from '../components/InspectorWrapper';
 
 export abstract class TransactionItemAbstract implements IContentItem<unknown> {
     public readonly id: string = 'someId';
@@ -26,7 +29,7 @@ export default class TransactionItem
     public readonly id: string;
     public readonly type: ItemType = ItemType.Transaction;
     public readonly timestamp: number;
-    private readonly _name: IItemTransactionCfg['name'];
+    private readonly _name: string;
     private readonly _result: TContent;
     private readonly _params: IItemTransactionCfg['params'];
     private readonly _tag: string;
@@ -35,19 +38,47 @@ export default class TransactionItem
     constructor(cfg: IItemTransactionCfg) {
         this.id = nanoid();
         this.timestamp = cfg.timestamp;
-        this._name = cfg.name;
+        this._name = cfg.name || 'No name';
         this._params = cfg.params;
         this._result = cfg.result;
         this._tag = cfg.tag || '';
         this._meta = cfg.meta || null;
     }
 
-    shouldShow(_cfg: SearchConfig = {}): boolean {
-        return true;
+    shouldShow(cfg: SearchConfig = {}): boolean {
+        const { searchValue, symbol, filterValue } = cfg;
+        const byFilterValue = filterValue
+            ? this.getName().includes(filterValue)
+            : true;
+        if (searchValue && symbol) {
+            //2 params match
+            // TODO mutation is bad
+            const content = this.getContent();
+            return (
+                byFilterValue &&
+                (markMatches(
+                    { params: this.getParams() },
+                    'params',
+                    createSearchMarker(searchValue),
+                    symbol
+                ) ||
+                    markMatches(
+                        {
+                            content: isMimeType(content)
+                                ? content.__getRaw()
+                                : content
+                        },
+                        'content',
+                        createSearchMarker(searchValue),
+                        symbol
+                    ))
+            );
+        }
+        return byFilterValue;
     }
 
-    getName(): IItemTransactionCfg['name'] {
-        return this._name;
+    getName(): string {
+        return this._name || 'No name';
     }
 
     getTag(): string {

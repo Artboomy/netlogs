@@ -39,13 +39,9 @@ const netlogs = function (cfg: TransactionOptional | ContentOptional) {
     window.postMessage({ type: 'FROM_PAGE', event: JSON.stringify(cfg) }, '*');
 };
 
-let helpShowTime: number;
-const original = netlogs.toString;
-netlogs.toString = (): string => {
-    if (!helpShowTime || new Date().getTime() - helpShowTime > 60 * 1000) {
-        helpShowTime = new Date().getTime();
-        console.info(
-            `
+netlogs.help = (): void => {
+    console.info(
+        `
         %cCall this function to send arbitrary event to Net logs
         
         %cUsage: netlogs(event);
@@ -74,6 +70,7 @@ netlogs.toString = (): string => {
                 timestamp?: number;
                 // small bit of text next to date
                 tag?: string;
+                name?: string;
                 // viewable on date click
                 meta?: {
                     key: {
@@ -85,14 +82,12 @@ netlogs.toString = (): string => {
                 
                 result: object;
         `,
-            'font-size: 1.5em',
-            'font-size: 1em; color: green;',
-            'color: blue;',
-            'font-weight: bold; color: black;',
-            'font-weight: normal'
-        );
-    }
-    return original.call(netlogs);
+        'font-size: 1.5em',
+        'font-size: 1em; color: green;',
+        'color: blue;',
+        'font-weight: bold; color: black;',
+        'font-weight: normal'
+    );
 };
 
 window.netlogs = netlogs;

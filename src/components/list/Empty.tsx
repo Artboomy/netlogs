@@ -4,8 +4,7 @@ import { createUseStyles } from 'react-jss';
 const useStyles = createUseStyles({
     root: {
         display: 'flex',
-        justifyContent: 'center',
-        height: '50vh'
+        justifyContent: 'center'
     },
     emptyContent: {
         display: 'flex',

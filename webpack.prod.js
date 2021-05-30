@@ -8,7 +8,7 @@ module.exports = merge(common, {
         minimize: true,
         minimizer: [
             new TerserPlugin({
-                exclude: /settings/
+                exclude: /settings|inject/
             })
         ]
     }
