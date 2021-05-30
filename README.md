@@ -43,6 +43,66 @@ Just drag and drop `*.har` file from browser or `*.zip` file from Netlogs into t
 
 To export log, click `Export` button in the header.
 
+## ⛓️ Preserve log
+
+If you want to preserve logs on page reload - click `expand` button in the header, then mark checkbox.
+
+![preserve logs](./img/preserve.png)
+
+## 🦄 Custom events
+
+You can send custom events to Netlogs, using `window.netlogs` function.
+
+Usage:
+`window?.netlogs(event)`
+
+Example:
+
+`window?.netlogs({ tag: 'TEST', content: { message: 'Hello world' } }`
+
+![custom events](./img/custom.gif)
+
+Event signature is either `IItemContentOnlyCfg`:
+
+```typescript
+type IItemContentOnlyCfg ={
+    // by default new Date().getTime() will be used
+    timestamp?: number;
+    // small bit of text next to date
+    tag?: string; 
+    // viewable on date click
+    meta?: {
+        key: {
+            items: [{name: string, value: string}]
+        }
+    }
+    
+    content: object | string;
+}
+```
+or `IItemTransactionCfg`
+```typescript
+type IItemTransactionCfg = {
+    // by default new Date().getTime() will be used
+    timestamp?: number;
+    // small bit of text next to date
+    tag?: string;
+    name?: string;
+    // viewable on date click
+    meta?: {
+        key: {
+            items: [{name: string, value: string}]
+        }
+    }
+    
+    params: object;
+    
+    result: object;
+}
+```
+
+To get help message in console, invoke `window?.netlogs.help()`.
+
 ## 🛠️ Configuration
 
 Open the devtools in any webpage, and navigate to "Net logs" tab.

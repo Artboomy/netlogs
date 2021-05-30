@@ -1,8 +1,6 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Section, TSection } from './Section';
-import { chromeLight } from 'react-inspector';
-
 export type PropTreeProps = {
     data: {
         [key: string]: TSection;
@@ -10,7 +8,7 @@ export type PropTreeProps = {
 };
 const useStyles = createUseStyles({
     root: {
-        fontFamily: String(chromeLight.BASE_FONT_FAMILY),
+        fontFamily: 'Tahoma, sans-serif',
         fontSize: '12px',
         lineHeight: 1.5
     }

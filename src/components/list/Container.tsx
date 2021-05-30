@@ -11,7 +11,7 @@ export const ListContainer: FC = () => {
     const { list } = useListStore();
     const [key, setKey] = useState(nanoid());
     const [settings] = useSettings();
-    const searchValue = useContext(SearchContext);
+    const { value: searchValue } = useContext(SearchContext);
     const filterValue = useContext(FilterContext);
     const symbol = useMemo(
         () => (searchValue ? Symbol.for(searchValue) : undefined),

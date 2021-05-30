@@ -1,6 +1,6 @@
 {
     "name": "netlogs",
-    "version": "0.0.3",
+    "version": "0.0.5",
     "description": "Web extension for custom network logs representation",
     "main": "index.js",
     "author": "artboomy",
@@ -36,7 +36,7 @@
         "react-dnd": "14.0.2",
         "react-dnd-html5-backend": "14.0.0",
         "react-dom": "17.0.1",
-        "react-inspector": "https://github.com/Artboomy/react-inspector/releases/download/5.3.1/react-inspector-5.3.1.tgz",
+        "react-inspector": "https://github.com/Artboomy/react-inspector/releases/download/5.3.2/react-inspector-5.3.2.tgz",
         "react-jss": "10.5.0",
         "react-use": "17.2.4",
         "zustand": "3.3.3"

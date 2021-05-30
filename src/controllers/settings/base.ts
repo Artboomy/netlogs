@@ -70,6 +70,12 @@ export const defaultProfile = {
                 'Request headers': {
                     title: 'Request headers',
                     items: request.request.headers
+                },
+                Timings: {
+                    title: 'Timings',
+                    items: Object.entries(
+                        request.timings
+                    ).map(([key, value]) => ({ name: key, value }))
                 }
             };
         },

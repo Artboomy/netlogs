@@ -14,7 +14,8 @@ module.exports = {
                 'react-dnd',
                 'react-dnd-html5-backend',
                 'classnames',
-                'base16'
+                'base16',
+                'jszip'
             ]
         },
         devtools: './src/app/devtools.ts',
@@ -68,6 +69,10 @@ module.exports = {
 
     module: {
         rules: [
+            {
+                test: /\.svg/,
+                type: 'asset/resource'
+            },
             {
                 test: /\.tsx?$/,
                 loader: 'ts-loader'

@@ -39,7 +39,6 @@ function readAsZip<T>(file: File): Promise<T> {
             const contents = e.target?.result;
             if (contents) {
                 JSZip.loadAsync(contents).then((zip) => {
-                    console.info(zip.files);
                     const name = Object.keys(zip.files).find((name) =>
                         name.endsWith('har')
                     );

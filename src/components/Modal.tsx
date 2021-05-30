@@ -2,6 +2,7 @@ import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
 import { mediaQuerySmallOnly } from '../utils';
 import { theme } from '../theme/light';
+import { IconButton, ICONS } from './IconButton';
 
 const useStyles = createUseStyles({
     root: {
@@ -40,7 +41,11 @@ export const Modal: FC<ModalProps> = ({ children, onClose }) => {
     return (
         <div className={styles.root}>
             <div className={styles.header}>
-                <button onClick={onClose}>Close</button>
+                <IconButton
+                    icon={ICONS.cross}
+                    onClick={onClose}
+                    title='Close'
+                />
             </div>
             <div className={styles.wrapper}>{children}</div>
         </div>

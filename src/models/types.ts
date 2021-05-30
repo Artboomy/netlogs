@@ -25,7 +25,7 @@ export interface IItemContentOnlyCfg {
 
 export interface IItemTransactionCfg {
     timestamp: number;
-    name: string;
+    name?: string;
     tag?: string;
     meta: PropTreeProps['data'] | null;
     params: Record<string, unknown>;
