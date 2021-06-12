@@ -28,15 +28,20 @@ window.addEventListener('message', (event) => {
     }
 });
 
-const netlogs = function (cfg: TransactionOptional | ContentOptional) {
-    // validation
-    // @ts-ignore
-    if (!cfg?.content && !(cfg?.params && cfg?.result)) {
-        console.warn('Either content or params & result must be supplied');
-        return;
+const netlogs = function (cfg: TransactionOptional | ContentOptional | any) {
+    let event = cfg;
+    if (!event || (!event?.content && !(event?.params && event?.result))) {
+        event = {
+            content: cfg
+        };
     }
-    cfg.timestamp = cfg.timestamp || new Date().getTime();
-    window.postMessage({ type: 'FROM_PAGE', event: JSON.stringify(cfg) }, '*');
+    if (event && typeof event === 'object') {
+        event.timestamp = event.timestamp || new Date().getTime();
+    }
+    window.postMessage(
+        { type: 'FROM_PAGE', event: JSON.stringify(event) },
+        '*'
+    );
 };
 
 netlogs.help = (): void => {

@@ -2,7 +2,6 @@ import { insertSorted, subscribeParent } from '../utils';
 import { useListStore } from './network';
 import ContentOnlyItem from '../models/ContentOnlyItem';
 import TransactionItem from '../models/TransactionItem';
-import { ItemType } from '../models/types';
 
 class EventsController {
     subscribe() {

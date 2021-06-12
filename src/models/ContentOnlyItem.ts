@@ -103,10 +103,6 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
     }
 
     getContent(): TContent {
-        return typeof this._content === 'string'
-            ? this._content
-            : {
-                  content: this._content
-              };
+        return this._content;
     }
 }
