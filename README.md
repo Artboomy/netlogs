@@ -1,6 +1,7 @@
 # 📜 Net logs
 
 ![license](https://img.shields.io/github/license/Artboomy/netlogs?cacheSeconds=86400)
+![version](https://img.shields.io/chrome-web-store/v/cjdmhjppaehhblekcplokfdhikmalnaf)
 ![chrome installs](https://img.shields.io/chrome-web-store/users/cjdmhjppaehhblekcplokfdhikmalnaf?cacheSeconds=43200)
 [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Ftwitter.com%2F?cacheSeconds=86400)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2FArtboomy%2Fnetlogs&text=%20&hashtags=netlogs%2Cdevtools%2Cdebugging)
 
