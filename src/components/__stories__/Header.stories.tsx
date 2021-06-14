@@ -10,7 +10,9 @@ export default {
 export const Header: React.FC = () => (
     <Component
         searchValue=''
+        caseSensitive={false}
         onSearchChange={action('onSearchChange')}
         onHideUnrelatedChange={action('onHideUnrelatedChange')}
+        onCaseSensitiveChange={action('onCaseSensitiveChange')}
     />
 );

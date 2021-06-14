@@ -11,8 +11,7 @@ import {
     SearchConfig
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
-import { markMatches } from 'react-inspector';
-import { createSearchMarker } from '../utils';
+import { isVisible } from 'react-inspector';
 import { isMimeType } from '../components/InspectorWrapper';
 
 function injectMimeType<T>(obj: T, mimeType: string): void {
@@ -64,34 +63,28 @@ export default class NetworkItem
     // TODO: refactor multireturn
     shouldShow(cfg: SearchConfig = {}): boolean {
         const baseShouldShow = this.getFunctions().shouldShow(this._request);
-        const { searchValue, symbol, filterValue } = cfg;
+        const { searchValue, marker, filterValue } = cfg;
         if (!baseShouldShow) {
             return false;
         }
         const byFilterValue = filterValue
             ? this._request.request.url.includes(filterValue)
             : true;
-        if (searchValue && symbol) {
+        if (searchValue && marker) {
             //2 params match
             // TODO mutation is bad
             const content = this.getContent();
             return (
                 byFilterValue &&
-                (markMatches(
-                    { params: this.getParams() },
-                    'params',
-                    createSearchMarker(searchValue),
-                    symbol
-                ) ||
-                    markMatches(
+                (isVisible({ params: this.getParams() }, 'params', marker) ||
+                    isVisible(
                         {
                             content: isMimeType(content)
                                 ? content.__getRaw()
                                 : content
                         },
                         'content',
-                        createSearchMarker(searchValue),
-                        symbol
+                        marker
                     ))
             );
         }

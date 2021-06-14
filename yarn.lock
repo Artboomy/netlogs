@@ -8945,9 +8945,9 @@ react-inspector@^5.1.0:
     is-dom "^1.0.0"
     prop-types "^15.0.0"
 
-"react-inspector@https://github.com/Artboomy/react-inspector/releases/download/5.3.2/react-inspector-5.3.2.tgz":
-  version "5.3.2"
-  resolved "https://github.com/Artboomy/react-inspector/releases/download/5.3.2/react-inspector-5.3.2.tgz#0a27ebb538a2fa30daff1722c3d342374ba76643"
+"react-inspector@https://github.com/Artboomy/react-inspector/releases/download/5.3.3/react-inspector-5.3.3.tgz":
+  version "5.3.3"
+  resolved "https://github.com/Artboomy/react-inspector/releases/download/5.3.3/react-inspector-5.3.3.tgz#2f90207406bc8eb09832c42708b1607a7efc3904"
   dependencies:
     "@babel/runtime" "^7.0.0"
     is-dom "^1.0.0"

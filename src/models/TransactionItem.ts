@@ -7,8 +7,7 @@ import {
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { Entry } from 'har-format';
-import { markMatches } from 'react-inspector';
-import { createSearchMarker } from '../utils';
+import { isVisible } from 'react-inspector';
 import { isMimeType } from '../components/InspectorWrapper';
 
 export abstract class TransactionItemAbstract implements IContentItem<unknown> {
@@ -46,31 +45,25 @@ export default class TransactionItem
     }
 
     shouldShow(cfg: SearchConfig = {}): boolean {
-        const { searchValue, symbol, filterValue } = cfg;
+        const { searchValue, marker, filterValue } = cfg;
         const byFilterValue = filterValue
             ? this.getName().includes(filterValue)
             : true;
-        if (searchValue && symbol) {
+        if (searchValue && marker) {
             //2 params match
             // TODO mutation is bad
             const content = this.getContent();
             return (
                 byFilterValue &&
-                (markMatches(
-                    { params: this.getParams() },
-                    'params',
-                    createSearchMarker(searchValue),
-                    symbol
-                ) ||
-                    markMatches(
+                (isVisible({ params: this.getParams() }, 'params', marker) ||
+                    isVisible(
                         {
                             content: isMimeType(content)
                                 ? content.__getRaw()
                                 : content
                         },
                         'content',
-                        createSearchMarker(searchValue),
-                        symbol
+                        marker
                     ))
             );
         }

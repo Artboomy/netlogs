@@ -1,6 +1,7 @@
 # 📜 Net logs
 
 ![license](https://img.shields.io/github/license/Artboomy/netlogs?cacheSeconds=86400)
+![version](https://img.shields.io/chrome-web-store/v/cjdmhjppaehhblekcplokfdhikmalnaf)
 ![chrome installs](https://img.shields.io/chrome-web-store/users/cjdmhjppaehhblekcplokfdhikmalnaf?cacheSeconds=43200)
 [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Ftwitter.com%2F?cacheSeconds=86400)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2FArtboomy%2Fnetlogs&text=%20&hashtags=netlogs%2Cdevtools%2Cdebugging)
 
@@ -55,8 +56,10 @@ If you want to preserve logs on page reload - click `expand` button in the heade
 
 You can send custom events to Netlogs, using `window.netlogs` function.
 
+_Note that function might not always be available._
+
 Usage:
-`window?.netlogs(event)`
+`window.netlogs(event)` or `window.netlogs('Hello world')`
 
 Example:
 

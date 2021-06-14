@@ -6,7 +6,7 @@ import {
     SearchConfig
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
-import { markMatches } from 'react-inspector';
+import { isVisible } from 'react-inspector';
 import { Entry } from 'har-format';
 
 type TContent = IItemContentOnlyCfg['content'];
@@ -27,20 +27,12 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
     }
 
     shouldShow(cfg: SearchConfig = {}): boolean {
-        const { symbol, searchValue } = cfg;
-        if (!symbol || !searchValue) {
+        const { searchValue, marker } = cfg;
+        if (!searchValue || !marker) {
             return true;
         }
-        return typeof this._content === 'string'
-            ? this._content.includes(searchValue)
-            : markMatches(
-                  { content: this._content },
-                  'content',
-                  (k, v) =>
-                      String(k).includes(searchValue) ||
-                      String(v).includes(searchValue),
-                  symbol
-              );
+        // TODO use marker to compare this._content with searchValue
+        return isVisible({ content: this._content }, 'content', marker);
     }
 
     static fromJSON(input: Entry): ContentOnlyItem {
@@ -103,10 +95,6 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
     }
 
     getContent(): TContent {
-        return typeof this._content === 'string'
-            ? this._content
-            : {
-                  content: this._content
-              };
+        return this._content;
     }
 }

@@ -1,9 +1,9 @@
-import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { useListStore } from '../../controllers/network';
 import { Row } from '../Row';
 import { List } from '../List';
 import { nanoid } from 'nanoid';
-import { SearchContext } from 'react-inspector';
+import { SearchContext, useSearchParams } from 'react-inspector';
 import { FilterContext } from '../../context/FilterContext';
 import { useSettings } from '../../hooks/useSettings';
 
@@ -13,16 +13,13 @@ export const ListContainer: FC = () => {
     const [settings] = useSettings();
     const { value: searchValue } = useContext(SearchContext);
     const filterValue = useContext(FilterContext);
-    const symbol = useMemo(
-        () => (searchValue ? Symbol.for(searchValue) : undefined),
-        [searchValue]
-    );
+    const { marker } = useSearchParams();
     useEffect(() => {
         setKey(nanoid());
     }, [settings]);
     const content = list
         .filter((networkItem) =>
-            networkItem.shouldShow({ symbol, searchValue, filterValue })
+            networkItem.shouldShow({ marker, searchValue, filterValue })
         )
         .map((networkItem) => {
             return <Row key={networkItem.id} item={networkItem} />;
