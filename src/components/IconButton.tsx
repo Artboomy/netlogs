@@ -9,7 +9,8 @@ const useStyles = createUseStyles({
         padding: '0',
         background: 'transparent',
         border: 'none',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        fontWeight: 'bold'
     },
     icon: {
         backgroundColor: theme.icon.normal,
@@ -26,12 +27,18 @@ const useStyles = createUseStyles({
         '&:hover': {
             backgroundColor: theme.accent
         }
+    },
+    activeText: {
+        color: theme.accent,
+        '&:hover': {
+            color: theme.accent
+        }
     }
 });
 
 export type IconButtonProps = {
     className?: string;
-    icon: `${number}px ${number}px`;
+    icon?: `${number}px ${number}px`;
     onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     title: string;
     active?: boolean;
@@ -42,19 +49,25 @@ export const IconButton: FC<IconButtonProps> = ({
     icon,
     onClick,
     title,
-    active
+    active,
+    children
 }) => {
     const styles = useStyles({ icon: icon });
     return (
         <button
-            className={cn(styles.button, className)}
+            className={cn(styles.button, className, {
+                [styles.activeText]: active
+            })}
             onClick={onClick}
             title={title}>
-            <div
-                className={cn(styles.icon, {
-                    [styles.active]: active
-                })}
-            />
+            {icon ? (
+                <div
+                    className={cn(styles.icon, {
+                        [styles.active]: active
+                    })}
+                />
+            ) : null}
+            {children}
         </button>
     );
 };

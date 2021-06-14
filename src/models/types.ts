@@ -39,5 +39,7 @@ export interface IItemNetworkCfg {
 export type SearchConfig = {
     searchValue?: string;
     filterValue?: string;
-    symbol?: symbol;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    marker?: (k: unknown, v: unknown) => boolean;
 };

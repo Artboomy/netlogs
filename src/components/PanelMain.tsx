@@ -42,6 +42,7 @@ export const PanelMain: React.FC = () => {
     const styles = useStyles();
     const [searchValue, setSearchValue] = useState('');
     const [hideUnrelated, setHideUnrelated] = useState(true);
+    const [caseSensitive, setCaseSensitive] = useState(false);
     const [debSearchValue, setDebSearchValue] = useState('');
     useDebounce(() => setDebSearchValue(searchValue), 100, [searchValue]);
     const [filterValue, setFilterValue] = useState('');
@@ -53,13 +54,19 @@ export const PanelMain: React.FC = () => {
                 <ModalContainer>
                     <div className={styles.root}>
                         <SearchContext.Provider
-                            value={{ value: debSearchValue, hideUnrelated }}>
+                            value={{
+                                value: debSearchValue,
+                                hideUnrelated,
+                                caseSensitive
+                            }}>
                             <Header
                                 className={styles.header}
                                 searchValue={searchValue}
                                 hideUnrelated={hideUnrelated}
                                 onSearchChange={setSearchValue}
                                 onHideUnrelatedChange={setHideUnrelated}
+                                caseSensitive={caseSensitive}
+                                onCaseSensitiveChange={setCaseSensitive}
                             />
                             <FilterContext.Provider value={debFilterValue}>
                                 <ErrorBoundary>

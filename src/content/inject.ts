@@ -38,6 +38,7 @@ const netlogs = function (cfg: TransactionOptional | ContentOptional | any) {
     if (event && typeof event === 'object') {
         event.timestamp = event.timestamp || new Date().getTime();
     }
+    event.tag = event.tag || 'PAGE';
     window.postMessage(
         { type: 'FROM_PAGE', event: JSON.stringify(event) },
         '*'

@@ -34,6 +34,8 @@ interface IProps {
     hideUnrelated?: boolean;
     onSearchChange: (value: string) => void;
     onHideUnrelatedChange: (value: boolean) => void;
+    caseSensitive?: boolean;
+    onCaseSensitiveChange: (value: boolean) => void;
 }
 
 function getFileName(): string {
@@ -46,7 +48,9 @@ export const Header: FC<IProps> = ({
     searchValue,
     hideUnrelated,
     onSearchChange,
-    onHideUnrelatedChange
+    onHideUnrelatedChange,
+    caseSensitive,
+    onCaseSensitiveChange
 }) => {
     const styles = useStyles();
     const { version, name } = runtime.getManifest();
@@ -89,6 +93,12 @@ export const Header: FC<IProps> = ({
                     title='Filter options'
                     active={secondRowVisible}
                 />
+                <IconButton
+                    title='Case sensitive'
+                    onClick={() => onCaseSensitiveChange(!caseSensitive)}
+                    active={caseSensitive}>
+                    Aa
+                </IconButton>
                 <input
                     type='search'
                     placeholder='Search in params/result'
