@@ -98,7 +98,9 @@ function isGraphqlResult(
     );
 }
 
-export function isGraphql(request: NetworkRequest): boolean {
-    const params = defaultProfile.functions.getParams(request);
+export function isGraphql(
+    params: Record<string, unknown>,
+    _result: unknown
+): boolean {
     return isGraphqlParams(params);
 }

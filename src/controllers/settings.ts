@@ -154,10 +154,17 @@ class Settings {
 
     getMather(): ISettings['matcher'] {
         return (request: NetworkRequest) => {
-            if (isJsonRpc(request) && this.settings.jsonRpcIntegration) {
+            const params = defaultProfile.functions.getParams(request);
+            const result = request.response.content.text
+                ? defaultProfile.functions.getResult(
+                      request,
+                      request.response.content.text
+                  )
+                : null;
+            if (isJsonRpc(params, result) && this.settings.jsonRpcIntegration) {
                 return 'jsonRpc';
             }
-            if (isGraphql(request) && this.settings.graphqlIntegration) {
+            if (isGraphql(params, result) && this.settings.graphqlIntegration) {
                 return 'graphql';
             }
             return this.settings.matcher(request);

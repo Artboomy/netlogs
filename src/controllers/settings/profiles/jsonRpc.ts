@@ -80,14 +80,10 @@ const weakMatch = (obj: Record<string, unknown> | unknown): boolean => {
             'params' in obj
     );
 };
-export function isJsonRpc(request: NetworkRequest): boolean {
-    const params = defaultProfile.functions.getParams(request);
-    const result = request.response.content.text
-        ? defaultProfile.functions.getResult(
-              request,
-              request.response.content.text
-          )
-        : null;
+export function isJsonRpc(
+    params: Record<string, unknown>,
+    result: unknown
+): boolean {
     const byParams = standardMatch(params) || weakMatch(params);
     const byResult = standardMatch(result);
     return Boolean(byParams || byResult);
