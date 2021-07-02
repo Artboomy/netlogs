@@ -29,15 +29,39 @@ export default class NetworkItem
     private readonly _request: NetworkRequest;
     public readonly type: ItemType = ItemType.Transaction;
     public readonly timestamp: number;
-    private _baseShouldShow: boolean;
+    private readonly _baseShouldShow: boolean;
     private _lastShouldShowCfg: SearchConfig | null = null;
     private _lastShouldShow = true;
+
+    /* computed fields */
+    private _name = '';
+    private _tag = '';
+    private _isError = false;
+    private _params: Record<string, unknown> = {};
+    private _meta: PropTreeProps['data'] | null = null;
+    private _content: TContent = {};
+    private _duration = 0;
 
     constructor(cfg: IItemNetworkCfg) {
         this.id = nanoid();
         this._request = cfg.request;
         this.timestamp = new Date(this._request.startedDateTime).getTime();
         this._baseShouldShow = this.getFunctions().shouldShow(this._request);
+        this._setComputedFields();
+    }
+
+    private _setComputedFields(): void {
+        console.count(`setComputedFields-${this.id}`);
+        const functions = settings.getFunctions(this._request);
+        this._name = functions.getName(this._request);
+        this._tag = functions.getTag(this._request);
+        this._isError = functions.isError(this._request);
+        this._params = functions.getParams(this._request);
+        this._meta = functions.getMeta(this._request);
+        this._content = this._computeContent();
+        this._duration = Object.entries(this._request.timings)
+            .filter(([k, t]) => !k.startsWith('_') && t !== -1)
+            .reduce((acc, [_, t]) => t + acc, 0);
     }
 
     getFunctions(): IProfile['functions'] {
@@ -45,18 +69,15 @@ export default class NetworkItem
     }
 
     getName(): string {
-        console.count(`getName${this.id}`);
-        return this.getFunctions().getName(this._request);
+        return this._name;
     }
 
     getTag(): string {
-        console.count(`getTag${this.id}`);
-        return this.getFunctions().getTag(this._request);
+        return this._tag;
     }
 
     isError(): boolean {
-        console.count(`isError${this.id}`);
-        return this.getFunctions().isError(this._request);
+        return this._isError;
     }
 
     static fromJSON(request: Entry): NetworkItem {
@@ -77,7 +98,7 @@ export default class NetworkItem
         if (!this._baseShouldShow) {
             return false;
         }
-        console.count(`shouldShow${this.id}`);
+        console.count(`shouldShow-${this.id}`);
         const byFilterValue = filterValue
             ? this._request.request.url.includes(filterValue)
             : true;
@@ -103,14 +124,19 @@ export default class NetworkItem
     }
 
     getParams(): Record<string, unknown> {
-        return this.getFunctions().getParams(this._request);
+        return this._params;
     }
 
     getMeta(): PropTreeProps['data'] | null {
-        return this.getFunctions().getMeta(this._request);
+        return this._meta;
     }
 
     getContent(): TContent {
+        return this._content;
+    }
+
+    private _computeContent(): TContent {
+        console.count(`getContent-${this.id}`);
         let result;
         if (this._request.response) {
             const content = this._request.response.content.text;
@@ -136,8 +162,6 @@ export default class NetworkItem
     }
 
     getDuration(): number {
-        return Object.entries(this._request.timings)
-            .filter(([k, t]) => !k.startsWith('_') && t !== -1)
-            .reduce((acc, [_, t]) => t + acc, 0);
+        return this._duration;
     }
 }
