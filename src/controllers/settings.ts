@@ -115,6 +115,7 @@ class Settings {
                     changes.settings.newValue
                 ) {
                     this.settings = deserialize(changes.settings.newValue);
+                    injectStaticProfiles(this.settings);
                     this.listeners.forEach(
                         (listener) => this.settings && listener(this.settings)
                     );

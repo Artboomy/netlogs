@@ -47,6 +47,10 @@ export default class TransactionItem
         this._duration = cfg.duration || 0;
     }
 
+    setComputedFields(): void {
+        // pass
+    }
+
     shouldShow(cfg: SearchConfig = {}): boolean {
         const { searchValue, marker, filterValue } = cfg;
         const byFilterValue = filterValue

@@ -25,7 +25,7 @@ function injectMimeType<T>(obj: T, mimeType: string): void {
 type TContent = Record<string, unknown>;
 export default class NetworkItem
     implements TransactionItemAbstract, IContentItem<TContent> {
-    public readonly id: string;
+    public id = '';
     private readonly _request: NetworkRequest;
     public readonly type: ItemType = ItemType.Transaction;
     public readonly timestamp: number;
@@ -43,16 +43,16 @@ export default class NetworkItem
     private _duration = 0;
 
     constructor(cfg: IItemNetworkCfg) {
-        this.id = nanoid();
         this._request = cfg.request;
         this.timestamp = new Date(this._request.startedDateTime).getTime();
         this._baseShouldShow = this.getFunctions().shouldShow(this._request);
-        this._setComputedFields();
+        this.setComputedFields();
     }
 
-    private _setComputedFields(): void {
+    setComputedFields(): void {
         console.count(`setComputedFields-${this.id}`);
         const functions = settings.getFunctions(this._request);
+        this.id = nanoid();
         this._name = functions.getName(this._request);
         this._tag = functions.getTag(this._request);
         this._isError = functions.isError(this._request);
