@@ -97,4 +97,8 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
     getContent(): TContent {
         return this._content;
     }
+
+    getDuration(): number {
+        return 0;
+    }
 }

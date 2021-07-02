@@ -46,7 +46,7 @@ class Network {
                     ...(isPreserve ? list : []),
                     new ContentOnlyItem({
                         timestamp: new Date().getTime(),
-                        tag: 'NET LOGS',
+                        tag: 'NAV',
                         content: `Navigated to ${url}`
                     })
                 ]

@@ -29,26 +29,33 @@ export default class NetworkItem
     private readonly _request: NetworkRequest;
     public readonly type: ItemType = ItemType.Transaction;
     public readonly timestamp: number;
+    private _baseShouldShow: boolean;
+    private _lastShouldShowCfg: SearchConfig | null = null;
+    private _lastShouldShow = true;
 
     constructor(cfg: IItemNetworkCfg) {
         this.id = nanoid();
         this._request = cfg.request;
         this.timestamp = new Date(this._request.startedDateTime).getTime();
+        this._baseShouldShow = this.getFunctions().shouldShow(this._request);
     }
 
     getFunctions(): IProfile['functions'] {
-        return settings.getFunctions(this._request.request.url);
+        return settings.getFunctions(this._request);
     }
 
     getName(): string {
+        console.count(`getName${this.id}`);
         return this.getFunctions().getName(this._request);
     }
 
     getTag(): string {
+        console.count(`getTag${this.id}`);
         return this.getFunctions().getTag(this._request);
     }
 
     isError(): boolean {
+        console.count(`isError${this.id}`);
         return this.getFunctions().isError(this._request);
     }
 
@@ -62,11 +69,15 @@ export default class NetworkItem
 
     // TODO: refactor multireturn
     shouldShow(cfg: SearchConfig = {}): boolean {
-        const baseShouldShow = this.getFunctions().shouldShow(this._request);
+        if (cfg === this._lastShouldShowCfg) {
+            return this._lastShouldShow;
+        }
         const { searchValue, marker, filterValue } = cfg;
-        if (!baseShouldShow) {
+        this._lastShouldShowCfg = cfg;
+        if (!this._baseShouldShow) {
             return false;
         }
+        console.count(`shouldShow${this.id}`);
         const byFilterValue = filterValue
             ? this._request.request.url.includes(filterValue)
             : true;
@@ -122,5 +133,11 @@ export default class NetworkItem
             };
         }
         return result;
+    }
+
+    getDuration(): number {
+        return Object.entries(this._request.timings)
+            .filter(([k, t]) => !k.startsWith('_') && t !== -1)
+            .reduce((acc, [_, t]) => t + acc, 0);
     }
 }
