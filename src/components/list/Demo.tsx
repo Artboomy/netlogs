@@ -10,6 +10,7 @@ import { DropContainer } from './DropContainer';
 import { ListContainer } from './Container';
 import { useListStore } from '../../controllers/network';
 import { createUseStyles } from 'react-jss';
+import { action } from '@storybook/addon-actions';
 const useStyles = createUseStyles({
     '@global': {
         html: {
@@ -37,7 +38,7 @@ export const ListDemo: FC = () => {
         <DndProvider backend={HTML5Backend}>
             <ModalContainer>
                 <DropContainer>
-                    <ListContainer />
+                    <ListContainer onCountChange={action('onCountChange')} />
                 </DropContainer>
             </ModalContainer>
         </DndProvider>

@@ -4,9 +4,13 @@ import {
     ISettings,
     ISettingsSerialized
 } from './settings/types';
-import { defaultProfile, defaultSettings } from './settings/base';
+import { defaultSettings } from './settings/base';
 import storage from '../api/storage';
 import { isSandbox } from '../utils';
+import { defaultProfile } from './settings/profiles/default';
+import { NetworkRequest } from '../models/types';
+import { isJsonRpc, jsonRpcProfile } from './settings/profiles/jsonRpc';
+import { graphqlProfile, isGraphql } from './settings/profiles/graphql';
 
 function deserializeFunctionRaw<T>(strFunction: string): T {
     return isSandbox() ? new Function(`return ${strFunction}`)() : strFunction;
@@ -89,11 +93,19 @@ export function serialize(
 
 type Listener = (newSettings: ISettings) => void;
 
+function injectStaticProfiles(settings: ISettings): void {
+    settings.profiles.default = defaultProfile;
+    settings.profiles.jsonRpc = jsonRpcProfile;
+    settings.profiles.graphql = graphqlProfile;
+}
+
 class Settings {
     private settings: ISettings = defaultSettings;
     private listeners: Listener[] = [];
 
     constructor() {
+        this.settings = defaultSettings;
+        injectStaticProfiles(this.settings);
         storage.onChanged.addListener(
             (
                 changes: { [key: string]: chrome.storage.StorageChange },
@@ -105,6 +117,7 @@ class Settings {
                     changes.settings.newValue
                 ) {
                     this.settings = deserialize(changes.settings.newValue);
+                    injectStaticProfiles(this.settings);
                     this.listeners.forEach(
                         (listener) => this.settings && listener(this.settings)
                     );
@@ -127,6 +140,7 @@ class Settings {
                     } catch (e) {
                         this.settings = defaultSettings;
                     }
+                    injectStaticProfiles(this.settings);
                     resolve(this.settings);
                 }
             );
@@ -141,18 +155,34 @@ class Settings {
         }
     }
 
-    getProfile(url: string): IProfile {
-        return {
-            ...defaultProfile,
-            ...this.settings.profiles[this.settings.matcher(url)]
+    getMather(): ISettings['matcher'] {
+        return (request: NetworkRequest) => {
+            const params = defaultProfile.functions.getParams(request);
+            const result = request.response.content.text
+                ? defaultProfile.functions.getResult(
+                      request,
+                      request.response.content.text
+                  )
+                : null;
+            if (isJsonRpc(params, result) && this.settings.jsonRpcIntegration) {
+                return 'jsonRpc';
+            }
+            if (isGraphql(params, result) && this.settings.graphqlIntegration) {
+                return 'graphql';
+            }
+            return this.settings.matcher(request);
         };
     }
 
-    getFunctions(url: string): IProfile['functions'] {
+    getProfile(request: NetworkRequest): IProfile {
         return {
-            ...defaultProfile.functions,
-            ...this.settings.profiles[this.settings.matcher(url)]?.functions
+            ...defaultProfile,
+            ...this.settings.profiles[this.getMather()(request)]
         };
+    }
+
+    getFunctions(request: NetworkRequest): IProfile['functions'] {
+        return this.settings.profiles[this.getMather()(request)]?.functions;
     }
 
     set(newSettings: ISettings | ISettingsSerialized) {

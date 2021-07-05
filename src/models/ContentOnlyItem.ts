@@ -26,6 +26,10 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
         this._meta = cfg.meta || null;
     }
 
+    setComputedFields(): void {
+        // pass
+    }
+
     shouldShow(cfg: SearchConfig = {}): boolean {
         const { searchValue, marker } = cfg;
         if (!searchValue || !marker) {
@@ -96,5 +100,9 @@ export default class ContentOnlyItem implements IContentItem<TContent> {
 
     getContent(): TContent {
         return this._content;
+    }
+
+    getDuration(): number {
+        return 0;
     }
 }

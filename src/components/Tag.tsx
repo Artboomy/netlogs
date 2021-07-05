@@ -2,6 +2,7 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { google } from 'base16';
 import { ItemType } from '../models/types';
+import { theme } from '../theme/light';
 
 const useStyles = createUseStyles({
     root: {
@@ -22,13 +23,26 @@ type TProps = {
     content: string;
     type: ItemType;
 };
+
+function getColor(
+    color: string | undefined,
+    content: string,
+    type: ItemType
+): string | undefined {
+    if (['NEXT', 'NUXT'].includes(content)) {
+        return google.base0B;
+    }
+    if (['GQL'].includes(content) && !color) {
+        return theme.graphql;
+    }
+    if (type === ItemType.Transaction) {
+        return color;
+    }
+    return google.base0C;
+}
+
 export const Tag: React.FC<TProps> = ({ color, content, type }) => {
-    const computedColor =
-        type === ItemType.Transaction
-            ? color
-            : ['NEXT', 'NUXT'].includes(content)
-            ? google.base0B
-            : google.base0C;
+    const computedColor = getColor(color, content, type);
     const styles = useStyles(computedColor);
     return <div className={styles.root}>{content}</div>;
 };

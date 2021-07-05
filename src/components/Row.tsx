@@ -15,7 +15,8 @@ const useStyles = createUseStyles(() => ({
     date: {
         color: google.base02,
         fontSize: '12px',
-        padding: '4px 4px 4px 8px'
+        padding: '4px 4px 4px 8px',
+        whiteSpace: 'nowrap'
     },
     dateContentOnly: {
         [mediaQuerySmallOnly]: {
@@ -65,7 +66,7 @@ export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
                     className
                 )}
                 onClick={handleClick}>
-                {timeToString(item.timestamp)}
+                {item.getDuration().toFixed(2)} ms
             </div>
         ),
         tag: tag ? (

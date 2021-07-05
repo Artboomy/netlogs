@@ -23,10 +23,12 @@ export type IProfileSerialized = Omit<IProfile, 'functions'> & {
 };
 
 export interface ISettings {
-    matcher: (url: string) => ProfileName;
+    matcher: (request: NetworkRequest) => ProfileName;
     profiles: Record<ProfileName, IProfile>;
     nextjsIntegration: boolean;
     nuxtjsIntegraction: boolean;
+    jsonRpcIntegration: boolean;
+    graphqlIntegration: boolean;
 }
 
 export type ISettingsSerialized = Omit<ISettings, 'matcher' | 'profiles'> & {

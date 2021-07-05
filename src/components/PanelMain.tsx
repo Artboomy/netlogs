@@ -48,6 +48,10 @@ export const PanelMain: React.FC = () => {
     const [filterValue, setFilterValue] = useState('');
     const [debFilterValue, setDebFilterValue] = useState('');
     useDebounce(() => setDebFilterValue(filterValue), 100, [filterValue]);
+    const [count, setCount] = useState<{
+        visibleCount: number;
+        totalCount: number;
+    }>({ visibleCount: 0, totalCount: 0 });
     return (
         <DndProvider backend={HTML5Backend}>
             <SettingsContainer>
@@ -71,12 +75,16 @@ export const PanelMain: React.FC = () => {
                             <FilterContext.Provider value={debFilterValue}>
                                 <ErrorBoundary>
                                     <DropContainer>
-                                        <ListContainer />
+                                        <ListContainer
+                                            onCountChange={setCount}
+                                        />
                                     </DropContainer>
                                 </ErrorBoundary>
                                 <Footer
                                     value={filterValue}
                                     onValueChange={setFilterValue}
+                                    totalCount={count.totalCount}
+                                    visibleCount={count.visibleCount}
                                 />
                             </FilterContext.Provider>
                         </SearchContext.Provider>

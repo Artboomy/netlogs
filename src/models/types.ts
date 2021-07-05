@@ -12,6 +12,7 @@ export interface IContentItem<T> {
     isError(): boolean;
     getContent(): T;
     getMeta(): PropTreeProps['data'] | null;
+    getDuration(): number;
 }
 
 export type NetworkRequest = Entry;
@@ -27,6 +28,7 @@ export interface IItemTransactionCfg {
     timestamp: number;
     name?: string;
     tag?: string;
+    duration?: number;
     meta: PropTreeProps['data'] | null;
     params: Record<string, unknown>;
     result: Record<string, unknown>;

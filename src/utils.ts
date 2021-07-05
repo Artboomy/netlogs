@@ -101,9 +101,12 @@ export const createSearchMarker = (searchValue: string) => (
 };
 
 export const insertSorted = (
-    item: ItemList[number],
+    item: ItemList[number] | undefined,
     items: ItemList
 ): ItemList => {
+    if (!item) {
+        return items;
+    }
     let newArr: ItemList = [];
     let isLast = true;
     if (items.length === 0) {

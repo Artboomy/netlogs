@@ -20,6 +20,7 @@ export abstract class TransactionItemAbstract implements IContentItem<unknown> {
     abstract getParams(): Record<string, unknown>;
     abstract getContent(): unknown;
     abstract getMeta(): PropTreeProps['data'] | null;
+    abstract getDuration(): number;
 }
 
 type TContent = IItemTransactionCfg['result'];
@@ -33,6 +34,7 @@ export default class TransactionItem
     private readonly _params: IItemTransactionCfg['params'];
     private readonly _tag: string;
     private readonly _meta: PropTreeProps['data'] | null;
+    private readonly _duration: number;
 
     constructor(cfg: IItemTransactionCfg) {
         this.id = nanoid();
@@ -42,6 +44,11 @@ export default class TransactionItem
         this._result = cfg.result;
         this._tag = cfg.tag || '';
         this._meta = cfg.meta || null;
+        this._duration = cfg.duration || 0;
+    }
+
+    setComputedFields(): void {
+        // pass
     }
 
     shouldShow(cfg: SearchConfig = {}): boolean {
@@ -149,5 +156,9 @@ export default class TransactionItem
 
     getContent(): TContent {
         return this._result;
+    }
+
+    getDuration(): number {
+        return this._duration || 0;
     }
 }

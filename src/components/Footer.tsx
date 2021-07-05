@@ -8,13 +8,20 @@ const useStyles = createUseStyles({
         borderTop: `1px solid ${theme.borderColor}`,
         padding: '2px 4px',
         display: 'flex',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        alignItems: 'baseline'
+    },
+    countWrapper: {
+        marginLeft: '8px',
+        marginRight: 'auto'
     }
 });
 export const Footer: FC<{
     value: string;
     onValueChange: (newValue: string) => void;
-}> = ({ value, onValueChange }) => {
+    visibleCount?: number;
+    totalCount?: number;
+}> = ({ value, onValueChange, visibleCount = 0, totalCount = 0 }) => {
     const styles = useStyles();
     return (
         <footer className={styles.root}>
@@ -24,6 +31,10 @@ export const Footer: FC<{
                 value={value}
                 onChange={(e) => onValueChange(e.target.value)}
             />
+            <span className={styles.countWrapper}>
+                {visibleCount} / {totalCount} requests
+            </span>
+
             <a
                 href='https://github.com/Artboomy/netlogs'
                 target='_blank'

@@ -6,6 +6,7 @@ import network from '../api/network';
 import TransactionItem from '../models/TransactionItem';
 import { NetworkRequest } from '../models/types';
 import { insertSorted } from '../utils';
+import Settings from './settings';
 
 export type ItemList = Array<NetworkItem | TransactionItem | ContentOnlyItem>;
 
@@ -30,6 +31,11 @@ export const useListStore = create<TStore>((set) => ({
 
 class Network {
     constructor() {
+        Settings.addListener(() => {
+            const { list, setList } = useListStore.getState();
+            list.forEach((i) => i.setComputedFields());
+            setList([...list]);
+        });
         network.onRequestFinished.addListener((request: NetworkRequest) => {
             const { list, isDynamic } = useListStore.getState();
             if (isDynamic) {
@@ -46,7 +52,7 @@ class Network {
                     ...(isPreserve ? list : []),
                     new ContentOnlyItem({
                         timestamp: new Date().getTime(),
-                        tag: 'NET LOGS',
+                        tag: 'NAV',
                         content: `Navigated to ${url}`
                     })
                 ]

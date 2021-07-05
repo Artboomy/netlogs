@@ -288,6 +288,52 @@ export const Options: FC = () => {
                     <label>
                         <input
                             type='checkbox'
+                            name='jsonRpcIntegration'
+                            checked={settings.jsonRpcIntegration}
+                            onChange={(e) =>
+                                setSettings({
+                                    ...settings,
+                                    jsonRpcIntegration: e.target.checked
+                                })
+                            }
+                        />
+                        Unwrap{' '}
+                        <a
+                            href='https://www.jsonrpc.org/specification'
+                            target='_blank'
+                            rel='noreferrer'>
+                            JSON-RPC
+                        </a>{' '}
+                        requests
+                    </label>
+                </div>
+                <div className={styles.checkboxRow}>
+                    <label>
+                        <input
+                            type='checkbox'
+                            name='graphqlIntegration'
+                            checked={settings.graphqlIntegration}
+                            onChange={(e) =>
+                                setSettings({
+                                    ...settings,
+                                    graphqlIntegration: e.target.checked
+                                })
+                            }
+                        />
+                        Unwrap{' '}
+                        <a
+                            href='https://graphql.org/'
+                            target='_blank'
+                            rel='noreferrer'>
+                            GraphQL
+                        </a>{' '}
+                        requests
+                    </label>
+                </div>
+                <div className={styles.checkboxRow}>
+                    <label>
+                        <input
+                            type='checkbox'
                             name='nuxtjsIntegraction'
                             checked={settings.nuxtjsIntegraction}
                             onChange={(e) =>
