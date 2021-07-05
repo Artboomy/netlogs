@@ -104,6 +104,8 @@ class Settings {
     private listeners: Listener[] = [];
 
     constructor() {
+        this.settings = defaultSettings;
+        injectStaticProfiles(this.settings);
         storage.onChanged.addListener(
             (
                 changes: { [key: string]: chrome.storage.StorageChange },

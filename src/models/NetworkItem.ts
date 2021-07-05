@@ -29,7 +29,7 @@ export default class NetworkItem
     private readonly _request: NetworkRequest;
     public readonly type: ItemType = ItemType.Transaction;
     public readonly timestamp: number;
-    private readonly _baseShouldShow: boolean;
+    private _baseShouldShow = true;
     private _lastShouldShowCfg: SearchConfig | null = null;
     private _lastShouldShow = true;
 
@@ -40,28 +40,28 @@ export default class NetworkItem
     private _params: Record<string, unknown> = {};
     private _meta: PropTreeProps['data'] | null = null;
     private _content: TContent = {};
-    private _duration = 0;
+    private readonly _duration: number;
 
     constructor(cfg: IItemNetworkCfg) {
         this._request = cfg.request;
         this.timestamp = new Date(this._request.startedDateTime).getTime();
-        this._baseShouldShow = this.getFunctions().shouldShow(this._request);
+        this._duration = Object.entries(this._request.timings)
+            .filter(([k, t]) => !k.startsWith('_') && t !== -1)
+            .reduce((acc, [_, t]) => t + acc, 0);
         this.setComputedFields();
     }
 
     setComputedFields(): void {
-        console.count(`setComputedFields-${this.id}`);
-        const functions = settings.getFunctions(this._request);
+        // this ensures rerender of rows
         this.id = nanoid();
+        const functions = settings.getFunctions(this._request);
         this._name = functions.getName(this._request);
         this._tag = functions.getTag(this._request);
         this._isError = functions.isError(this._request);
         this._params = functions.getParams(this._request);
         this._meta = functions.getMeta(this._request);
         this._content = this._computeContent();
-        this._duration = Object.entries(this._request.timings)
-            .filter(([k, t]) => !k.startsWith('_') && t !== -1)
-            .reduce((acc, [_, t]) => t + acc, 0);
+        this._baseShouldShow = functions.shouldShow(this._request);
     }
 
     getFunctions(): IProfile['functions'] {
@@ -98,7 +98,6 @@ export default class NetworkItem
         if (!this._baseShouldShow) {
             return false;
         }
-        console.count(`shouldShow-${this.id}`);
         const byFilterValue = filterValue
             ? this._request.request.url.includes(filterValue)
             : true;
@@ -136,7 +135,6 @@ export default class NetworkItem
     }
 
     private _computeContent(): TContent {
-        console.count(`getContent-${this.id}`);
         let result;
         if (this._request.response) {
             const content = this._request.response.content.text;
