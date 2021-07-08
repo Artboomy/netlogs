@@ -167,7 +167,10 @@ class Settings {
             if (isJsonRpc(params, result) && this.settings.jsonRpcIntegration) {
                 return 'jsonRpc';
             }
-            if (isGraphql(params, result) && this.settings.graphqlIntegration) {
+            if (
+                isGraphql(params, result, request.response.content.text) &&
+                this.settings.graphqlIntegration
+            ) {
                 return 'graphql';
             }
             return this.settings.matcher(request);
