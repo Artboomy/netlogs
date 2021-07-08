@@ -11,16 +11,27 @@ export const graphqlProfile: IProfile = {
         getName(request: NetworkRequest): string {
             const params = defaultProfile.functions.getParams(request);
             let name = '';
-            if (isGraphqlParams(params)) {
-                name = params.operationName || '';
-                if (!name) {
-                    const match = params.query.match(queryRegex);
-                    if (match) {
-                        name = `${match.groups?.type || 'query'}::${
-                            match.groups?.name || 'Unnamed'
-                        }`;
-                    }
+            if (!params) {
+                return name;
+            }
+            name =
+                (typeof params.operationName === 'string' &&
+                    params.operationName) ||
+                '';
+            if (!name && params.query && typeof params.query === 'string') {
+                const match = params.query.match(queryRegex);
+                if (match) {
+                    name = `${match.groups?.type || 'query'}::${
+                        match.groups?.name || 'Unnamed'
+                    }`;
                 }
+            }
+            if (
+                !name &&
+                params.query_hash &&
+                typeof params.query_hash === 'string'
+            ) {
+                name = params.query_hash;
             }
             return name;
         },
@@ -80,12 +91,30 @@ type graphqlResult = {
 function isGraphqlParams(
     params: Record<string, unknown>
 ): params is graphqlParams {
-    return Boolean(
-        params &&
-            params.query &&
-            typeof params.query === 'string' &&
-            params.query.match('query|mutation')
-    );
+    if (!params) {
+        return false;
+    }
+    const hasQuery =
+        params.query &&
+        typeof params.query === 'string' &&
+        params.query.match('query|mutation');
+    // instagram uses query_hash
+    const hasHash = 'query_hash' in params;
+    return Boolean(hasQuery || hasHash);
+}
+
+function isGraphqlParamsWeak(
+    params: Record<string, unknown>
+): params is graphqlParams {
+    if (!params) {
+        return false;
+    }
+    // airbnb does not send query but has operationName+variables
+    return Boolean('operationName' in params && 'variables' in params);
+}
+
+function isGraphqlResultWeak(resultText?: string): boolean {
+    return typeof resultText === 'string' && resultText.includes('__typename');
 }
 
 function isGraphqlResult(
@@ -100,7 +129,12 @@ function isGraphqlResult(
 
 export function isGraphql(
     params: Record<string, unknown>,
-    _result: unknown
+    result: unknown,
+    resultText?: string
 ): boolean {
-    return isGraphqlParams(params);
+    return (
+        isGraphqlParams(params) ||
+        (isGraphqlParamsWeak(params) &&
+            (isGraphqlResultWeak(resultText) || !resultText))
+    );
 }
