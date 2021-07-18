@@ -33,12 +33,13 @@ interface IRowProps {
     className?: string;
     item: ContentOnlyItem | TransactionItemAbstract;
 }
-function timeToString(timestamp: number): string {
+
+/*function timeToString(timestamp: number): string {
     const date = new Date(timestamp);
     return `${date.toLocaleTimeString('en-GB')}.${String(
         date.getMilliseconds()
     ).padStart(3, '0')}`;
-}
+}*/
 
 export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
     const styles = useStyles();

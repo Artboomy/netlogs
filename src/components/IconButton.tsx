@@ -73,10 +73,12 @@ export const IconButton: FC<IconButtonProps> = ({
 };
 
 export const ICONS: Record<string, IconButtonProps['icon']> = {
-    clear: '0px 144px',
+    clear: '-4px 144px',
     settings: '-168px 168px',
     export: '-196px 144px',
     cross: '-84px 216px',
     filter: '-56px 120px',
-    panelDown: '-116px 0px'
+    panelDown: '-116px 0px',
+    panelRight: '136px 168px',
+    panelUp: '136px -72px'
 } as const;

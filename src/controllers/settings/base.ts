@@ -12,5 +12,9 @@ export const defaultSettings: ISettings = {
     nextjsIntegration: true,
     nuxtjsIntegraction: true,
     jsonRpcIntegration: true,
-    graphqlIntegration: true
+    graphqlIntegration: true,
+    hiddenTags: {
+        OPTIONS: 'OPTIONS'
+    },
+    tagsToolbarVisible: true
 };

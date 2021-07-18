@@ -5,12 +5,14 @@ import { List } from '../List';
 import { SearchContext, useSearchParams } from 'react-inspector';
 import { FilterContext } from '../../context/FilterContext';
 import shallow from 'zustand/shallow';
+import { useSettings } from '../../hooks/useSettings';
 export const ListContainer: FC<{
     onCountChange: (count: {
         totalCount: number;
         visibleCount: number;
     }) => void;
 }> = ({ onCountChange }) => {
+    const [settings] = useSettings();
     const list = useListStore((state) => state.list, shallow);
     const [visibleList, setVisibleList] = useState(list);
     const { value: searchValue } = useContext(SearchContext);
@@ -23,11 +25,13 @@ export const ListContainer: FC<{
     useEffect(() => {
         const filterMap = filterMapRef.current;
         const visibleList = list.filter((i) => {
-            const shouldShow = i.shouldShow({
-                marker,
-                searchValue,
-                filterValue
-            });
+            const shouldShow =
+                !settings.hiddenTags[i.getTag()] &&
+                i.shouldShow({
+                    marker,
+                    searchValue,
+                    filterValue
+                });
             filterMap.set(i, shouldShow);
             return shouldShow;
         });
@@ -36,18 +40,20 @@ export const ListContainer: FC<{
             totalCount: list.length,
             visibleCount: visibleList.length
         });
-    }, [filterValue, searchValue, marker]);
+    }, [filterValue, searchValue, marker, settings]);
     // use map in useEffect on new item to detect if it visible
     useEffect(() => {
         const filterMap = filterMapRef.current;
         const visibleList = list.filter((i) => {
             let computedVisibility = filterMap.get(i);
             if (computedVisibility === undefined) {
-                computedVisibility = i.shouldShow({
-                    marker,
-                    searchValue,
-                    filterValue
-                });
+                computedVisibility =
+                    !settings.hiddenTags[i.getTag()] &&
+                    i.shouldShow({
+                        marker,
+                        searchValue,
+                        filterValue
+                    });
                 filterMap.set(i, computedVisibility);
             }
             return computedVisibility;

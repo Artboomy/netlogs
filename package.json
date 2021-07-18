@@ -9,7 +9,7 @@
     "private": true,
     "scripts": {
         "postinstall": "npx husky install",
-        "lint": "npx tsc --noEmit && npx eslint --max-warnings=0 --ext .ts,.tsx",
+        "lint": "npx tsc --noEmit && npx eslint ./src --max-warnings=0 --ext .ts,.tsx",
         "build": "npx webpack --config webpack.dev.js",
         "build:prod": "npm run lint && npx webpack --config webpack.prod.js",
         "build:analyze": "npm run lint && npx webpack --config webpack.analyze.js",
@@ -36,7 +36,7 @@
         "react-dnd": "14.0.2",
         "react-dnd-html5-backend": "14.0.0",
         "react-dom": "17.0.1",
-        "react-inspector": "https://github.com/Artboomy/react-inspector/releases/download/5.3.4/react-inspector-5.3.4.tgz",
+        "react-inspector": "https://github.com/Artboomy/react-inspector/releases/download/5.3.5/react-inspector-5.3.5.tgz",
         "react-jss": "10.5.0",
         "react-use": "17.2.4",
         "zustand": "3.3.3"

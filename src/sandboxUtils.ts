@@ -40,6 +40,9 @@ export async function wrapSandbox(): Promise<void> {
                             }
                         );
                         break;
+                    case 'chrome.storage.local.set':
+                        storage.local.set(JSON.parse(data));
+                        break;
                     case 'chrome.storage.onChanged.addListener':
                         storage.onChanged.addListener(
                             (

@@ -29,6 +29,8 @@ export interface ISettings {
     nuxtjsIntegraction: boolean;
     jsonRpcIntegration: boolean;
     graphqlIntegration: boolean;
+    tagsToolbarVisible: boolean;
+    hiddenTags: Record<string, string>;
 }
 
 export type ISettingsSerialized = Omit<ISettings, 'matcher' | 'profiles'> & {
