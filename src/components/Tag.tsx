@@ -3,25 +3,34 @@ import { createUseStyles } from 'react-jss';
 import { google } from 'base16';
 import { ItemType } from '../models/types';
 import { theme } from '../theme/light';
+import cn from 'classnames';
 
 const useStyles = createUseStyles({
     root: {
         display: 'inline-block',
         boxSizing: 'border-box',
         borderRadius: '20px',
-        color: google.base07,
         fontSize: '0.8em',
-        backgroundColor: (color) => color || google.base03,
         padding: '2px 6px',
         marginRight: '4px',
         height: '16px',
-        lineHeight: '1em'
+        lineHeight: '12px'
+    },
+    active: {
+        color: google.base07,
+        backgroundColor: (color) => color || google.base03
+    },
+    inactive: {
+        color: 'black',
+        backgroundColor: 'transparent',
+        border: '1px black dashed'
     }
 });
 type TProps = {
     color?: string;
     content: string;
     type: ItemType;
+    active?: boolean;
 };
 
 function getColor(
@@ -41,8 +50,21 @@ function getColor(
     return google.base0C;
 }
 
-export const Tag: React.FC<TProps> = ({ color, content, type }) => {
+export const Tag: React.FC<TProps> = ({
+    color,
+    content,
+    type,
+    active = true
+}) => {
     const computedColor = getColor(color, content, type);
     const styles = useStyles(computedColor);
-    return <div className={styles.root}>{content}</div>;
+    return (
+        <div
+            className={cn(
+                styles.root,
+                active ? styles.active : styles.inactive
+            )}>
+            {content}
+        </div>
+    );
 };

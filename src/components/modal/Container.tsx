@@ -17,7 +17,7 @@ export const ModalContainer: FC = ({ children }) => {
         }
     }, [value]);
     return (
-        <ModalContext.Provider value={{ value: null, setValue }}>
+        <ModalContext.Provider value={{ value, setValue }}>
             {children}
             {value && <Modal onClose={() => setValue(null)}>{value}</Modal>}
         </ModalContext.Provider>

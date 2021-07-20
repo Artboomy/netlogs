@@ -26,6 +26,7 @@ import { Demo } from './options/Demo';
 import { useSettings } from '../hooks/useSettings';
 import cn from 'classnames';
 import { theme } from '../theme/light';
+import { HiddenTagList } from './options/HiddenTagList';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -347,6 +348,10 @@ export const Options: FC = () => {
                         <span title='Extracts window.__NUTXT__ value'>❓</span>
                     </label>
                 </div>
+            </section>
+            <section className={styles.block}>
+                <h2>Hidden tags</h2>
+                <HiddenTagList />
             </section>
             <section className={cn(styles.block, styles.profilesBlock)}>
                 <h2>Profiles</h2>

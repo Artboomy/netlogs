@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
-import { google } from 'base16';
 
 const useStyles = createUseStyles({
     root: {

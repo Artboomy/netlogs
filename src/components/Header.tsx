@@ -43,6 +43,32 @@ function getFileName(): string {
     return now.toISOString().replace(/:/g, '-');
 }
 
+const doExport = () => {
+    const { version, name } = runtime.getManifest();
+    const { list } = useListStore.getState();
+    const entries = list
+        .filter((i) => i.shouldShow())
+        .map((item) => item.toJSON());
+    const fileData: Har = {
+        log: {
+            version: '1.2',
+            creator: {
+                name,
+                version
+            },
+            entries,
+            comment: 'Format: http://www.softwareishard.com/blog/har-12-spec/'
+        }
+    };
+    callParentVoid(
+        'download',
+        JSON.stringify({
+            fileName: getFileName(),
+            data: JSON.stringify(fileData)
+        })
+    );
+};
+
 export const Header: FC<IProps> = ({
     className,
     searchValue,
@@ -53,33 +79,9 @@ export const Header: FC<IProps> = ({
     onCaseSensitiveChange
 }) => {
     const styles = useStyles();
-    const { version, name } = runtime.getManifest();
-    const { clear, list, isPreserve, setPreserve } = useListStore();
+    const { version } = runtime.getManifest();
+    const { clear, isPreserve, setPreserve } = useListStore();
     const [secondRowVisible, setSecondRowVisible] = useState(false);
-    const handleExport = () => {
-        const entries = list
-            .filter((i) => i.shouldShow())
-            .map((item) => item.toJSON());
-        const fileData: Har = {
-            log: {
-                version: '1.2',
-                creator: {
-                    name,
-                    version
-                },
-                entries,
-                comment:
-                    'Format: http://www.softwareishard.com/blog/har-12-spec/'
-            }
-        };
-        callParentVoid(
-            'download',
-            JSON.stringify({
-                fileName: getFileName(),
-                data: JSON.stringify(fileData)
-            })
-        );
-    };
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPreserve(e.target.checked);
     };
@@ -125,7 +127,7 @@ export const Header: FC<IProps> = ({
                 />
                 <IconButton
                     icon={ICONS.export}
-                    onClick={handleExport}
+                    onClick={doExport}
                     title='Export'
                 />
                 <div className={styles.version}>v.{version}</div>

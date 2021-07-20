@@ -54,7 +54,7 @@ function deserializeProfile(profile: IProfileSerialized): IProfile {
     };
 }
 
-function deserialize(strSettings: string): ISettings {
+export function deserialize(strSettings: string): ISettings {
     const deserialized = JSON.parse(strSettings) as ISettingsSerialized;
     return {
         ...deserialized,
@@ -136,7 +136,10 @@ class Settings {
                 { settings: serialize(defaultSettings) },
                 ({ settings }) => {
                     try {
-                        this.settings = deserialize(settings);
+                        this.settings = {
+                            ...defaultSettings,
+                            ...deserialize(settings)
+                        };
                     } catch (e) {
                         this.settings = defaultSettings;
                     }

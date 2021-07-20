@@ -4,7 +4,7 @@ class SandboxRuntime {
         return {
             manifest_version: 2,
             name: 'Net logs',
-            version: '0.0.8'
+            version: '0.0.9'
         };
     }
     openOptionsPage(): void {
