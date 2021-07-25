@@ -26,7 +26,21 @@ export const Empty: FC = () => {
             <div className={styles.emptyContent}>
                 <p className={styles.line}>No items.</p>
                 <p className={styles.line}>
-                    ⛰️ Next/Nuxt state will appear here as row if available
+                    ⛰️{' '}
+                    <a
+                        href='https://nextjs.org/'
+                        target='_blank'
+                        rel='noreferrer'>
+                        Next
+                    </a>
+                    /
+                    <a
+                        href='https://nuxtjs.org/'
+                        target='_blank'
+                        rel='noreferrer'>
+                        Nuxt
+                    </a>{' '}
+                    state will appear here as row if available
                 </p>
                 <p className={styles.line}>
                     👆 Press on item date to show headers
