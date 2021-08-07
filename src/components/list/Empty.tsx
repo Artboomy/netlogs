@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
+import cn from 'classnames';
 
 const useStyles = createUseStyles({
     root: {
@@ -11,6 +12,10 @@ const useStyles = createUseStyles({
         alignItems: 'start',
         justifyContent: 'center',
         flexDirection: 'column'
+    },
+    noItemsLine: {
+        width: '100%',
+        textAlign: 'center'
     },
     line: {
         margin: '0.5em 0'
@@ -24,7 +29,7 @@ export const Empty: FC = () => {
     return (
         <section className={styles.root}>
             <div className={styles.emptyContent}>
-                <p className={styles.line}>No items.</p>
+                <p className={cn(styles.line, styles.noItemsLine)}>No items.</p>
                 <p className={styles.line}>
                     ⛰️{' '}
                     <a

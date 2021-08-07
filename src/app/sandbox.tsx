@@ -12,10 +12,32 @@ callParent('onIframeReady').then(() => {
 });
 
 const F5_CODE = 'F5';
+const F_CODE = 'KeyF';
+const U_CODE = 'KeyU';
+const L_CODE = 'KeyL';
 
 // Since we are in iframe, F5 event for inspected page should be hoisted manually
 document.addEventListener('keydown', (e) => {
-    if (e.code === F5_CODE) {
-        callParentVoid('devtools.inspectedWindow.reload');
+    switch (e.code) {
+        case F5_CODE:
+            callParentVoid('devtools.inspectedWindow.reload');
+            break;
+        case F_CODE:
+            if (e.ctrlKey) {
+                window.postMessage({ type: 'focusSearch' }, '*');
+            }
+            break;
+        case U_CODE:
+            if (e.ctrlKey) {
+                window.postMessage({ type: 'toggleHideUnrelated' }, '*');
+            }
+            break;
+        case L_CODE:
+            if (e.ctrlKey) {
+                window.postMessage({ type: 'clearList' }, '*');
+            }
+            break;
+        default:
+        // pass
     }
 });
