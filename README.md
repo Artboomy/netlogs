@@ -5,7 +5,7 @@
 ![chrome installs](https://img.shields.io/chrome-web-store/users/cjdmhjppaehhblekcplokfdhikmalnaf?cacheSeconds=43200)
 [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Ftwitter.com%2F?cacheSeconds=86400)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2FArtboomy%2Fnetlogs&text=%20&hashtags=netlogs%2Cdevtools%2Cdebugging)
 
-[Install for Chrome](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
+[Install for Chrome/Edge](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
 
 This is extendable network request viewer extension for Chromium-based browsers.
 
@@ -16,16 +16,18 @@ The extension will appear in devtools as a `📜 Net logs` tab.
 * 🔍 **Search:** Filter by url and search by params/result.
 * ⛰️ **Integration:** View Next.js & NuxtJS hydration state.
 * 🛠️ **Customization:** Transform name, parameters, and response with javascript.
-* ✨ **Universality:** View live logs or load from [`*.har` file](https://developer.chrome.com/docs/devtools/network/reference/#save-as-har).
-* 🤝 **Team-friendly:** Export logs and share them with others.
+* ✨ **Universality:** View live logs or load
+  from [`*.har` file](https://developer.chrome.com/docs/devtools/network/reference/#save-as-har).
+* 🤝 **Team-oriented:** Export logs and share them with others.
 
 ![main.gif](./img/main.gif)
 
 ## 🚀 Installation
 
-You can find a version for Chrome/Edge [here](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf).
+You can find a version for
+Chrome/Edge [here](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf).
 
-To install from zip or source, see [local development](#local-development) section.
+To install from zip or source, see [local development](LOCAL_DEVELOPMENT.md).
 
 ## ⛰️ [Next.js](https://nextjs.org/) and [NuxtJS](https://nuxtjs.org/) debugging
 
@@ -54,7 +56,7 @@ If you want to preserve logs on page reload - click `expand` button in the heade
 
 ## 🦄 Custom events
 
-You can send custom events to Netlogs, using `window.netlogs` function.
+You can send custom events to extension from page with `window.netlogs` function.
 
 _Note that function might not always be available._
 
@@ -70,22 +72,24 @@ Example:
 Event signature is either `IItemContentOnlyCfg`:
 
 ```typescript
-type IItemContentOnlyCfg ={
+type IItemContentOnlyCfg = {
     // by default new Date().getTime() will be used
     timestamp?: number;
     // small bit of text next to date
-    tag?: string; 
+    tag?: string;
     // viewable on date click
     meta?: {
         key: {
-            items: [{name: string, value: string}]
+            items: [{ name: string, value: string }]
         }
     }
-    
+
     content: object | string;
 }
 ```
+
 or `IItemTransactionCfg`
+
 ```typescript
 type IItemTransactionCfg = {
     // by default new Date().getTime() will be used
@@ -96,12 +100,12 @@ type IItemTransactionCfg = {
     // viewable on date click
     meta?: {
         key: {
-            items: [{name: string, value: string}]
+            items: [{ name: string, value: string }]
         }
     }
-    
+
     params: object;
-    
+
     result: object;
 }
 ```
@@ -110,18 +114,8 @@ To get help message in console, invoke `window?.netlogs.help()`.
 
 ## 🛠️ Configuration
 
-Open the devtools in any webpage, and navigate to "Net logs" tab.
-Click the "Options" button to open the **Options page**.
-
-![options.png](./img/options.png)
-
-Here you can modify the functions to customize the view.
-
-* Drag and drop your network file to tailor your profile to the logs inside
-
-* Save changes to instantly view the result
-
-* Export finished profile to share with the team
+Open the devtools in any webpage, and navigate to "Net logs" tab. Click the "Options" button to open the **Options
+page**.
 
 ## 🐜Troubleshooting
 
@@ -134,14 +128,15 @@ If something goes wrong and functions crash the view, do the following:
 
 You should see the errors in the console.
 
-Alternatively, you can open a devtools on the devtools.
-To do so, undock the devtools and press `Ctrl+Shift+J`, or press right-click and choose `Inpsect`.
+Alternatively, you can open a devtools on the devtools. To do so, undock the devtools and press `Ctrl+Shift+J`, or press
+right-click and choose `Inpsect`.
 
 This will open new debugger window, where you can find console log with errors.
 
 ## 🔐 Security & privacy
 
-All your custom javascript runs in a [sandbox environment](https://developer.chrome.com/docs/extensions/mv2/manifest/sandbox/).
+All your custom javascript runs in
+a [sandbox environment](https://developer.chrome.com/docs/extensions/mv2/manifest/sandbox/).
 
 Extension does not transmit any data to the servers.
 
@@ -156,41 +151,5 @@ The list may extend in the future.
 
 ## 🚧 Disclaimer
 
-This is software in its early stages of development, which is developed in the free time.
-You can report a bug or suggestion in the [Issues tab](https://github.com/Artboomy/netlogs/issues).
-I may or may not fix it 😉.
-
-# Local development
-
-## 🏗️ Building
-
-1. Clone `git clone git@github.com:Artboomy/netlogs.git`
-
-2. Install dependencies `cd netlogs && yarn`
-
-3. Build `yarn run build`
-
-4. Enable developer mode in browser at chrome://extensions/ and click **"Load unpacked"** from `dist` folder.
-
-5. You are ready to go! If you don't see the tab in devtools - just reopen it.
-
-6. You can run `yarn run build:watch` for active development. 
-   _Hot reload won't work, you'll need to manually reopen devtools on every change._
-
-## 📦 Packaging
-
-Run `yarn run package`. This will generate .zip archive, which can be unpacked and installed as development extensions.
-
-Alternatively, run `yarn run bild:prod` and archive `dist` folder manually.
-
-## 🗜️ Zip installation
-
-1. Grab the latest release from [Github](https://github.com/Artboomy/netlogs/releases). Download `netlogs.zip`.
-
-2. Unzip it.
-
-3. Open chrome://extensions/ and toggle developer mode in the header.
-
-4. Click **"Load unpacked"** and select folder from step 2.
-
-5. You are ready to go! If you don't see the tab in devtools - just reopen it.
+This is software in its early stages of development, which is developed in the free time. You can report a bug or
+suggestion in the [Issues tab](https://github.com/Artboomy/netlogs/issues). I may or may not fix it 😉.
