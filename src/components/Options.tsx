@@ -27,6 +27,7 @@ import { useSettings } from '../hooks/useSettings';
 import cn from 'classnames';
 import { theme } from '../theme/light';
 import { HiddenTagList } from './options/HiddenTagList';
+import { TaskTrack } from './options/TaskTrack';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -349,6 +350,7 @@ export const Options: FC = () => {
                     </label>
                 </div>
             </section>
+            <TaskTrack className={styles.block} />
             <section className={styles.block}>
                 <h2>Hidden tags</h2>
                 <HiddenTagList />

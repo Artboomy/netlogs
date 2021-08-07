@@ -22,6 +22,10 @@ export type IProfileSerialized = Omit<IProfile, 'functions'> & {
     functions: Record<keyof IProfile['functions'], string>;
 };
 
+type JiraConfig = {
+    url: string;
+};
+
 export interface ISettings {
     matcher: (request: NetworkRequest) => ProfileName;
     profiles: Record<ProfileName, IProfile>;
@@ -31,6 +35,8 @@ export interface ISettings {
     graphqlIntegration: boolean;
     tagsToolbarVisible: boolean;
     hiddenTags: Record<string, string>;
+    taskTrackerName: 'null' | 'jira';
+    taskTrackerConfig?: JiraConfig;
 }
 
 export type ISettingsSerialized = Omit<ISettings, 'matcher' | 'profiles'> & {
