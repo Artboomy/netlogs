@@ -95,6 +95,9 @@ export const Header: FC<IProps> = ({
         [ref]
     );
     useHotkey('clearList', clear, []);
+    useHotkey('togglePreserveLog', () => setPreserve(!isPreserve), [
+        isPreserve
+    ]);
     return (
         <header className={cn(styles.root, className)}>
             <div className={styles.row}>

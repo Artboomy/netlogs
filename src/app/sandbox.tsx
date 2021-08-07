@@ -15,6 +15,7 @@ const F5_CODE = 'F5';
 const F_CODE = 'KeyF';
 const U_CODE = 'KeyU';
 const L_CODE = 'KeyL';
+const P_CODE = 'KeyP';
 
 // Since we are in iframe, F5 event for inspected page should be hoisted manually
 document.addEventListener('keydown', (e) => {
@@ -37,7 +38,13 @@ document.addEventListener('keydown', (e) => {
                 window.postMessage({ type: 'clearList' }, '*');
             }
             break;
+        case P_CODE:
+            if (e.ctrlKey) {
+                window.postMessage({ type: 'togglePreserveLog' }, '*');
+            }
+            break;
         default:
+            console.log(e);
         // pass
     }
 });

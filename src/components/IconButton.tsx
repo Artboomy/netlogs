@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss';
 import largeIcons from '../icons/largeIcons.svg';
 import cn from 'classnames';
 import { theme } from '../theme/light';
+
 const useStyles = createUseStyles({
     button: {
         appearance: 'none',
@@ -75,7 +76,7 @@ export const IconButton: FC<IconButtonProps> = ({
 export const ICONS: Record<string, IconButtonProps['icon']> = {
     clear: '-4px 144px',
     settings: '-168px 168px',
-    export: '-196px 144px',
+    export: '-199px 144px',
     cross: '-84px 216px',
     filter: '-56px 120px',
     panelDown: '-116px 0px',
