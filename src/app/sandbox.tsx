@@ -29,7 +29,7 @@ document.addEventListener('keydown', (e) => {
             }
             break;
         case U_CODE:
-            if (e.ctrlKey) {
+            if (e.ctrlKey && e.shiftKey) {
                 window.postMessage({ type: 'toggleHideUnrelated' }, '*');
             }
             break;

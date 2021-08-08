@@ -14,6 +14,7 @@ This is extendable network request viewer extension for Chromium-based browsers.
 The extension will appear in devtools as a `📜 Net logs` tab.
 
 * 🔍 **Search:** Filter by url and search by params/result.
+* 🎨 Presets: GraphQL & JSON-RPC protocols unpacking.
 * ⛰️ **Integration:** View Next.js & NuxtJS hydration state.
 * 🛠️ **Customization:** Transform name, parameters, and response with javascript.
 * ✨ **Universality:** View live logs or load
@@ -93,18 +94,18 @@ Event signature is either `IItemContentOnlyCfg`:
 
 ```typescript
 type IItemContentOnlyCfg = {
-    // by default new Date().getTime() will be used
-    timestamp?: number;
-    // small bit of text next to date
-    tag?: string;
-    // viewable on date click
-    meta?: {
-        key: {
-            items: [{ name: string, value: string }]
-        }
+  // by default new Date().getTime() will be used
+  timestamp?: number;
+  // small bit of text next to date
+  tag?: string;
+  // viewable on date click
+  meta?: {
+    key: {
+      items: [{ name: string, value: string }]
     }
+  }
 
-    content: object | string;
+  content: object | string;
 }
 ```
 
@@ -112,21 +113,21 @@ or `IItemTransactionCfg`
 
 ```typescript
 type IItemTransactionCfg = {
-    // by default new Date().getTime() will be used
-    timestamp?: number;
-    // small bit of text next to date
-    tag?: string;
-    name?: string;
-    // viewable on date click
-    meta?: {
-        key: {
-            items: [{ name: string, value: string }]
-        }
+  // by default new Date().getTime() will be used
+  timestamp?: number;
+  // small bit of text next to date
+  tag?: string;
+  name?: string;
+  // viewable on date click
+  meta?: {
+    key: {
+      items: [{ name: string, value: string }]
     }
+  }
 
-    params: object;
+  params: object;
 
-    result: object;
+  result: object;
 }
 ```
 

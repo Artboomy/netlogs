@@ -49,7 +49,8 @@ export const Empty: FC = () => {
                         Clear log: <kbd>Ctrl</kbd>+<kbd>L</kbd>
                     </p>
                     <p>
-                        Toggle show/hide unrelated: <kbd>Ctrl</kbd>+<kbd>U</kbd>
+                        Toggle show/hide unrelated: <kbd>Ctrl</kbd>+
+                        <kbd>Shift</kbd>+<kbd>U</kbd>
                     </p>
                     <p>
                         Toggle preserve log: <kbd>Ctrl</kbd>+<kbd>P</kbd>
