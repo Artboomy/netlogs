@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
 import { useListStore } from '../controllers/network';
@@ -7,6 +7,7 @@ import { theme } from '../theme/light';
 import { Har } from 'har-format';
 import { callParentVoid } from '../utils';
 import { IconButton, ICONS } from './IconButton';
+import { useHotkey } from '../hooks/useHotkey';
 
 const useStyles = createUseStyles({
     root: {
@@ -85,10 +86,26 @@ export const Header: FC<IProps> = ({
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPreserve(e.target.checked);
     };
+    const ref = useRef<HTMLInputElement>(null);
+    useHotkey(
+        'focusSearch',
+        () => {
+            ref.current?.focus();
+        },
+        [ref]
+    );
+    useHotkey('clearList', clear, []);
+    useHotkey('togglePreserveLog', () => setPreserve(!isPreserve), [
+        isPreserve
+    ]);
     return (
         <header className={cn(styles.root, className)}>
             <div className={styles.row}>
-                <IconButton icon={ICONS.clear} onClick={clear} title='Clear' />
+                <IconButton
+                    icon={ICONS.clear}
+                    onClick={clear}
+                    title='Clear [Ctrl+L]'
+                />
                 <IconButton
                     icon={ICONS.panelDown}
                     onClick={() => setSecondRowVisible(!secondRowVisible)}
@@ -102,9 +119,11 @@ export const Header: FC<IProps> = ({
                     Aa
                 </IconButton>
                 <input
+                    ref={ref}
                     type='search'
                     placeholder='Search in params/result'
                     value={searchValue}
+                    title='Search [Ctrl+F]'
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
                 {searchValue && (
@@ -115,6 +134,7 @@ export const Header: FC<IProps> = ({
                             onChange={(e) =>
                                 onHideUnrelatedChange(e.target.checked)
                             }
+                            title='Toggle unrelated[Ctrl+U]'
                         />
                         Hide unrelated
                     </label>

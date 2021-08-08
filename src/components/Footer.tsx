@@ -4,6 +4,7 @@ import { theme } from '../theme/light';
 import { IconButton, ICONS } from './IconButton';
 import { TagList } from './TagList';
 import { useSettings } from '../hooks/useSettings';
+import { useListStore } from '../controllers/network';
 
 const useStyles = createUseStyles({
     root: {
@@ -28,6 +29,7 @@ export const Footer: FC<{
     totalCount?: number;
 }> = ({ value, onValueChange, visibleCount = 0, totalCount = 0 }) => {
     const styles = useStyles();
+    const { isPreserve } = useListStore();
     const [settings, setSettings] = useSettings();
     const { tagsToolbarVisible } = settings;
     const setTagListVisible = (newValue: boolean) => {
@@ -58,6 +60,7 @@ export const Footer: FC<{
                 />
                 <span className={styles.countWrapper}>
                     {visibleCount} / {totalCount} requests
+                    {isPreserve && ', log preserved'}
                 </span>
 
                 <a

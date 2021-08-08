@@ -12,6 +12,7 @@ import { DropContainer } from './list/DropContainer';
 import useDebounce from 'react-use/lib/useDebounce';
 import { Footer } from './Footer';
 import { FilterContext } from '../context/FilterContext';
+import { useHotkey } from '../hooks/useHotkey';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -25,6 +26,19 @@ const useStyles = createUseStyles({
         },
         '#root': {
             height: '100%'
+        },
+        kbd: {
+            backgroundColor: '#eee',
+            borderRadius: '3px',
+            border: '1px solid #b4b4b4',
+            boxShadow:
+                '0 1px 1px rgba(0, 0, 0, .2), 0 2px 0 0 rgba(255, 255, 255, .7) inset',
+            color: '#333',
+            display: 'inline-block',
+            fontWeight: 700,
+            lineHeight: 1,
+            padding: '2px 4px',
+            whiteSpace: 'nowrap'
         }
     },
     root: {
@@ -52,6 +66,9 @@ export const PanelMain: React.FC = () => {
         visibleCount: number;
         totalCount: number;
     }>({ visibleCount: 0, totalCount: 0 });
+    useHotkey('toggleHideUnrelated', () => setHideUnrelated(!hideUnrelated), [
+        hideUnrelated
+    ]);
     return (
         <DndProvider backend={HTML5Backend}>
             <SettingsContainer>
