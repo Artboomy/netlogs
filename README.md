@@ -29,6 +29,22 @@ Chrome/Edge [here](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppae
 
 To install from zip or source, see [local development](LOCAL_DEVELOPMENT.md).
 
+## 🎨 Presets
+
+*You can disable presets in the settings.*
+
+### [GraphQL](https://graphql.org/)
+
+Features: query name extraction, result unwrapping, colored tag.
+
+![graphql.png](./img/graphql.png)
+
+### [JSON-RPC](https://www.jsonrpc.org/)
+
+Features: method extraction, result unwrapping, coloring for error responses.
+
+![json-rpc.png](./img/json-rpc.png)
+
 ## ⛰️ [Next.js](https://nextjs.org/) and [NuxtJS](https://nuxtjs.org/) debugging
 
 ![next.png](./img/next.png)
@@ -148,6 +164,10 @@ All settings are stored locally.
 * `content_scripts` - used to extract nextjs/nuxtjs data from page.
 
 The list may extend in the future.
+
+## 🏗️ Development
+
+Please see the [dedicated documentation](LOCAL_DEVELOPMENT.md).
 
 ## 🚧 Disclaimer
 

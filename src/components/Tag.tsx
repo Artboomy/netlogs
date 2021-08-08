@@ -14,7 +14,8 @@ const useStyles = createUseStyles({
         padding: '2px 6px',
         marginRight: '4px',
         height: '16px',
-        lineHeight: '12px'
+        lineHeight: '12px',
+        userSelect: 'none'
     },
     active: {
         color: google.base07,
