@@ -45,6 +45,10 @@ Features: method extraction, result unwrapping, coloring for error responses.
 
 ![json-rpc.png](./img/json-rpc.png)
 
+### Custom profiles
+
+If you need custom request/response processing, please refer to the [documentation](CUSTOM_PROFILES.md).
+
 ## ⛰️ [Next.js](https://nextjs.org/) and [NuxtJS](https://nuxtjs.org/) debugging
 
 ![next.png](./img/next.png)

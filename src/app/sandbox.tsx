@@ -44,7 +44,7 @@ document.addEventListener('keydown', (e) => {
             }
             break;
         default:
-            console.log(e);
+        // console.log(e);
         // pass
     }
 });
