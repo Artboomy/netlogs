@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
-import { mediaQuerySmallOnly } from '../../utils';
+import { isMacOs, mediaQuerySmallOnly } from '../../utils';
 
 const useStyles = createUseStyles({
     columns: {
@@ -35,6 +35,7 @@ const url =
     'https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf';
 export const Empty: FC = () => {
     const styles = useStyles();
+    const modifierKey = isMacOs() ? '⌘' : 'Ctrl';
     return (
         <section>
             <p className={cn(styles.line, styles.noItemsLine)}>
@@ -43,17 +44,18 @@ export const Empty: FC = () => {
             <div className={styles.columns}>
                 <div className={cn(styles.column, styles.hotkeys)}>
                     <p>
-                        Focus search: <kbd>Ctrl</kbd>+<kbd>F</kbd>
+                        Focus search: <kbd>{modifierKey}</kbd>+<kbd>F</kbd>
                     </p>
                     <p>
-                        Clear log: <kbd>Ctrl</kbd>+<kbd>L</kbd>
+                        Clear log: <kbd>{modifierKey}</kbd>+<kbd>L</kbd>
                     </p>
                     <p>
-                        Toggle show/hide unrelated: <kbd>Ctrl</kbd>+
+                        Toggle show/hide unrelated: <kbd>{modifierKey}</kbd>+
                         <kbd>Shift</kbd>+<kbd>U</kbd>
                     </p>
                     <p>
-                        Toggle preserve log: <kbd>Ctrl</kbd>+<kbd>P</kbd>
+                        Toggle preserve log: <kbd>{modifierKey}</kbd>+
+                        <kbd>P</kbd>
                     </p>
                 </div>
                 <div className={styles.column}>
