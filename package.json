@@ -1,6 +1,6 @@
 {
     "name": "netlogs",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "description": "Web extension for custom network logs representation",
     "main": "index.js",
     "author": "artboomy",

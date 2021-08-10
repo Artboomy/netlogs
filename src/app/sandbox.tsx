@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { PanelMain } from 'components/PanelMain';
-import { callParent, callParentVoid } from '../utils';
+import { callParent, callParentVoid, isMacOs } from '../utils';
 
 import EventsController from 'controllers/events';
 
@@ -19,27 +19,28 @@ const P_CODE = 'KeyP';
 
 // Since we are in iframe, F5 event for inspected page should be hoisted manually
 document.addEventListener('keydown', (e) => {
+    const isModifierPressed = isMacOs() ? e.metaKey : e.ctrlKey;
     switch (e.code) {
         case F5_CODE:
             callParentVoid('devtools.inspectedWindow.reload');
             break;
         case F_CODE:
-            if (e.ctrlKey) {
+            if (isModifierPressed) {
                 window.postMessage({ type: 'focusSearch' }, '*');
             }
             break;
         case U_CODE:
-            if (e.ctrlKey && e.shiftKey) {
+            if (isModifierPressed && e.shiftKey) {
                 window.postMessage({ type: 'toggleHideUnrelated' }, '*');
             }
             break;
         case L_CODE:
-            if (e.ctrlKey) {
+            if (isModifierPressed) {
                 window.postMessage({ type: 'clearList' }, '*');
             }
             break;
         case P_CODE:
-            if (e.ctrlKey) {
+            if (isModifierPressed) {
                 window.postMessage({ type: 'togglePreserveLog' }, '*');
             }
             break;
