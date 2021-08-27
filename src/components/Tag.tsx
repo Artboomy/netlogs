@@ -10,7 +10,7 @@ const useStyles = createUseStyles({
         display: 'inline-block',
         boxSizing: 'border-box',
         borderRadius: '20px',
-        fontSize: '0.8em',
+        fontSize: '10px',
         padding: '2px 6px',
         marginRight: '4px',
         height: '16px',

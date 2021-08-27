@@ -18,11 +18,14 @@ const useStyles = createUseStyles({
     '@global': {
         html: {
             height: '100%',
-            backgroundColor: 'white'
+            backgroundColor: 'white',
+            fontFamily: '"Segoe UI", Tahoma, sans-serif',
+            fontSize: '13px'
         },
         body: {
             height: '100%',
-            margin: 0
+            margin: 0,
+            fontSize: '100%'
         },
         '#root': {
             height: '100%'

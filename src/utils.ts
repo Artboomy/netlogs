@@ -81,6 +81,10 @@ export function subscribeParent(
     });
 }
 
+export function isExtension(): boolean {
+    return Boolean(chrome.devtools);
+}
+
 export function postSandbox(payload: IframeEvent): void {
     const iframe = document.getElementById('sandbox') as HTMLIFrameElement;
     iframe.contentWindow?.postMessage(payload, '*');
@@ -137,4 +141,4 @@ export const download = (fileName: string, blob: Blob): void => {
     window.URL.revokeObjectURL(url);
 };
 
-export const isMacOs = (): boolean => navigator.userAgent.includes('Mac OS X');
+export const isMacOs = (): boolean => navigator.userAgent.includes("Mac OS X");

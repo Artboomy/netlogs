@@ -20,7 +20,7 @@ const useStyles = createUseStyles(() => {
         name: {
             // marginRight: 'auto',
             fontSize: '13px',
-            maxWidth: '30ch',
+            // maxWidth: '30ch',
             textOverflow: 'ellipsis',
             overflow: 'hidden',
             whiteSpace: 'nowrap',
@@ -81,4 +81,4 @@ export const Transaction: FC<ITransactionProps> = ({
         </>
     );
 };
-Transaction.displayName = 'TransactionRow';
+Transaction.displayName = "TransactionRow";

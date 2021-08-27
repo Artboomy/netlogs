@@ -27,8 +27,9 @@ class InMemoryStorage {
             }
         },
         set: (data: Parameters<StorageArea['set']>[0]) => {
-            //pass
-            InMemoryStorage._data = JSON.stringify(data);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            InMemoryStorage._data = data.settings;
             InMemoryStorage._listeners.forEach((callback) =>
                 callback(
                     { settings: { newValue: InMemoryStorage._data } },
@@ -85,6 +86,7 @@ class SandboxStorage {
         }
     };
 }
+
 const currentStorage = isSandbox()
     ? new SandboxStorage()
     : chrome.storage
