@@ -82,7 +82,7 @@ export function subscribeParent(
 }
 
 export function isExtension(): boolean {
-    return Boolean(chrome.devtools);
+    return Boolean(window.chrome?.devtools);
 }
 
 export function postSandbox(payload: IframeEvent): void {

@@ -2,11 +2,11 @@ import { wrapSandbox } from '../sandboxUtils';
 import { createEventPayload, isExtension, postSandbox } from '../utils';
 import Port = chrome.runtime.Port;
 
-const tabId = isExtension() && chrome.devtools.inspectedWindow.tabId;
+const tabId = isExtension() && window.chrome.devtools.inspectedWindow.tabId;
 document.addEventListener('DOMContentLoaded', () => {
     wrapSandbox().then(() => {
         if (tabId) {
-            const portToContent = chrome.tabs.connect(tabId);
+            const portToContent = window.chrome.tabs.connect(tabId);
             portToContent.postMessage({ type: 'connectionTest' });
             portToContent.onDisconnect.addListener(() => {
                 portToContent.onMessage.removeListener(messageHandler);
@@ -28,7 +28,7 @@ const messageHandler = (
     }
 };
 if (isExtension()) {
-    chrome.runtime.onConnect.addListener((port) => {
+    window.chrome.runtime.onConnect.addListener((port) => {
         port.onDisconnect.addListener(() => {
             port.onMessage.removeListener(messageHandler);
         });

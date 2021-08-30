@@ -7,15 +7,15 @@ import {
     isIframeEvent,
     postSandbox
 } from './utils';
-import AreaName = chrome.storage.AreaName;
 import runtime from './api/runtime';
 import JSZip from 'jszip';
+import AreaName = chrome.storage.AreaName;
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
 // TODO: split into multiple handlers
 export async function wrapSandbox(): Promise<void> {
     return new Promise((resolve) => {
-        const network = chrome?.devtools?.network;
+        const network = window.chrome?.devtools?.network;
         window.addEventListener('message', (event) => {
             if (isIframeEvent(event)) {
                 const { type, id, data } = event.data;
@@ -72,7 +72,7 @@ export async function wrapSandbox(): Promise<void> {
                         postSandbox({
                             id,
                             type,
-                            data: JSON.stringify(chrome.runtime.getManifest())
+                            data: JSON.stringify(runtime.getManifest())
                         });
                         break;
                     case 'chrome.devtools.network.onNavigated.addListener':
@@ -111,7 +111,7 @@ export async function wrapSandbox(): Promise<void> {
                         runtime.openOptionsPage();
                         break;
                     case 'devtools.inspectedWindow.reload':
-                        chrome.devtools.inspectedWindow.reload({});
+                        window.chrome?.devtools.inspectedWindow.reload({});
                         break;
                     case 'download':
                         downloadAsZip(data);

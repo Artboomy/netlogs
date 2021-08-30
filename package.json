@@ -1,6 +1,6 @@
 {
     "name": "netlogs",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "description": "Web extension for custom network logs representation",
     "main": "index.js",
     "author": "artboomy",
@@ -15,6 +15,7 @@
         "build:analyze": "npm run lint && npx webpack --config webpack.analyze.js",
         "build:watch": "npx webpack --config webpack.dev.js --watch",
         "package": "npm run build:prod && tar -C dist -caf netlogs.zip *",
+        "site": "http-server dist",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook"
     },

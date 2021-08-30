@@ -5,7 +5,7 @@ class SandboxRuntime {
         return {
             manifest_version: 2,
             name: 'Net logs',
-            version: '0.0.12'
+            version: '0.0.13'
         };
     }
 
@@ -32,6 +32,6 @@ class LocalRuntime {
 
 export default isSandbox()
     ? sandboxRuntime
-    : chrome.runtime
-    ? chrome.runtime
+    : window.chrome?.runtime
+    ? window.chrome.runtime
     : new LocalRuntime();
