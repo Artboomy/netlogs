@@ -81,4 +81,4 @@ export const Transaction: FC<ITransactionProps> = ({
         </>
     );
 };
-Transaction.displayName = "TransactionRow";
+Transaction.displayName = 'TransactionRow';

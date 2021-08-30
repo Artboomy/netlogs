@@ -141,4 +141,4 @@ export const download = (fileName: string, blob: Blob): void => {
     window.URL.revokeObjectURL(url);
 };
 
-export const isMacOs = (): boolean => navigator.userAgent.includes("Mac OS X");
+export const isMacOs = (): boolean => navigator.userAgent.includes('Mac OS X');
