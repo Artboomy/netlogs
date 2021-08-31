@@ -3,5 +3,14 @@
     "jsxSingleQuote": true,
     "trailingComma": "none",
     "jsxBracketSameLine": true,
-    "singleQuote": true
+    "singleQuote": true,
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": ["**/*.css", "**/*.scss", "**/*.html"],
+            "options": {
+                "singleQuote": false
+            }
+        }
+    ]
 }

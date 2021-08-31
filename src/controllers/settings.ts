@@ -62,7 +62,7 @@ export function deserialize(strSettings: string): ISettings {
         ...{
             profiles: Object.assign(
                 {},
-                ...Object.entries(deserialized.profiles).map(
+                ...Object.entries(deserialized.profiles || {}).map(
                     ([key, profile]) => ({
                         [key]: deserializeProfile(profile)
                     })

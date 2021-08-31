@@ -81,6 +81,10 @@ export function subscribeParent(
     });
 }
 
+export function isExtension(): boolean {
+    return Boolean(window.chrome?.devtools);
+}
+
 export function postSandbox(payload: IframeEvent): void {
     const iframe = document.getElementById('sandbox') as HTMLIFrameElement;
     iframe.contentWindow?.postMessage(payload, '*');

@@ -60,6 +60,6 @@ class SandboxNetwork {
 
 export default isSandbox()
     ? new SandboxNetwork()
-    : chrome.devtools
-    ? chrome.devtools.network
+    : window.chrome?.devtools
+    ? window.chrome.devtools.network
     : NetworkStub;

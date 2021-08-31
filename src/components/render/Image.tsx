@@ -5,11 +5,10 @@ import { ModalContext } from '../modal/Context';
 
 const useStyles = createUseStyles({
     tag: {
-        verticalAlign: 'sub',
         color: String(chromeLight.OBJECT_NAME_COLOR),
         marginRight: '4px',
         fontFamily: String(chromeLight.BASE_FONT_FAMILY),
-        fontSize: '13px'
+        fontSize: '12px'
     },
     image: {
         height: '24px',

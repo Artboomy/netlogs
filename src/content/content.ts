@@ -1,8 +1,9 @@
 import settings from '../controllers/settings';
+
 function injectScript(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = chrome.runtime.getURL(path);
+        s.src = window.chrome.runtime.getURL(path);
         s.onload = function () {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -25,7 +26,7 @@ injectScript('js/inject.js').then(() => {
 
 let connectionReady = false;
 // create port
-const portFromContent = chrome.runtime.connect({
+const portFromContent = window.chrome.runtime.connect({
     name: 'contentScript'
 });
 
@@ -34,9 +35,9 @@ let portToSend: chrome.runtime.Port;
 // initiate a connection
 portFromContent.postMessage({ type: 'connectionTest' });
 portFromContent.onDisconnect.addListener(() => {
-    if (chrome.runtime.lastError) {
+    if (window.chrome.runtime.lastError) {
         portFromContent.onMessage.removeListener(messageCallback);
-        chrome.runtime.onConnect.addListener((port) => {
+        window.chrome.runtime.onConnect.addListener((port) => {
             connectionReady = true;
             portToSend = port;
             sendMessages();
@@ -53,6 +54,7 @@ const messageCallback = (event: { type: string }) => {
 };
 
 portFromContent.onMessage.addListener(messageCallback);
+
 // on response send data
 function sendMessages() {
     if (cache.length && portToSend && connectionReady) {

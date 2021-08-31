@@ -5,7 +5,7 @@ import { useListStore } from '../controllers/network';
 import runtime from '../api/runtime';
 import { theme } from '../theme/light';
 import { Har } from 'har-format';
-import { callParentVoid } from '../utils';
+import { callParentVoid, isExtension } from '../utils';
 import { IconButton, ICONS } from './IconButton';
 import { useHotkey } from '../hooks/useHotkey';
 
@@ -139,13 +139,16 @@ export const Header: FC<IProps> = ({
                         Hide unrelated
                     </label>
                 )}
+                {isExtension() && (
+                    <IconButton
+                        className={styles.optionsButton}
+                        icon={ICONS.settings}
+                        onClick={() => runtime.openOptionsPage()}
+                        title='Options'
+                    />
+                )}
                 <IconButton
-                    className={styles.optionsButton}
-                    icon={ICONS.settings}
-                    onClick={() => runtime.openOptionsPage()}
-                    title='Options'
-                />
-                <IconButton
+                    className={cn({ [styles.optionsButton]: !isExtension() })}
                     icon={ICONS.export}
                     onClick={doExport}
                     title='Export'

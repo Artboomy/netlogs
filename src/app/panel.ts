@@ -1,16 +1,18 @@
 import { wrapSandbox } from '../sandboxUtils';
-import { createEventPayload, postSandbox } from '../utils';
+import { createEventPayload, isExtension, postSandbox } from '../utils';
 import Port = chrome.runtime.Port;
 
-const tabId = chrome.devtools.inspectedWindow.tabId;
+const tabId = isExtension() && window.chrome.devtools.inspectedWindow.tabId;
 document.addEventListener('DOMContentLoaded', () => {
     wrapSandbox().then(() => {
-        const portToContent = chrome.tabs.connect(tabId);
-        portToContent.postMessage({ type: 'connectionTest' });
-        portToContent.onDisconnect.addListener(() => {
-            portToContent.onMessage.removeListener(messageHandler);
-        });
-        portToContent.onMessage.addListener(messageHandler);
+        if (tabId) {
+            const portToContent = window.chrome.tabs.connect(tabId);
+            portToContent.postMessage({ type: 'connectionTest' });
+            portToContent.onDisconnect.addListener(() => {
+                portToContent.onMessage.removeListener(messageHandler);
+            });
+            portToContent.onMessage.addListener(messageHandler);
+        }
     });
 });
 
@@ -25,11 +27,12 @@ const messageHandler = (
         }
     }
 };
-
-chrome.runtime.onConnect.addListener((port) => {
-    port.onDisconnect.addListener(() => {
-        port.onMessage.removeListener(messageHandler);
+if (isExtension()) {
+    window.chrome.runtime.onConnect.addListener((port) => {
+        port.onDisconnect.addListener(() => {
+            port.onMessage.removeListener(messageHandler);
+        });
+        port.onMessage.addListener(messageHandler);
+        port.postMessage({ type: 'connectionTest' });
     });
-    port.onMessage.addListener(messageHandler);
-    port.postMessage({ type: 'connectionTest' });
-});
+}

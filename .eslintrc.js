@@ -4,10 +4,19 @@ module.exports = {
     rules: {
         'no-prototype-builtins': 0,
         'react/prop-types': 0,
-        '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-        'no-unused-vars': 0
+        '@typescript-eslint/no-unused-vars': [
+            'error',
+            { argsIgnorePattern: '^_' }
+        ],
+        'no-unused-vars': 0,
+        'prettier/prettier': [
+            'error',
+            {
+                endOfLine: 'auto'
+            }
+        ]
     },
-    plugins: ['@typescript-eslint'],
+    plugins: ['prettier', '@typescript-eslint'],
     extends: [
         'eslint:recommended',
         'plugin:react/recommended',
