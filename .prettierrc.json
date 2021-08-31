@@ -4,5 +4,13 @@
     "trailingComma": "none",
     "jsxBracketSameLine": true,
     "singleQuote": true,
-    "endOfLine": "lf"
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": ["**/*.css", "**/*.scss", "**/*.html"],
+            "options": {
+                "singleQuote": false
+            }
+        }
+    ]
 }
