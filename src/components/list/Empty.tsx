@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
 import { isMacOs, mediaQuerySmallOnly } from '../../utils';
+import { Link } from '../Link';
 
 const useStyles = createUseStyles({
     columns: {
@@ -60,43 +61,28 @@ export const Empty: FC = () => {
                 </div>
                 <div className={styles.column}>
                     <p className={styles.line}>
-                        ⛰️{' '}
-                        <a
-                            href='https://nextjs.org/'
-                            target='_blank'
-                            rel='noreferrer'>
-                            Next
-                        </a>
+                        ⛰️ <Link href='https://nextjs.org/' text='Next' />
                         /
-                        <a
-                            href='https://nuxtjs.org/'
-                            target='_blank'
-                            rel='noreferrer'>
-                            Nuxt
-                        </a>{' '}
-                        state will appear here as row if available
+                        <Link href='https://nuxtjs.org/' text='Nuxt' /> state
+                        will appear here as row if available
                     </p>
                     <p className={styles.line}>
                         👆 Press on item date to show headers
                     </p>
                     <p className={styles.line}>
                         📖 You can find readme{' '}
-                        <a
-                            href='https://github.com/Artboomy/netlogs'
-                            target='_blank'
-                            rel='noreferrer'>
-                            here
-                        </a>
+                        <Link
+                            href='https://github.com/Artboomy/netlogs#readme'
+                            text='here'
+                        />
                     </p>
                     <p className={styles.line}>
                         📦 Drop HAR/netlogs.zip file to see what&apos;s inside
                     </p>
                     <p className={styles.line}>
                         ❤️ If you like the extension -{' '}
-                        <a href={url} target='_blank' rel='noreferrer'>
-                            share
-                        </a>{' '}
-                        with your friends and colleagues
+                        <Link href={url} text='share' /> with your friends and
+                        colleagues
                     </p>
                 </div>
             </div>

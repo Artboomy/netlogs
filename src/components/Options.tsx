@@ -128,6 +128,7 @@ function getInitialProfileName(profiles: ISettings['profiles']): string {
     const local = localStorage.getItem(CURRENT_PROFILE_KEY);
     return local && profiles.hasOwnProperty(local) ? local : 'default';
 }
+
 export const Options: FC = () => {
     const [settings, setSettings, resetSettings] = useSettings();
     const [currentProfile, setCurrentProfile] = useState(
@@ -384,13 +385,19 @@ export const Options: FC = () => {
                                     id='profile'
                                     onChange={handleChange}
                                     value={currentProfile}>
-                                    {Object.keys(settings.profiles).map(
-                                        (name) => (
+                                    {Object.keys(settings.profiles)
+                                        .filter(
+                                            (key) =>
+                                                ![
+                                                    'jsonRpc',
+                                                    'graphql'
+                                                ].includes(key)
+                                        )
+                                        .map((name) => (
                                             <option key={name} value={name}>
                                                 {name}
                                             </option>
-                                        )
-                                    )}
+                                        ))}
                                 </select>
                                 <button
                                     onClick={() =>
