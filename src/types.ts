@@ -25,8 +25,11 @@ type DevtoolsEventName = 'devtools.inspectedWindow.reload';
 
 type CustomEventName = 'newItem' | 'download';
 
+type TabEventName = 'chrome.tabs.create';
+
 export type EventName =
     | 'onIframeReady'
+    | TabEventName
     | StorageEventName
     | RuntimeEventName
     | NetworkEventName

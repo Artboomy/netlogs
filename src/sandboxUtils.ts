@@ -28,6 +28,9 @@ export async function wrapSandbox(): Promise<void> {
                         });
                         resolve();
                         break;
+                    case 'chrome.tabs.create':
+                        chrome.tabs.create({ url: data });
+                        break;
                     case 'chrome.storage.local.get':
                         storage.local.get(
                             { settings: serialize(defaultSettings) },

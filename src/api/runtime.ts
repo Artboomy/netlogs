@@ -5,7 +5,7 @@ class SandboxRuntime {
         return {
             manifest_version: 2,
             name: 'Net logs',
-            version: '0.0.13'
+            version: '0.0.14'
         };
     }
 
