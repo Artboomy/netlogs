@@ -5,6 +5,7 @@ import { google } from 'base16';
 import { ItemType } from '../models/types';
 import { useSettings } from '../hooks/useSettings';
 import { createUseStyles } from 'react-jss';
+import shallow from 'zustand/shallow';
 
 const useStyles = createUseStyles({
     root: {
@@ -21,7 +22,7 @@ const useStyles = createUseStyles({
 
 export const TagList: FC = () => {
     const styles = useStyles();
-    const { list } = useListStore();
+    const list = useListStore((state) => state.list, shallow);
     const [settings, setSettings] = useSettings();
     const hiddenTags = { ...settings.hiddenTags };
     const tags: Record<

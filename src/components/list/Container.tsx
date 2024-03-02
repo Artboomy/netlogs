@@ -1,4 +1,11 @@
-import React, { FC, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+    FC,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import { useListStore } from '../../controllers/network';
 import { Row } from '../Row';
 import { List } from '../List';
@@ -6,6 +13,7 @@ import { SearchContext, useSearchParams } from 'react-inspector';
 import { FilterContext } from '../../context/FilterContext';
 import shallow from 'zustand/shallow';
 import { useSettings } from '../../hooks/useSettings';
+
 export const ListContainer: FC<{
     onCountChange: (count: {
         totalCount: number;
@@ -19,6 +27,10 @@ export const ListContainer: FC<{
     const filterValue = useContext(FilterContext);
     const { marker } = useSearchParams();
 
+    const hiddenMimeTypes = useMemo(() => {
+        return new Set(settings.hiddenMimeTypes);
+    }, [settings]);
+
     // generate map item: visibility
     const filterMapRef = useRef(new WeakMap());
     // recalculate map entirely on new filter values
@@ -27,6 +39,7 @@ export const ListContainer: FC<{
         const visibleList = list.filter((i) => {
             const shouldShow =
                 !settings.hiddenTags[i.getTag()] &&
+                !hiddenMimeTypes.has(i.toJSON().response?.content.mimeType) &&
                 i.shouldShow({
                     marker,
                     searchValue,
@@ -49,6 +62,9 @@ export const ListContainer: FC<{
             if (computedVisibility === undefined) {
                 computedVisibility =
                     !settings.hiddenTags[i.getTag()] &&
+                    !hiddenMimeTypes.has(
+                        i.toJSON().response?.content.mimeType
+                    ) &&
                     i.shouldShow({
                         marker,
                         searchValue,

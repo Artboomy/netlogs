@@ -39,6 +39,7 @@
         "react-dom": "17.0.1",
         "react-inspector": "https://github.com/Artboomy/react-inspector/releases/download/5.3.5/react-inspector-5.3.5.tgz",
         "react-jss": "10.5.0",
+        "react-multi-select-component": "^4.3.4",
         "react-use": "17.2.4",
         "zustand": "3.3.3"
     },

@@ -8,6 +8,7 @@ import { Har } from 'har-format';
 import { callParentVoid, isExtension } from '../utils';
 import { IconButton, ICONS } from './IconButton';
 import { useHotkey } from '../hooks/useHotkey';
+import { MimetypeSelect } from './MimetypeSelect';
 
 const useStyles = createUseStyles({
     root: {
@@ -25,7 +26,10 @@ const useStyles = createUseStyles({
         fontStyle: 'italic'
     },
     optionsButton: {
-        marginLeft: 'auto'
+        // marginLeft: 'auto'
+    },
+    hideUnrelated: {
+        display: 'flex'
     }
 });
 
@@ -81,10 +85,11 @@ export const Header: FC<IProps> = ({
 }) => {
     const styles = useStyles();
     const { version } = runtime.getManifest();
-    const { clear, isPreserve, setPreserve } = useListStore();
+    const clear = useListStore((state) => state.clear);
+    const isPreserve = useListStore((state) => state.isPreserve);
     const [secondRowVisible, setSecondRowVisible] = useState(false);
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPreserve(e.target.checked);
+        useListStore.setState({ isPreserve: e.target.checked });
     };
     const ref = useRef<HTMLInputElement>(null);
     useHotkey(
@@ -95,9 +100,15 @@ export const Header: FC<IProps> = ({
         [ref]
     );
     useHotkey('clearList', clear, []);
-    useHotkey('togglePreserveLog', () => setPreserve(!isPreserve), [
-        isPreserve
-    ]);
+    useHotkey(
+        'togglePreserveLog',
+        () =>
+            useListStore.setState((prevState) => ({
+                ...prevState,
+                isPreserve: !prevState.isPreserve
+            })),
+        []
+    );
     return (
         <header className={cn(styles.root, className)}>
             <div className={styles.row}>
@@ -127,7 +138,7 @@ export const Header: FC<IProps> = ({
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
                 {searchValue && (
-                    <label>
+                    <label className={styles.hideUnrelated}>
                         <input
                             type='checkbox'
                             checked={hideUnrelated}
@@ -139,6 +150,7 @@ export const Header: FC<IProps> = ({
                         Hide unrelated
                     </label>
                 )}
+                <MimetypeSelect />
                 {isExtension() && (
                     <IconButton
                         className={styles.optionsButton}

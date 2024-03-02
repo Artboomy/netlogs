@@ -30,7 +30,7 @@ export const Footer: FC<{
     totalCount?: number;
 }> = ({ value, onValueChange, visibleCount = 0, totalCount = 0 }) => {
     const styles = useStyles();
-    const { isPreserve } = useListStore();
+    const isPreserve = useListStore((state) => state.isPreserve);
     const [settings, setSettings] = useSettings();
     const { tagsToolbarVisible } = settings;
     const setTagListVisible = (newValue: boolean) => {

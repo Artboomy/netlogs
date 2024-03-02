@@ -2,7 +2,7 @@
     "name": "Net logs",
     "version": "1.0.0",
     "manifest_version": 3,
-    "minimum_chrome_version": "60",
+    "minimum_chrome_version": "88",
     "description": "Extendable network logs debugger",
     "devtools_page": "devtools.html",
     "author": "artboomy",
