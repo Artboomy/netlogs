@@ -63,8 +63,8 @@ export const Empty: FC = () => {
                     <p className={styles.line}>
                         ⛰️ <Link href='https://nextjs.org/' text='Next' />
                         /
-                        <Link href='https://nuxtjs.org/' text='Nuxt' /> state
-                        will appear here as row if available
+                        <Link href='https://nuxt.com/' text='Nuxt' /> state will
+                        appear here as row if available
                     </p>
                     <p className={styles.line}>
                         👆 Press on item date to show headers
