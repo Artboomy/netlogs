@@ -10,6 +10,7 @@ import { DropContainer } from './DropContainer';
 import { ListContainer } from './Container';
 import { useListStore } from '../../controllers/network';
 import { createUseStyles } from 'react-jss';
+
 const useStyles = createUseStyles({
     '@global': {
         html: {
@@ -25,12 +26,13 @@ const useStyles = createUseStyles({
     }
 });
 export const ListDemo: FC = () => {
-    const { setList } = useListStore();
     useStyles();
 
     useEffect(() => {
         const demoList = (data.log.entries as unknown) as NetworkRequest[];
-        setList(demoList.map((request) => new NetworkItem({ request })));
+        useListStore
+            .getState()
+            .setList(demoList.map((request) => new NetworkItem({ request })));
     }, []);
 
     return (

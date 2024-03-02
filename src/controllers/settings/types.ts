@@ -31,6 +31,7 @@ export interface ISettings {
     graphqlIntegration: boolean;
     tagsToolbarVisible: boolean;
     hiddenTags: Record<string, string>;
+    hiddenMimeTypes: string[];
 }
 
 export type ISettingsSerialized = Omit<ISettings, 'matcher' | 'profiles'> & {

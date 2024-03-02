@@ -19,7 +19,8 @@ export const defaultProfile: IProfile = {
         getParams: function (request: NetworkRequest): Record<string, unknown> {
             let params;
             const postData = request.request.postData;
-            if (request.request.method === 'POST' && postData) {
+            const method = request.request.method;
+            if ((method === 'POST' || method === 'PATCH') && postData) {
                 if (postData.text) {
                     try {
                         params = JSON.parse(postData.text);

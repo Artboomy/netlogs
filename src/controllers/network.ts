@@ -1,4 +1,4 @@
-import create from 'zustand';
+import create, { PartialState } from 'zustand';
 
 import NetworkItem from '../models/NetworkItem';
 import ContentOnlyItem from '../models/ContentOnlyItem';
@@ -15,18 +15,18 @@ type TStore = {
     isDynamic: boolean;
     isPreserve: boolean;
     clear: () => void;
+    mimeTypes: Set<string>;
     setList: (newList: ItemList, isDynamic?: boolean) => void;
-    setPreserve: (isPreserve: boolean) => void;
 };
 
 export const useListStore = create<TStore>((set) => ({
     list: [],
     isDynamic: true,
     isPreserve: false,
-    clear: () => set({ list: [], isDynamic: true }),
+    mimeTypes: new Set(),
+    clear: () => set({ list: [], isDynamic: true, mimeTypes: new Set() }),
     setList: (newList: ItemList, isDynamic = true) =>
-        set({ list: newList, isDynamic }),
-    setPreserve: (isPreserve) => set({ isPreserve })
+        set({ list: newList, isDynamic })
 }));
 
 class Network {
@@ -37,11 +37,20 @@ class Network {
             setList([...list]);
         });
         network.onRequestFinished.addListener((request: NetworkRequest) => {
-            const { list, isDynamic } = useListStore.getState();
+            const { list, isDynamic, mimeTypes } = useListStore.getState();
             if (isDynamic) {
-                useListStore.setState({
-                    list: insertSorted(new NetworkItem({ request }), list)
-                });
+                const newState: PartialState<TStore, 'mimeTypes' | 'list'> = {
+                    list: insertSorted(new NetworkItem({ request }), list),
+                    mimeTypes
+                };
+                const mimeType = request.response.content.mimeType;
+                if (mimeType && !mimeTypes.has(mimeType)) {
+                    newState.mimeTypes = new Set([
+                        ...useListStore.getState().mimeTypes,
+                        mimeType
+                    ]);
+                }
+                useListStore.setState(newState);
             }
         });
         network.onNavigated.addListener((url) => {

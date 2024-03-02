@@ -27,6 +27,7 @@ import { useSettings } from '../hooks/useSettings';
 import cn from 'classnames';
 import { theme } from '../theme/light';
 import { HiddenTagList } from './options/HiddenTagList';
+import { Link } from './Link';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -245,24 +246,15 @@ export const Options: FC = () => {
                 <h1>Options page</h1>
                 <div>
                     Links:{' '}
-                    <a
+                    <Link
                         href='https://github.com/Artboomy/netlogs'
-                        target='_blank'
-                        rel='noreferrer'>
-                        Github
-                    </a>{' '}
-                    <a
+                        text='Github'
+                    />{' '}
+                    <Link
                         href='https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf'
-                        target='_blank'
-                        rel='noreferrer'>
-                        Chrome store
-                    </a>{' '}
-                    <a
-                        href='https://twitter.com/Artboomy'
-                        target='_blank'
-                        rel='noreferrer'>
-                        Tweet me
-                    </a>
+                        text='Chrome store'
+                    />{' '}
+                    <Link href='https://twitter.com/Artboomy' text='Tweet me' />
                 </div>
             </section>
             <section className={styles.block}>
@@ -300,12 +292,10 @@ export const Options: FC = () => {
                             }
                         />
                         Unwrap{' '}
-                        <a
+                        <Link
+                            text='JSON-RPC'
                             href='https://www.jsonrpc.org/specification'
-                            target='_blank'
-                            rel='noreferrer'>
-                            JSON-RPC
-                        </a>{' '}
+                        />{' '}
                         requests
                     </label>
                 </div>
@@ -323,12 +313,7 @@ export const Options: FC = () => {
                             }
                         />
                         Unwrap{' '}
-                        <a
-                            href='https://graphql.org/'
-                            target='_blank'
-                            rel='noreferrer'>
-                            GraphQL
-                        </a>{' '}
+                        <Link text='GraphQL' href='https://graphql.org/' />{' '}
                         requests
                     </label>
                 </div>

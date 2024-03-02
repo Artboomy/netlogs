@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 import { Disclaimer } from './Disclaimer';
 import { createUseStyles } from 'react-jss';
+import { Link } from '../Link';
+
 const useStyles = createUseStyles({
     howToList: {
         lineHeight: '1.5'
@@ -74,12 +76,10 @@ export const Instructions: FC = () => {
             <p>
                 <code className={styles.functionName}>request</code> in function
                 params is single{' '}
-                <a
+                <Link
+                    text='HAR entry'
                     href='http://www.softwareishard.com/blog/har-12-spec/#entries'
-                    target='_blank'
-                    rel='noreferrer'>
-                    HAR entry
-                </a>
+                />
             </p>
             <Disclaimer />
         </section>

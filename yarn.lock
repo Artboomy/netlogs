@@ -2194,10 +2194,10 @@
   resolved "https://registry.yarnpkg.com/@types/braces/-/braces-3.0.1.tgz#5a284d193cfc61abb2e5a50d36ebbc50d942a32b"
   integrity sha512-+euflG6ygo4bn0JHtn4pYqcXwRtLvElQ7/nnjDu7iYG56H0+OhCd7d6Ug0IE3WcFpZozBKW2+80FUbv5QGk5AQ==
 
-"@types/chrome@0.0.127":
-  version "0.0.127"
-  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.127.tgz#9e29f351d558f60e95326ceadc586fdcc824151b"
-  integrity sha512-hBB9EApLYKKn2GvklVkTxVP6vZvxsH9okyIRUinNtMzZHIgIKWQk/ESbX+O5g4Bihfy38+aFGn7Kl7Cxou5JUg==
+"@types/chrome@0.0.262":
+  version "0.0.262"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.262.tgz#7c188d946da51216a558342637393c998bb85dd2"
+  integrity sha512-TOoj3dqSYE13PD2fRuMQ6X6pggEvL9rRk/yOYOyWE6sfqRWxsJm4VoVm+wr9pkr4Sht/M5t7FFL4vXato8d1gA==
   dependencies:
     "@types/filesystem" "*"
     "@types/har-format" "*"
@@ -9314,6 +9314,11 @@ react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
+
+react-multi-select-component@^4.3.4:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/react-multi-select-component/-/react-multi-select-component-4.3.4.tgz#4f4b354bfa1f0353fa9c3bccf8178c87c9780450"
+  integrity sha512-Ui/bzCbROF4WfKq3OKWyQJHmy/bd1mW7CQM+L83TfiltuVvHElhKEyPM3JzO9urIcWplBUKv+kyxqmEnd9jPcA==
 
 react-popper-tooltip@^3.1.1:
   version "3.1.1"

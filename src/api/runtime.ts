@@ -3,9 +3,9 @@ import { callParentVoid, isSandbox } from '../utils';
 class SandboxRuntime {
     getManifest(): ReturnType<typeof chrome.runtime.getManifest> {
         return {
-            manifest_version: 2,
+            manifest_version: 3,
             name: 'Net logs',
-            version: '0.0.14'
+            version: '1.0.0'
         };
     }
 

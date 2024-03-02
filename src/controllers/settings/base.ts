@@ -16,5 +16,6 @@ export const defaultSettings: ISettings = {
     hiddenTags: {
         OPTIONS: 'OPTIONS'
     },
+    hiddenMimeTypes: [],
     tagsToolbarVisible: true
 };
