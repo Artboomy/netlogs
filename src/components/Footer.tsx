@@ -5,6 +5,7 @@ import { IconButton, ICONS } from './IconButton';
 import { TagList } from './TagList';
 import { useSettings } from '../hooks/useSettings';
 import { useListStore } from '../controllers/network';
+import { Link } from './Link';
 
 const useStyles = createUseStyles({
     root: {
@@ -62,13 +63,10 @@ export const Footer: FC<{
                     {visibleCount} / {totalCount} requests
                     {isPreserve && ', log preserved'}
                 </span>
-
-                <a
+                <Link
+                    text='Github'
                     href='https://github.com/Artboomy/netlogs'
-                    target='_blank'
-                    rel='noreferrer'>
-                    Github
-                </a>
+                />
             </div>
         </footer>
     );
