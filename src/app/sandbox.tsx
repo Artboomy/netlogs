@@ -24,6 +24,11 @@ document.addEventListener('keydown', (e) => {
         case F5_CODE:
             callParentVoid('devtools.inspectedWindow.reload');
             break;
+        case 'KeyR':
+            if (isModifierPressed) {
+                callParentVoid('devtools.inspectedWindow.reload');
+            }
+            break;
         case F_CODE:
             if (isModifierPressed) {
                 window.postMessage({ type: 'focusSearch' }, '*');
