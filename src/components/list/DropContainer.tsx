@@ -10,6 +10,7 @@ import { createUseStyles } from 'react-jss';
 import ContentOnlyItem from '../../models/ContentOnlyItem';
 import { ItemType } from '../../models/types';
 import TransactionItem from '../../models/TransactionItem';
+import { toast } from 'react-toastify';
 
 const useStyles = createUseStyles({
     dropZone: {
@@ -29,52 +30,55 @@ export const DropContainer: FC = ({ children }) => {
     const [{ canDrop, isOver }, dropRef] = useDrop(
         () => ({
             accept: [NativeTypes.FILE],
-            drop(item: { files: File[] }) {
+            async drop(item: { files: File[] }) {
                 const file = item.files[0];
-                if (isFileSupported(file.name)) {
-                    parseFile<Har>(file).then(
-                        (log) => {
-                            if (log?.log?.entries) {
-                                try {
-                                    setList(
-                                        [
-                                            new ContentOnlyItem({
-                                                timestamp: new Date().getTime(),
-                                                tag: 'NET LOGS',
-                                                content: `Opened file "${file.name}"`
-                                            }),
-                                            ...log.log.entries.map(
-                                                (request) => {
-                                                    let ItemContstructor;
-                                                    switch (request.comment) {
-                                                        case ItemType.ContentOnly:
-                                                            ItemContstructor = ContentOnlyItem;
-                                                            break;
-                                                        case ItemType.Transaction:
-                                                            ItemContstructor = TransactionItem;
-                                                            break;
-                                                        default:
-                                                            ItemContstructor = NetworkItem;
-                                                    }
-                                                    return ItemContstructor.fromJSON(
-                                                        request
-                                                    );
-                                                }
-                                            )
-                                        ],
-                                        false
-                                    );
-                                } catch (e) {
-                                    window.alert('Invalid har file');
+                if (!isFileSupported(file.name)) {
+                    toast.error('Only json files are supported');
+                }
+                let log: Har | null = null;
+                const toastId = toast('Loading file...');
+                try {
+                    log = await parseFile<Har>(file);
+                    toast.dismiss(toastId);
+                } catch (e) {
+                    toast.dismiss(toastId);
+                    toast.error('Error parsing file');
+                }
+                if (!log) {
+                    return;
+                }
+                if (!log?.log?.entries) {
+                    toast.error('Invalid har file');
+                    return;
+                }
+                try {
+                    setList(
+                        [
+                            new ContentOnlyItem({
+                                timestamp: new Date().getTime(),
+                                tag: 'NET LOGS',
+                                content: `Opened file "${file.name}"`
+                            }),
+                            ...log.log.entries.map((request) => {
+                                let ItemConstructor;
+                                switch (request.comment) {
+                                    case ItemType.ContentOnly:
+                                        ItemConstructor = ContentOnlyItem;
+                                        break;
+                                    case ItemType.Transaction:
+                                        ItemConstructor = TransactionItem;
+                                        break;
+                                    default:
+                                        ItemConstructor = NetworkItem;
                                 }
-                            } else {
-                                window.alert('Invalid har file');
-                            }
-                        },
-                        (e) => window.alert(`Error parsing file ${e.message}`)
+                                return ItemConstructor.fromJSON(request);
+                            })
+                        ],
+                        false
                     );
-                } else {
-                    window.alert('Only json files are supported');
+                } catch (e) {
+                    console.log('Error occurred:', e);
+                    toast.error('Invalid har file');
                 }
             },
             collect: (monitor) => ({

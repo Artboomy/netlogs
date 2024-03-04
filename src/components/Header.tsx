@@ -5,10 +5,11 @@ import { useListStore } from '../controllers/network';
 import runtime from '../api/runtime';
 import { theme } from '../theme/light';
 import { Har } from 'har-format';
-import { callParentVoid, isExtension } from '../utils';
+import { callParent, isExtension } from '../utils';
 import { IconButton, ICONS } from './IconButton';
 import { useHotkey } from '../hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
+import { toast } from 'react-toastify';
 
 const useStyles = createUseStyles({
     root: {
@@ -65,12 +66,19 @@ const doExport = () => {
             comment: 'Format: http://www.softwareishard.com/blog/har-12-spec/'
         }
     };
-    callParentVoid(
-        'download',
-        JSON.stringify({
-            fileName: getFileName(),
-            data: JSON.stringify(fileData)
-        })
+    toast.promise(
+        callParent(
+            'download',
+            JSON.stringify({
+                fileName: getFileName(),
+                data: JSON.stringify(fileData)
+            })
+        ),
+        {
+            pending: 'Exporting...',
+            success: 'Exported',
+            error: 'Error exporting'
+        }
     );
 };
 

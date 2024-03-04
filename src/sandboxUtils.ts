@@ -117,7 +117,14 @@ export async function wrapSandbox(): Promise<void> {
                         window.chrome?.devtools.inspectedWindow.reload({});
                         break;
                     case 'download':
-                        downloadAsZip(data);
+                        downloadAsZip(data).finally(() => {
+                            postSandbox({
+                                id,
+                                type,
+                                data: ''
+                            });
+                            resolve();
+                        });
                         break;
                     default:
                         console.warn(`Unrecognized type ${type}`);
@@ -127,18 +134,20 @@ export async function wrapSandbox(): Promise<void> {
     });
 }
 
-function downloadAsZip(dataString: string): void {
+function downloadAsZip(dataString: string): Promise<unknown> {
     const { fileName, data } = JSON.parse(dataString);
     // const blob = new Blob([data], { type: 'application/json' });
     const zip = new JSZip();
     zip.file(`${fileName}.har`, data);
-    zip.generateAsync({
-        type: 'blob',
-        compression: 'DEFLATE',
-        compressionOptions: {
-            level: 9
-        }
-    }).then((content) => {
-        download(`${fileName}.netlogs.zip`, content);
-    });
+    return zip
+        .generateAsync({
+            type: 'blob',
+            compression: 'DEFLATE',
+            compressionOptions: {
+                level: 9
+            }
+        })
+        .then((content) => {
+            download(`${fileName}.netlogs.zip`, content);
+        });
 }
