@@ -1,1 +1,2 @@
-chrome.devtools.panels.create('📜 Net logs', 'icons/16.png', 'panel.html');
+const title = navigator.userAgent.includes('Edg') ? 'Net logs' : '📜 Net logs';
+chrome.devtools.panels.create(title, 'icons/16', 'panel.html');

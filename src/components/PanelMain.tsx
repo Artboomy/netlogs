@@ -13,6 +13,8 @@ import useDebounce from 'react-use/lib/useDebounce';
 import { Footer } from './Footer';
 import { FilterContext } from '../context/FilterContext';
 import { useHotkey } from '../hooks/useHotkey';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -108,6 +110,7 @@ export const PanelMain: React.FC = () => {
                                 />
                             </FilterContext.Provider>
                         </SearchContext.Provider>
+                        <ToastContainer />
                     </div>
                 </ModalContainer>
             </SettingsContainer>

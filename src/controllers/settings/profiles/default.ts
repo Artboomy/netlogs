@@ -20,7 +20,10 @@ export const defaultProfile: IProfile = {
             let params;
             const postData = request.request.postData;
             const method = request.request.method;
-            if ((method === 'POST' || method === 'PATCH') && postData) {
+            if (
+                (method === 'POST' || method === 'PATCH' || method === 'PUT') &&
+                postData
+            ) {
                 if (postData.text) {
                     try {
                         params = JSON.parse(postData.text);

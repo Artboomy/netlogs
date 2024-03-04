@@ -19,14 +19,28 @@ type TStore = {
     setList: (newList: ItemList, isDynamic?: boolean) => void;
 };
 
-export const useListStore = create<TStore>((set) => ({
+export const useListStore = create<TStore>((set, get) => ({
     list: [],
     isDynamic: true,
     isPreserve: false,
     mimeTypes: new Set(),
     clear: () => set({ list: [], isDynamic: true, mimeTypes: new Set() }),
-    setList: (newList: ItemList, isDynamic = true) =>
-        set({ list: newList, isDynamic })
+    setList: (newList: ItemList, isDynamic = true) => {
+        const newState = {
+            list: newList,
+            isDynamic,
+            mimeTypes: new Set([...get().mimeTypes])
+        };
+        if (!isDynamic) {
+            newList.forEach((request) => {
+                const mimeType = request.toJSON().response.content.mimeType;
+                if (mimeType && !newState.mimeTypes.has(mimeType)) {
+                    newState.mimeTypes.add(mimeType);
+                }
+            });
+        }
+        set(newState);
+    }
 }));
 
 class Network {
