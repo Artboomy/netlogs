@@ -11,6 +11,7 @@ import ContentOnlyItem from '../../models/ContentOnlyItem';
 import { ItemType } from '../../models/types';
 import TransactionItem from '../../models/TransactionItem';
 import { toast } from 'react-toastify';
+import { callParentVoid } from '../../utils';
 
 const useStyles = createUseStyles({
     dropZone: {
@@ -75,6 +76,10 @@ export const DropContainer: FC = ({ children }) => {
                             })
                         ],
                         false
+                    );
+                    callParentVoid(
+                        'analytics.fileOpen',
+                        String(log.log.entries.length)
                     );
                 } catch (e) {
                     console.log('Error occurred:', e);
