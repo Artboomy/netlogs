@@ -4,6 +4,7 @@ import { useListStore } from '../controllers/network';
 import { MultiSelect } from 'react-multi-select-component';
 import isEqual from 'lodash.isequal';
 import settings from '../controllers/settings';
+import { callParentVoid } from '../utils';
 
 const useStyles = createUseStyles({
     root: {
@@ -51,6 +52,7 @@ export const MimetypeSelect: FC = memo(() => {
             (mimeType) => !selectedMimeTypes.has(mimeType)
         );
         setHiddenMimeTypes(newHiddenMimeTypes);
+        callParentVoid('analytics.mimeFilterChange');
     };
     return (
         <MultiSelect

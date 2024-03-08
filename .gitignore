@@ -5,3 +5,4 @@ node_modules/
 *.zip
 roadmap.md
 yarn-error.log
+src/secrets.json

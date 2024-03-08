@@ -27,6 +27,13 @@ type CustomEventName = 'newItem' | 'download';
 
 type TabEventName = 'chrome.tabs.create';
 
+type AnalyticsEventName =
+    | 'analytics.init'
+    | 'analytics.mimeFilterChange'
+    | 'analytics.propTreeViewed'
+    | 'analytics.hotkey'
+    | 'analytics.fileOpen';
+
 export type EventName =
     | 'onIframeReady'
     | TabEventName
@@ -34,7 +41,8 @@ export type EventName =
     | RuntimeEventName
     | NetworkEventName
     | DevtoolsEventName
-    | CustomEventName;
+    | CustomEventName
+    | AnalyticsEventName;
 
 export type IframeEvent = {
     type: EventName;

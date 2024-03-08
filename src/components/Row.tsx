@@ -1,4 +1,10 @@
-import React, { memo, MouseEventHandler, useContext } from 'react';
+import React, {
+    memo,
+    MouseEventHandler,
+    useContext,
+    useEffect,
+    useRef
+} from 'react';
 import ContentOnlyItem from '../models/ContentOnlyItem';
 import { TransactionItemAbstract } from '../models/TransactionItem';
 import { createUseStyles } from 'react-jss';
@@ -46,13 +52,23 @@ export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
     const { setValue } = useContext(ModalContext);
     const tag = item.getTag();
     const meta = item.getMeta();
+    const shouldClean = useRef(false);
     const handleClick: MouseEventHandler = (e) => {
         if (e.target === e.currentTarget) {
             if (meta) {
                 setValue(<PropTree data={meta} />);
+                shouldClean.current = true;
             }
         }
     };
+    useEffect(() => {
+        return () => {
+            if (shouldClean.current) {
+                setValue(null);
+                shouldClean.current = false;
+            }
+        };
+    }, []);
     const commonProps = {
         className,
         date: (

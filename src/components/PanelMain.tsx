@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import { Header } from './Header';
 import { createUseStyles } from 'react-jss';
@@ -15,6 +15,7 @@ import { FilterContext } from '../context/FilterContext';
 import { useHotkey } from '../hooks/useHotkey';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import { callParentVoid } from '../utils';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -74,6 +75,10 @@ export const PanelMain: React.FC = () => {
     useHotkey('toggleHideUnrelated', () => setHideUnrelated(!hideUnrelated), [
         hideUnrelated
     ]);
+
+    useEffect(() => {
+        callParentVoid('analytics.init');
+    }, []);
     return (
         <DndProvider backend={HTML5Backend}>
             <SettingsContainer>

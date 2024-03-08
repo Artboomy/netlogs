@@ -1,6 +1,6 @@
 {
     "name": "netlogs",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Web extension for custom network logs representation",
     "main": "index.js",
     "author": "artboomy",
@@ -74,7 +74,7 @@
         "prettier": "2.2.1",
         "style-loader": "2.0.0",
         "tsconfig-paths-webpack-plugin": "3.3.0",
-        "typescript": "^4.4.0",
+        "typescript": "^4.6.0",
         "webpack": "^5.11.1",
         "webpack-bundle-analyzer": "^4.4.0",
         "webpack-cli": "^4.3.1",

@@ -9,6 +9,7 @@ import {
 } from './utils';
 import runtime from './api/runtime';
 import JSZip from 'jszip';
+import analytics from './api/analytics';
 import AreaName = chrome.storage.AreaName;
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
@@ -29,7 +30,7 @@ export async function wrapSandbox(): Promise<void> {
                         resolve();
                         break;
                     case 'chrome.tabs.create':
-                        chrome.tabs.create({ url: data });
+                        openTab(data);
                         break;
                     case 'chrome.storage.local.get':
                         storage.local.get(
@@ -126,6 +127,27 @@ export async function wrapSandbox(): Promise<void> {
                             resolve();
                         });
                         break;
+                    case 'analytics.init':
+                        analyticsInit();
+                        break;
+                    case 'analytics.mimeFilterChange':
+                        analytics.fireEvent('mimeFilterChange');
+                        break;
+                    case 'analytics.propTreeViewed':
+                        analytics.fireEvent('propTreeViewed', {
+                            engagement_time_msec: parseInt(data)
+                        });
+                        break;
+                    case 'analytics.hotkey':
+                        analytics.fireEvent('hotkey', {
+                            key: data
+                        });
+                        break;
+                    case 'analytics.fileOpen':
+                        analytics.fireEvent('fileOpen', {
+                            entriesCount: Number(data)
+                        });
+                        break;
                     default:
                         console.warn(`Unrecognized type ${type}`);
                 }
@@ -134,11 +156,32 @@ export async function wrapSandbox(): Promise<void> {
     });
 }
 
+async function analyticsInit() {
+    // determine if settings matcher is equal to default settings matcher
+    const settings = await chrome.storage.local
+        .get({
+            settings: serialize(defaultSettings)
+        })
+        .then((data) => JSON.parse(data.settings));
+    const strSettings = settings.matcher.toString();
+    const strDefaultSettings = defaultSettings.matcher.toString();
+    // fire event with payload flag
+    analytics.fireEvent('matcherType', {
+        type: strSettings === strDefaultSettings ? 'default' : strSettings
+    });
+}
+
+function openTab(data: string) {
+    chrome.tabs.create({ url: data });
+    analytics.fireEvent('openTab', { url: data });
+}
+
 function downloadAsZip(dataString: string): Promise<unknown> {
     const { fileName, data } = JSON.parse(dataString);
     // const blob = new Blob([data], { type: 'application/json' });
     const zip = new JSZip();
     zip.file(`${fileName}.har`, data);
+    analytics.fireEvent('download', {});
     return zip
         .generateAsync({
             type: 'blob',
