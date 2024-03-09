@@ -23,9 +23,6 @@ const useStyles = createUseStyles({
         alignItems: 'center',
         gap: '8px'
     },
-    version: {
-        fontStyle: 'italic'
-    },
     optionsButton: {
         // marginLeft: 'auto'
     },
@@ -92,7 +89,6 @@ export const Header: FC<IProps> = ({
     onCaseSensitiveChange
 }) => {
     const styles = useStyles();
-    const { version } = runtime.getManifest();
     const clear = useListStore((state) => state.clear);
     const isPreserve = useListStore((state) => state.isPreserve);
     const [secondRowVisible, setSecondRowVisible] = useState(false);
@@ -173,7 +169,6 @@ export const Header: FC<IProps> = ({
                     onClick={doExport}
                     title='Export'
                 />
-                <div className={styles.version}>v.{version}</div>
             </div>
             {secondRowVisible && (
                 <div className={styles.row}>

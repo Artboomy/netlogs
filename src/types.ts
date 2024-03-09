@@ -23,7 +23,7 @@ type NetworkEventName =
 
 type DevtoolsEventName = 'devtools.inspectedWindow.reload';
 
-type CustomEventName = 'newItem' | 'download';
+type CustomEventName = 'newItem' | 'download' | 'searchOnPage';
 
 type TabEventName = 'chrome.tabs.create';
 
@@ -32,7 +32,9 @@ type AnalyticsEventName =
     | 'analytics.mimeFilterChange'
     | 'analytics.propTreeViewed'
     | 'analytics.hotkey'
-    | 'analytics.fileOpen';
+    | 'analytics.fileOpen'
+    | 'analytics.error'
+    | 'analytics.searchOnPage';
 
 export type EventName =
     | 'onIframeReady'

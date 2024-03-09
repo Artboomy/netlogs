@@ -13,13 +13,12 @@ This is extendable network request viewer extension for Chromium-based browsers.
 
 The extension will appear in devtools as a `📜 Net logs` tab.
 
-* 🔍 **Search:** Filter by url and search by params/result.
-* 🎨 Presets: GraphQL & JSON-RPC protocols unpacking.
-* ⛰️ **Integration:** View Next.js & NuxtJS hydration state.
-* 🛠️ **Customization:** Transform name, parameters, and response with javascript.
-* ✨ **Universality:** View live logs or load
-  from [`*.har` file](https://developer.chrome.com/docs/devtools/network/reference/#save-as-har).
-* 🤝 **Team-oriented:** Export logs and share them with others.
+* 🔍 **Advanced Search**: Filter requests by URL and search within parameters/results.
+* ⛰️ **Framework Integration**: View Next.js & NuxtJS hydration state.
+* 🎨 **Protocol Presets**: Streamlined unpacking for GraphQL and JSON-RPC.
+* 🛠️ **Customization**: Modify request names, parameters, and responses with JavaScript.
+* ✨ **Log Viewing**: Analyze live or import logs from HAR/*.netlogs.zip files.
+* 🤝 **Collaboration**: Export and share logs for team debugging.
 
 ![main.gif](./img/main.gif)
 
@@ -94,18 +93,18 @@ Event signature is either `IItemContentOnlyCfg`:
 
 ```typescript
 type IItemContentOnlyCfg = {
-  // by default new Date().getTime() will be used
-  timestamp?: number;
-  // small bit of text next to date
-  tag?: string;
-  // viewable on date click
-  meta?: {
-    key: {
-      items: [{ name: string, value: string }]
+    // by default new Date().getTime() will be used
+    timestamp?: number;
+    // small bit of text next to date
+    tag?: string;
+    // viewable on date click
+    meta?: {
+        key: {
+            items: [{ name: string, value: string }]
+        }
     }
-  }
 
-  content: object | string;
+    content: object | string;
 }
 ```
 
@@ -113,21 +112,21 @@ or `IItemTransactionCfg`
 
 ```typescript
 type IItemTransactionCfg = {
-  // by default new Date().getTime() will be used
-  timestamp?: number;
-  // small bit of text next to date
-  tag?: string;
-  name?: string;
-  // viewable on date click
-  meta?: {
-    key: {
-      items: [{ name: string, value: string }]
+    // by default new Date().getTime() will be used
+    timestamp?: number;
+    // small bit of text next to date
+    tag?: string;
+    name?: string;
+    // viewable on date click
+    meta?: {
+        key: {
+            items: [{ name: string, value: string }]
+        }
     }
-  }
 
-  params: object;
+    params: object;
 
-  result: object;
+    result: object;
 }
 ```
 
@@ -166,7 +165,8 @@ All settings are stored locally.
 ## 🤝 Permissions
 
 * `storage` - used to store your custom settings. Does not sync.
-* `content_scripts` - used to extract nextjs/nuxtjs data from page.
+* `content_scripts` - used to extract Nextjs/Nuxtjs data from page.
+* `contextMenus` - used to extract selected text for search
 
 The list may extend in the future.
 

@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { ErrorInfo } from 'react';
+import React, { Component, ErrorInfo } from 'react';
+import { callParentVoid } from '../utils';
 
 type TState = { hasError: boolean; error: Error | null };
 export default class ErrorBoundary extends Component<
@@ -22,6 +22,13 @@ export default class ErrorBoundary extends Component<
             'A following error occurred. This may indicate problems with custom functions or bug in the extension'
         );
         console.error(error, errorInfo);
+        callParentVoid(
+            'analytics.error',
+            JSON.stringify({
+                message: error.message,
+                stack: errorInfo.componentStack
+            })
+        );
     }
 
     render(): React.ReactNode {
