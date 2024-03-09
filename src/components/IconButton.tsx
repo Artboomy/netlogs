@@ -81,5 +81,6 @@ export const ICONS: Record<string, IconButtonProps['icon']> = {
     filter: '-56px 120px',
     panelDown: '-116px 0px',
     panelRight: '136px 168px',
-    panelUp: '136px -72px'
+    panelUp: '136px -72px',
+    inspect: '136px -72px'
 } as const;

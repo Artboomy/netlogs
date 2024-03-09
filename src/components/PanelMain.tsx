@@ -15,7 +15,7 @@ import { FilterContext } from '../context/FilterContext';
 import { useHotkey } from '../hooks/useHotkey';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { callParentVoid } from '../utils';
+import { callParentVoid, subscribeParent } from '../utils';
 
 const useStyles = createUseStyles({
     '@global': {
@@ -78,6 +78,13 @@ export const PanelMain: React.FC = () => {
 
     useEffect(() => {
         callParentVoid('analytics.init');
+    }, []);
+
+    useEffect(() => {
+        subscribeParent('searchOnPage', (str) => {
+            setSearchValue(str);
+            callParentVoid('analytics.searchOnPage');
+        });
     }, []);
     return (
         <DndProvider backend={HTML5Backend}>

@@ -1,5 +1,3 @@
-import Error = chrome.cast.Error;
-
 const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 const GA_DEBUG_ENDPOINT = 'https://www.google-analytics.com/debug/mp/collect';
 import secrets from '../secrets.json';
@@ -125,7 +123,10 @@ class Analytics {
     }
 
     // Fire an error event.
-    async fireErrorEvent(error: Error, additionalParams: Params = {}) {
+    async fireErrorEvent(
+        error: chrome.cast.Error | Error,
+        additionalParams: Params = {}
+    ) {
         // Note: 'error' is a reserved event name and cannot be used
         // see https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=gtag#reserved_names
         return this.fireEvent('extension_error', {

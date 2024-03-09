@@ -1,5 +1,6 @@
 import { wrapSandbox } from '../sandboxUtils';
 import { createEventPayload, isExtension, postSandbox } from '../utils';
+import analytics from '../api/analytics';
 import Port = chrome.runtime.Port;
 
 const tabId = isExtension() && window.chrome.devtools.inspectedWindow.tabId;
@@ -24,6 +25,14 @@ const messageHandler = (
     if (tabId === port.sender?.tab?.id) {
         if (type === 'fromContent') {
             postSandbox(createEventPayload('newItem', e.data));
+            try {
+                const d = JSON.parse(e.data);
+                if (!['NEXT', 'NUXT'].includes(d.tag)) {
+                    analytics.fireEvent('customEvent');
+                }
+            } catch (_e) {
+                // pass
+            }
         }
     }
 };

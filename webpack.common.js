@@ -4,7 +4,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 const path = require('path');
 
 module.exports = {
-    target: ['web', 'es6'],
+    target: ['web', 'es2020'],
     entry: {
         'react-vendors': {
             import: [
@@ -37,7 +37,8 @@ module.exports = {
             dependOn: ['react-vendors']
         },
         content: './src/content/content.ts',
-        inject: './src/content/inject.ts'
+        inject: './src/content/inject.ts',
+        background: './src/content/background.ts'
     },
 
     plugins: [

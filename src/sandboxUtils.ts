@@ -148,12 +148,35 @@ export async function wrapSandbox(): Promise<void> {
                             entriesCount: Number(data)
                         });
                         break;
+                    case 'analytics.error':
+                        analyticsError(data);
+                        break;
+                    case 'analytics.searchOnPage':
+                        analytics.fireEvent('searchOnPage');
+                        break;
                     default:
                         console.warn(`Unrecognized type ${type}`);
                 }
             }
         });
     });
+}
+
+const portToBackground = window.chrome.runtime.connect({
+    name: `netlogs-${window.chrome.devtools.inspectedWindow.tabId}`
+});
+
+portToBackground.onMessage.addListener((message) => {
+    if (message.type === 'searchOnPage') {
+        postSandbox(createEventPayload('searchOnPage', message.value));
+    }
+});
+
+function analyticsError(data: string) {
+    const { message, stack } = JSON.parse(data);
+    const error = new Error(message);
+    error.stack = stack;
+    analytics.fireErrorEvent(error);
 }
 
 async function analyticsInit() {
