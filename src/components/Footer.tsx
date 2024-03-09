@@ -6,6 +6,7 @@ import { TagList } from './TagList';
 import { useSettings } from '../hooks/useSettings';
 import { useListStore } from '../controllers/network';
 import { Link } from './Link';
+import runtime from '../api/runtime';
 
 const useStyles = createUseStyles({
     root: {
@@ -21,6 +22,10 @@ const useStyles = createUseStyles({
     countWrapper: {
         marginLeft: '8px',
         marginRight: 'auto'
+    },
+    version: {
+        fontStyle: 'italic',
+        paddingRight: '4px'
     }
 });
 export const Footer: FC<{
@@ -30,6 +35,7 @@ export const Footer: FC<{
     totalCount?: number;
 }> = ({ value, onValueChange, visibleCount = 0, totalCount = 0 }) => {
     const styles = useStyles();
+    const { version } = runtime.getManifest();
     const isPreserve = useListStore((state) => state.isPreserve);
     const [settings, setSettings] = useSettings();
     const { tagsToolbarVisible } = settings;
@@ -63,6 +69,7 @@ export const Footer: FC<{
                     {visibleCount} / {totalCount} requests
                     {isPreserve && ', log preserved'}
                 </span>
+                <div className={styles.version}>v.{version}</div>
                 <Link
                     text='Github'
                     href='https://github.com/Artboomy/netlogs'

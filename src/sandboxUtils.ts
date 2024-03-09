@@ -166,9 +166,13 @@ async function analyticsInit() {
     const strSettings = settings.matcher.toString();
     const strDefaultSettings = defaultSettings.matcher.toString();
     // fire event with payload flag
-    analytics.fireEvent('matcherType', {
-        type: strSettings === strDefaultSettings ? 'default' : strSettings
-    });
+    if (strSettings === strDefaultSettings) {
+        analytics.fireEvent('matcherTypeDefault', {});
+    } else {
+        analytics.fireEvent('matcherTypeCustom', {
+            source: `"${strSettings}"`
+        });
+    }
 }
 
 function openTab(data: string) {
