@@ -21,7 +21,8 @@ const useStyles = createUseStyles({
     },
     imageFull: {
         border: '2px dotted #ccc',
-        objectFit: 'none'
+        objectFit: 'none',
+        cursor: 'pointer'
     }
 });
 export const Image: FC<{
@@ -30,13 +31,23 @@ export const Image: FC<{
 }> = ({ base64, mimeType }) => {
     const styles = useStyles();
     const { setValue } = useContext(ModalContext);
+    const handleClickDiv = (
+        event: React.MouseEvent<HTMLDivElement, MouseEvent>
+    ) => {
+        const target = event.target as HTMLDivElement;
+        target.style.backgroundColor =
+            target.style.backgroundColor === '' ? 'black' : '';
+    };
     const handleClick = () => {
         setValue(
-            <img
-                src={`data:${mimeType};base64,${base64}`}
-                alt='Image'
-                className={styles.imageFull}
-            />
+            <div onClick={handleClickDiv}>
+                <img
+                    src={`data:${mimeType};base64,${base64}`}
+                    alt='Image'
+                    title='Click to toggle background'
+                    className={styles.imageFull}
+                />
+            </div>
         );
     };
     return (
