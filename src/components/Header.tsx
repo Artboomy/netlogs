@@ -91,6 +91,7 @@ export const Header: FC<IProps> = ({
     const styles = useStyles();
     const clear = useListStore((state) => state.clear);
     const isPreserve = useListStore((state) => state.isPreserve);
+    const isUnpack = useListStore((state) => state.isUnpack);
     const [secondRowVisible, setSecondRowVisible] = useState(false);
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         useListStore.setState({ isPreserve: e.target.checked });
@@ -113,6 +114,11 @@ export const Header: FC<IProps> = ({
             })),
         []
     );
+    const handleToggleUnpack = () => {
+        useListStore.setState((prev) => ({
+            isUnpack: !prev.isUnpack
+        }));
+    };
     return (
         <header className={cn(styles.root, className)}>
             <div className={styles.row}>
@@ -133,6 +139,12 @@ export const Header: FC<IProps> = ({
                     active={caseSensitive}>
                     Aa
                 </IconButton>
+                <IconButton
+                    active={isUnpack}
+                    icon={ICONS.brackets}
+                    onClick={handleToggleUnpack}
+                    title='Unpack JSON from strings'
+                />
                 <input
                     ref={ref}
                     type='search'

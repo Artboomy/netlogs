@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import Inspector, { chromeLight, DOMInspector } from 'react-inspector';
 import { Image } from './render/Image';
+import { useListStore } from '../controllers/network';
 
 const customTheme = {
     ...chromeLight,
@@ -25,14 +26,11 @@ type TXmlData = {
     __getRaw: () => string;
 };
 
+type RawType = Record<string, unknown> | string | null | undefined | number;
+
 type WithMimeType = {
     __mimeType: string;
-    __getRaw: () =>
-        | Record<string, unknown>
-        | string
-        | null
-        | undefined
-        | number;
+    __getRaw: () => RawType;
 };
 
 type TData = {
@@ -75,10 +73,50 @@ export interface InspectorWrapperProps {
     tagName?: string;
 }
 
+const isSerializedObject = (input: string): boolean => {
+    return (
+        (input.startsWith('{') && input.endsWith('}')) ||
+        (input.startsWith('[') && input.endsWith(']'))
+    );
+};
+
+function recursiveTextToObject<T extends RawType>(
+    data: T | unknown
+): T | unknown {
+    // If data is a string and is a serialized object, parse and return it
+    if (typeof data === 'string' && isSerializedObject(data)) {
+        try {
+            return JSON.parse(data);
+        } catch (e) {
+            // console.log('Error parsing JSON', e, data);
+            return data;
+        }
+    }
+
+    // If data is not an object, return it as is
+    if (typeof data !== 'object' || data === null) {
+        return data;
+    }
+
+    // If data is an object, recursively convert its properties
+    if (typeof data === 'object') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+        const result: any = Array.isArray(data) ? [] : {};
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                result[key] = recursiveTextToObject(data[key]);
+            }
+        }
+        return result;
+    }
+    return data;
+}
+
 export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     data,
     tagName
 }) => {
+    const isUnpack = useListStore((state) => state.isUnpack);
     if (isImage(data)) {
         return <Image base64={data.__getRaw()} mimeType={data.__mimeType} />;
     }
@@ -100,5 +138,14 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     }
     const name = tagName || (isMimeType(data) && data.__mimeType) || 'result';
     const unwrappedData = isMimeType(data) ? data.__getRaw() : data;
-    return <Inspector name={name} data={unwrappedData} theme={customTheme} />;
+    const unwrappedDataWithTextConverted = isUnpack
+        ? recursiveTextToObject(unwrappedData)
+        : unwrappedData;
+    return (
+        <Inspector
+            name={name}
+            data={unwrappedDataWithTextConverted}
+            theme={customTheme}
+        />
+    );
 };

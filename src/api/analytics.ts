@@ -18,9 +18,11 @@ type Params = {
 
 class Analytics {
     debug = false;
+    noSend = false;
 
-    constructor(debug = false) {
+    constructor(debug = false, noSend = false) {
         this.debug = debug;
+        this.noSend = noSend;
     }
 
     // Returns the client id, or creates a new one if one doesn't exist.
@@ -70,6 +72,9 @@ class Analytics {
 
     // Fires an event with optional params. Event names must only include letters and underscores.
     async fireEvent(name: string, params: Params = {}) {
+        if (this.noSend) {
+            return;
+        }
         // Configure session id and engagement time if not present, for more details see:
         // https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag#recommended_parameters_for_reports
         if (!params.session_id) {
@@ -127,6 +132,9 @@ class Analytics {
         error: chrome.cast.Error | Error,
         additionalParams: Params = {}
     ) {
+        if (this.noSend) {
+            return;
+        }
         // Note: 'error' is a reserved event name and cannot be used
         // see https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=gtag#reserved_names
         return this.fireEvent('extension_error', {
@@ -136,4 +144,4 @@ class Analytics {
     }
 }
 
-export default new Analytics(); //process.env.NODE_ENV === 'development');
+export default new Analytics(false, process.env.NODE_ENV === 'development'); //process.env.NODE_ENV === 'development');
