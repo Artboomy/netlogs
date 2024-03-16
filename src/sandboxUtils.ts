@@ -4,6 +4,7 @@ import { defaultSettings } from './controllers/settings/base';
 import {
     createEventPayload,
     download,
+    isExtension,
     isIframeEvent,
     postSandbox
 } from './utils';
@@ -162,15 +163,17 @@ export async function wrapSandbox(): Promise<void> {
     });
 }
 
-const portToBackground = window.chrome.runtime.connect({
-    name: `netlogs-${window.chrome.devtools.inspectedWindow.tabId}`
-});
+if (isExtension()) {
+    const portToBackground = window.chrome.runtime.connect({
+        name: `netlogs-${window.chrome.devtools.inspectedWindow.tabId}`
+    });
 
-portToBackground.onMessage.addListener((message) => {
-    if (message.type === 'searchOnPage') {
-        postSandbox(createEventPayload('searchOnPage', message.value));
-    }
-});
+    portToBackground.onMessage.addListener((message) => {
+        if (message.type === 'searchOnPage') {
+            postSandbox(createEventPayload('searchOnPage', message.value));
+        }
+    });
+}
 
 function analyticsError(data: string) {
     const { message, stack } = JSON.parse(data);
@@ -188,6 +191,9 @@ async function analyticsInit() {
         .then((data) => JSON.parse(data.settings));
     const strSettings = settings.matcher.toString();
     const strDefaultSettings = defaultSettings.matcher.toString();
+    if (!settings.sendAnalytics) {
+        analytics.noSend = true;
+    }
     // fire event with payload flag
     if (strSettings === strDefaultSettings) {
         analytics.fireEvent('matcherTypeDefault', {});

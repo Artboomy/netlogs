@@ -303,6 +303,22 @@ export const Options: FC = () => {
                     <label>
                         <input
                             type='checkbox'
+                            name='sendAnalytics'
+                            checked={settings.sendAnalytics}
+                            onChange={(e) =>
+                                setSettings({
+                                    ...settings,
+                                    sendAnalytics: e.target.checked
+                                })
+                            }
+                        />
+                        Send analytics
+                    </label>
+                </div>
+                <div className={styles.checkboxRow}>
+                    <label>
+                        <input
+                            type='checkbox'
                             name='graphqlIntegration'
                             checked={settings.graphqlIntegration}
                             onChange={(e) =>
