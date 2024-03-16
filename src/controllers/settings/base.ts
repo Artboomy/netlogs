@@ -11,6 +11,7 @@ export const defaultSettings: ISettings = {
     },
     nextjsIntegration: true,
     nuxtjsIntegraction: true,
+    sendAnalytics: true,
     jsonRpcIntegration: true,
     graphqlIntegration: true,
     hiddenTags: {

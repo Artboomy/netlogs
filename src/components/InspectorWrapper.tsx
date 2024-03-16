@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import Inspector, { chromeLight, DOMInspector } from 'react-inspector';
 import { Image } from './render/Image';
 import { useListStore } from '../controllers/network';
+import { Webm } from './render/Webm';
 
 const customTheme = {
     ...chromeLight,
@@ -45,10 +46,21 @@ type TAbstractData =
       }
     | unknown[];
 
-export type TAnyData = TAbstractData | TData | TXmlData | TDomData | TImageData;
+export type TAnyData =
+    | TAbstractData
+    | TData
+    | TXmlData
+    | TDomData
+    | TImageData
+    | TVideoWebmData;
 
 type TImageData = {
     __mimeType: `image/${string}`;
+    __getRaw: () => string;
+};
+
+type TVideoWebmData = {
+    __mimeType: `video/webm`;
     __getRaw: () => string;
 };
 
@@ -58,6 +70,10 @@ const isText = (data: unknown): data is TDomData => {
 
 const isImage = (data: unknown): data is TImageData => {
     return Boolean(isMimeType(data) && data.__mimeType.startsWith('image'));
+};
+
+const isWebm = (data: unknown): data is TVideoWebmData => {
+    return Boolean(isMimeType(data) && data.__mimeType === 'video/webm');
 };
 
 const isXml = (data: unknown): data is TXmlData => {
@@ -119,6 +135,9 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     const isUnpack = useListStore((state) => state.isUnpack);
     if (isImage(data)) {
         return <Image base64={data.__getRaw()} mimeType={data.__mimeType} />;
+    }
+    if (isWebm(data)) {
+        return <Webm base64={data.__getRaw()} />;
     }
     if (isText(data)) {
         const domParser = new DOMParser();

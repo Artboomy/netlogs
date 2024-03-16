@@ -24,6 +24,7 @@ export type IProfileSerialized = Omit<IProfile, 'functions'> & {
 
 export interface ISettings {
     matcher: (request: NetworkRequest) => ProfileName;
+    sendAnalytics: boolean;
     profiles: Record<ProfileName, IProfile>;
     nextjsIntegration: boolean;
     nuxtjsIntegraction: boolean;
