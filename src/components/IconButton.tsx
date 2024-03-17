@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss';
 import largeIcons from '../icons/largeIcons.svg';
 import cn from 'classnames';
 import { theme } from '../theme/light';
+import { google } from 'base16';
 
 const useStyles = createUseStyles({
     button: {
@@ -27,6 +28,12 @@ const useStyles = createUseStyles({
         backgroundColor: theme.accent,
         '&:hover': {
             backgroundColor: theme.accent
+        }
+    },
+    activeRed: {
+        backgroundColor: google.base08,
+        '&:hover': {
+            backgroundColor: google.base08
         }
     },
     activeText: {
@@ -64,7 +71,8 @@ export const IconButton: FC<IconButtonProps> = ({
             {icon ? (
                 <div
                     className={cn(styles.icon, {
-                        [styles.active]: active
+                        [styles.active]: active && icon !== ICONS.debugOn,
+                        [styles.activeRed]: icon === ICONS.debugOn
                     })}
                 />
             ) : null}
@@ -83,5 +91,7 @@ export const ICONS: Record<string, IconButtonProps['icon']> = {
     panelDown: '-116px 0px',
     panelRight: '136px 168px',
     panelUp: '136px -72px',
+    debugOff: '-172px 264px',
+    debugOn: '-88px 24px',
     inspect: '136px -72px'
 } as const;

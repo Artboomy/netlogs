@@ -65,15 +65,26 @@ export function callParent(
     });
 }
 
+const handlers: Array<{
+    name: EventName;
+    handler: (data: string) => unknown;
+}> = [];
+
+if (isExtension()) {
+    window.addEventListener('message', function listener(event) {
+        handlers.forEach((item) => {
+            if (isIframeEvent(event) && event.data.type === item.name) {
+                item.handler(event.data.data);
+            }
+        });
+    });
+}
+
 export function subscribeParent(
     name: EventName,
     handler: (data: string) => unknown
 ): void {
-    window.addEventListener('message', function listener(event) {
-        if (isIframeEvent(event) && event.data.type === name) {
-            handler(event.data.data);
-        }
-    });
+    handlers.push({ name, handler });
 }
 
 export function isExtension(): boolean {
@@ -137,3 +148,9 @@ export const download = (fileName: string, blob: Blob): void => {
 };
 
 export const isMacOs = (): boolean => navigator.userAgent.includes('Mac OS X');
+export const isSerializedObject = (input: string): boolean => {
+    return (
+        (input.startsWith('{') && input.endsWith('}')) ||
+        (input.startsWith('[') && input.endsWith(']'))
+    );
+};

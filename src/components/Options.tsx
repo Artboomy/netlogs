@@ -319,6 +319,22 @@ export const Options: FC = () => {
                     <label>
                         <input
                             type='checkbox'
+                            name='debuggerEnabled'
+                            checked={settings.debuggerEnabled}
+                            onChange={(e) =>
+                                setSettings({
+                                    ...settings,
+                                    debuggerEnabled: e.target.checked
+                                })
+                            }
+                        />
+                        Autoattach debugger (for WebSocket listening)
+                    </label>
+                </div>
+                <div className={styles.checkboxRow}>
+                    <label>
+                        <input
+                            type='checkbox'
                             name='graphqlIntegration'
                             checked={settings.graphqlIntegration}
                             onChange={(e) =>

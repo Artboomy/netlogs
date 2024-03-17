@@ -28,6 +28,7 @@ export interface ISettings {
     profiles: Record<ProfileName, IProfile>;
     nextjsIntegration: boolean;
     nuxtjsIntegraction: boolean;
+    debuggerEnabled: boolean;
     jsonRpcIntegration: boolean;
     graphqlIntegration: boolean;
     tagsToolbarVisible: boolean;

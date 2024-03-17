@@ -3,6 +3,7 @@ import Inspector, { chromeLight, DOMInspector } from 'react-inspector';
 import { Image } from './render/Image';
 import { useListStore } from '../controllers/network';
 import { Webm } from './render/Webm';
+import { isSerializedObject } from '../utils';
 
 const customTheme = {
     ...chromeLight,
@@ -64,7 +65,7 @@ type TVideoWebmData = {
     __getRaw: () => string;
 };
 
-const isText = (data: unknown): data is TDomData => {
+const isTextHtml = (data: unknown): data is TDomData => {
     return Boolean(isMimeType(data) && data.__mimeType === 'text/html');
 };
 
@@ -88,13 +89,6 @@ export interface InspectorWrapperProps {
     data: TData | TAbstractData | unknown;
     tagName?: string;
 }
-
-const isSerializedObject = (input: string): boolean => {
-    return (
-        (input.startsWith('{') && input.endsWith('}')) ||
-        (input.startsWith('[') && input.endsWith(']'))
-    );
-};
 
 function recursiveTextToObject<T extends RawType>(
     data: T | unknown
@@ -139,7 +133,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     if (isWebm(data)) {
         return <Webm base64={data.__getRaw()} />;
     }
-    if (isText(data)) {
+    if (isTextHtml(data)) {
         const domParser = new DOMParser();
         const renderData = domParser.parseFromString(
             data.__getRaw(),

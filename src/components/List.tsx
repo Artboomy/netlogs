@@ -7,8 +7,9 @@ const useStyles = createUseStyles({
     content: {
         display: 'grid',
         rowGap: '4px',
+        // 45% leaves gap on the right on ultra-wide monitor
         gridTemplateColumns:
-            'min-content 30ch minmax(auto, 45%) minmax(auto, 45%)',
+            'min-content 30ch minmax(auto, 46%) minmax(auto, 46%)',
         whiteSpace: 'pre-wrap',
         [mediaQuerySmallOnly]: {
             gridTemplateColumns: 'min-content auto',

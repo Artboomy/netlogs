@@ -10,6 +10,7 @@ import { IconButton, ICONS } from './IconButton';
 import { useHotkey } from '../hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
 import { toast } from 'react-toastify';
+import { DebuggerButton } from './DebuggerButton';
 
 const useStyles = createUseStyles({
     root: {
@@ -127,6 +128,7 @@ export const Header: FC<IProps> = ({
                     onClick={clear}
                     title='Clear [Ctrl+L]'
                 />
+                <DebuggerButton />
                 <IconButton
                     icon={ICONS.panelDown}
                     onClick={() => setSecondRowVisible(!secondRowVisible)}

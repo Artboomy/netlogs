@@ -12,6 +12,7 @@ import { ItemType } from '../../models/types';
 import TransactionItem from '../../models/TransactionItem';
 import { toast } from 'react-toastify';
 import { callParentVoid } from '../../utils';
+import WebSocketItem from '../../models/WebSocketItem';
 
 const useStyles = createUseStyles({
     dropZone: {
@@ -68,6 +69,9 @@ export const DropContainer: FC = ({ children }) => {
                                         break;
                                     case ItemType.Transaction:
                                         ItemConstructor = TransactionItem;
+                                        break;
+                                    case ItemType.WebSocket:
+                                        ItemConstructor = WebSocketItem;
                                         break;
                                     default:
                                         ItemConstructor = NetworkItem;

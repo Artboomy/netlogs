@@ -1,6 +1,6 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-import { google } from 'base16';
+import { google, solarized } from 'base16';
 import { ItemType } from '../models/types';
 import { theme } from '../theme/light';
 import cn from 'classnames';
@@ -47,6 +47,9 @@ function getColor(
     }
     if (type === ItemType.Transaction) {
         return color;
+    }
+    if (type === ItemType.WebSocket) {
+        return color ? color : solarized.base0B;
     }
     return google.base0C;
 }

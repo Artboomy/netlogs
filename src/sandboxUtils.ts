@@ -15,6 +15,9 @@ import AreaName = chrome.storage.AreaName;
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
 // TODO: split into multiple handlers
+
+let isIframeReady = false;
+
 export async function wrapSandbox(): Promise<void> {
     return new Promise((resolve) => {
         const network = window.chrome?.devtools?.network;
@@ -28,7 +31,10 @@ export async function wrapSandbox(): Promise<void> {
                             type,
                             data: ''
                         });
+                        isIframeReady = true;
                         resolve();
+                        cache.forEach(processMessage);
+                        cache = [];
                         break;
                     case 'chrome.tabs.create':
                         openTab(data);
@@ -128,6 +134,21 @@ export async function wrapSandbox(): Promise<void> {
                             resolve();
                         });
                         break;
+                    case 'debugger.attach':
+                        portToBackground.postMessage({
+                            type: 'debugger.attach'
+                        });
+                        break;
+                    case 'debugger.detach':
+                        portToBackground.postMessage({
+                            type: 'debugger.detach'
+                        });
+                        break;
+                    case 'debugger.getStatus':
+                        portToBackground.postMessage({
+                            type: 'debugger.getStatus'
+                        });
+                        break;
                     case 'analytics.init':
                         analyticsInit();
                         break;
@@ -163,16 +184,36 @@ export async function wrapSandbox(): Promise<void> {
     });
 }
 
+let portToBackground: chrome.runtime.Port;
+
+let cache: { type: string; value: string | undefined }[] = [];
 if (isExtension()) {
-    const portToBackground = window.chrome.runtime.connect({
+    console.log('created backport');
+    portToBackground = window.chrome.runtime.connect({
         name: `netlogs-${window.chrome.devtools.inspectedWindow.tabId}`
     });
 
     portToBackground.onMessage.addListener((message) => {
-        if (message.type === 'searchOnPage') {
-            postSandbox(createEventPayload('searchOnPage', message.value));
+        if (!isIframeReady) {
+            cache.push(message);
+            return;
         }
+        processMessage(message);
     });
+} else {
+    console.log('no portToBackground');
+}
+
+function processMessage(message: { type: string; value: string | undefined }) {
+    if (message.type === 'searchOnPage') {
+        postSandbox(createEventPayload('searchOnPage', message.value));
+    } else if (message.type === 'newItem') {
+        postSandbox(createEventPayload('newItem', message.value));
+    } else if (message.type === 'debugger.status') {
+        postSandbox(createEventPayload('debugger.status', message.value));
+    } else {
+        console.debug('Unrecognized message', message);
+    }
 }
 
 function analyticsError(data: string) {
