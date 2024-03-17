@@ -9,5 +9,6 @@ export const theme = {
         key: 'rgb(33% 33% 33%)'
     },
     accent: 'rgb(26, 115, 232)',
-    graphql: '#e535ab'
+    graphql: '#e535ab',
+    phoenixLiveView: '#ee765d' // '#634872'
 };

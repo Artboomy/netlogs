@@ -1,4 +1,4 @@
-import { NetworkRequest } from '../../models/types';
+import { IItemWebSocketCfg, NetworkRequest } from '../../models/types';
 import { PropTreeProps } from '../../components/PropTree';
 
 export type ProfileName = string;
@@ -16,6 +16,19 @@ export interface IProfile {
         isError: (requst: NetworkRequest) => boolean;
         shouldShow: (request: NetworkRequest) => boolean;
     };
+}
+
+export interface IProfileWebSocket {
+    functions: {
+        getName: (payload: string) => string;
+        getTag: (request: IItemWebSocketCfg) => string;
+        getParams: (payload: string) => Record<string, unknown>;
+        getResult: (payload: string) => Record<string, unknown> | unknown;
+        getMeta: (request: IItemWebSocketCfg) => PropTreeProps['data'] | null;
+        isError: (requst: IItemWebSocketCfg) => boolean;
+        shouldShow: (request: IItemWebSocketCfg) => boolean;
+    };
+    isMatch: (request: IItemWebSocketCfg) => boolean;
 }
 
 export type IProfileSerialized = Omit<IProfile, 'functions'> & {

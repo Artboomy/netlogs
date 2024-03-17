@@ -11,6 +11,7 @@ import { Entry } from 'har-format';
 import { isVisible } from 'react-inspector';
 import { isMimeType } from '../components/InspectorWrapper';
 import { TransactionItemAbstract } from './TransactionItem';
+import { phoenixLiveViewProfile } from '../controllers/settings/profiles/phoenixLiveView';
 
 type TContent = IItemTransactionCfg['result'];
 export default class WebSocketItem
@@ -19,9 +20,9 @@ export default class WebSocketItem
     public readonly type: ItemType = ItemType.WebSocket;
     public readonly timestamp: number;
     private _name: string = '';
-    private _result: TContent = {};
+    private _result: TContent | unknown = {};
     private readonly _request: IItemWebSocketCfg;
-    private readonly _isError: boolean;
+    private _isError: boolean;
     private _params: IItemTransactionCfg['params'] = {};
     private _tag: string = '';
     private readonly _meta: IItemWebSocketCfg['meta'];
@@ -38,10 +39,26 @@ export default class WebSocketItem
     }
 
     setComputedFields(): void {
-        this._name = 'WebSocket';
-        this._tag = 'WS';
-        this._params = { raw: this._request.params };
-        this._result = { raw: this._request.result };
+        if (phoenixLiveViewProfile.isMatch(this._request)) {
+            this._name = phoenixLiveViewProfile.functions.getName(
+                this._request.params
+            );
+            this._tag = phoenixLiveViewProfile.functions.getTag(this._request);
+            this._params = phoenixLiveViewProfile.functions.getParams(
+                this._request.params
+            );
+            this._result = phoenixLiveViewProfile.functions.getResult(
+                this._request.result
+            );
+            this._isError = phoenixLiveViewProfile.functions.isError(
+                this._request
+            );
+        } else {
+            this._name = 'WebSocket';
+            this._tag = 'WS';
+            this._params = { raw: this._request.params };
+            this._result = { raw: this._request.result };
+        }
     }
 
     shouldShow(cfg: SearchConfig = {}): boolean {
@@ -154,7 +171,7 @@ export default class WebSocketItem
     }
 
     getContent(): TContent {
-        return this._result;
+        return this._result as TContent;
     }
 
     getDuration(): number {

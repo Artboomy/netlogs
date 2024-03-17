@@ -5,8 +5,8 @@ export type TWebSocketFrameSent = {
     // https://chromedevtools.github.io/devtools-protocol/1-3/Network/#type-WebSocketFrame
     response: {
         mask: boolean;
-        // 1 for text, 0 for base64 encoded binary data
-        opcode: 0 | 1;
+        // 1 for text, other for base64 encoded binary data
+        opcode: 1 | number;
         payloadData: string;
     };
 };
