@@ -39,7 +39,7 @@ class EventsController {
                     });
                 }
             } catch (e) {
-                console.warn('Bad data: "', data, '"');
+                console.warn('Bad data: "', data, '"', e);
             }
         });
     }

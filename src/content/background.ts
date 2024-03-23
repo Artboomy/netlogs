@@ -195,9 +195,12 @@ function portMessageHandler(message: { type: string }, port: Port) {
         return;
     }
     if (message.type === 'debugger.attach') {
+        isDebuggerEnabled = true;
+        subscribeToDebugger();
         attachDebugger(tabId);
     } else if (message.type === 'debugger.detach') {
         detachDebugger(tabId);
+        isDebuggerEnabled = false;
     } else if (message.type === 'debugger.getStatus') {
         sendMessageToPort(tabId, {
             type: 'debugger.status',
@@ -231,9 +234,8 @@ const handleDebuggerEvent = (
     if (!ports[source.tabId]) {
         return;
     }
-    if (isWebSocketFrameSent(method, params)) {
-        framePairs[source.tabId][params.requestId] = params;
-    } else if (
+    if (
+        isWebSocketFrameSent(method, params) ||
         isWebSocketFrameReceived(method, params) ||
         isWebSocketFrameError(method, params)
     ) {
@@ -242,59 +244,20 @@ const handleDebuggerEvent = (
             timestamp: Date.now(),
             params: '',
             result: '',
-            duration: 0,
-            isError: false,
-            meta: {
-                request: {
-                    title: 'Request',
-                    items: []
-                },
-                response: {
-                    title: 'Response',
-                    items: []
-                }
-            }
+            isError: false
         };
-        // to keep typescript happy
-        if (!payload.meta) {
-            return;
-        }
-        const request = framePairs[source.tabId][params.requestId];
-        if (request) {
-            payload.params = request.response.payloadData;
-            payload.meta.request.items.push({
-                name: 'opcode',
-                value: String(request.response.opcode)
-            });
-            payload.meta.request.items.push({
-                name: 'mask',
-                value: String(request.response.mask)
-            });
-            payload.meta.request.items.push({
-                name: 'body',
-                value: request.response.payloadData
-            });
-            payload.duration = params.timestamp - request.timestamp;
-            delete framePairs[source.tabId][params.requestId];
+        if (isWebSocketFrameSent(method, params)) {
+            payload.params = params.response.payloadData;
+            payload.__subtype = 'sent';
         }
         if (isWebSocketFrameReceived(method, params)) {
-            payload.meta.response.items.push({
-                name: 'opcode',
-                value: String(params.response.opcode)
-            });
-            payload.meta.response.items.push({
-                name: 'mask',
-                value: String(params.response.mask)
-            });
-            payload.meta.response.items.push({
-                name: 'body',
-                value: params.response.payloadData
-            });
             payload.result = params.response.payloadData;
+            payload.__subtype = 'received';
         }
         if (isWebSocketFrameError(method, params)) {
             payload.result = params.errorMessage;
             payload.isError = true;
+            payload.__subtype = 'received';
         }
         sendMessageToPort(source.tabId, {
             type: 'newItem',

@@ -43,10 +43,10 @@ export interface IItemTransactionCfg {
 
 export interface IItemWebSocketCfg {
     __type: 'websocket';
+    __subtype?: 'sent' | 'received' | 'full';
     timestamp: number;
-    duration: number;
     isError: boolean;
-    meta: {
+    meta?: {
         request: {
             title: 'Request';
             items: Array<{ name: string; value: string }>;

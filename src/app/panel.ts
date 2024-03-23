@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const portToContent = window.chrome.tabs.connect(tabId);
             portToContent.postMessage({ type: 'connectionTest' });
             portToContent.onDisconnect.addListener(() => {
+                console.log('onDisconnect');
+                const lastError = window.chrome.runtime.lastError;
+                if (lastError) {
+                    console.log('lastError', lastError);
+                }
                 portToContent.onMessage.removeListener(messageHandler);
             });
             portToContent.onMessage.addListener(messageHandler);

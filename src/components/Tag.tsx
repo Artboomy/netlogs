@@ -45,7 +45,7 @@ function getColor(
     if (['GQL'].includes(content) && !color) {
         return theme.graphql;
     }
-    if (['LV'].includes(content) && !color) {
+    if (content.includes('LV') && !color) {
         return theme.phoenixLiveView;
     }
     if (type === ItemType.Transaction) {

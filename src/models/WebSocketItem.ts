@@ -27,13 +27,11 @@ export default class WebSocketItem
     private _params: IItemTransactionCfg['params'] = {};
     private _tag = '';
     private readonly _meta: IItemWebSocketCfg['meta'];
-    private readonly _duration: number;
+    private readonly _duration: number = 0;
 
     constructor(cfg: IItemWebSocketCfg) {
         this.id = nanoid();
         this.timestamp = cfg.timestamp;
-        this._meta = cfg.meta || null;
-        this._duration = cfg.duration || 0;
         this._isError = cfg.isError;
         this._request = cfg;
         this.setComputedFields();
@@ -42,9 +40,12 @@ export default class WebSocketItem
     setComputedFields(): void {
         if (phoenixLiveViewProfile.isMatch(this._request)) {
             this._name = phoenixLiveViewProfile.functions.getName(
-                this._request.params
+                this._request.params || this._request.result
             );
-            this._tag = phoenixLiveViewProfile.functions.getTag(this._request);
+            this._tag = phoenixLiveViewProfile.functions.getTag(
+                this._request,
+                this._name
+            );
             this._params = phoenixLiveViewProfile.functions.getParams(
                 this._request.params
             );
@@ -55,39 +56,49 @@ export default class WebSocketItem
                 this._request
             );
         } else {
-            this._name = 'WebSocket';
-            this._tag = 'WS';
-            if (isSerializedObject(this._request.params)) {
-                this._params = JSON.parse(this._request.params);
-                if (
-                    this._params &&
-                    typeof this._params === 'object' &&
-                    Object.keys(this._params).length === 1 &&
-                    'params' in this._params
-                ) {
-                    this._params = this._params.params as Record<
-                        string,
-                        unknown
-                    >;
-                }
+            if (this._request.__subtype === 'sent') {
+                this._name = 'WebSocket.sent';
+            } else if (this._request.__subtype === 'received') {
+                this._name = 'WebSocket.received';
             } else {
-                this._params = { raw: this._request.params };
+                this._name = 'Websocket';
             }
-            if (isSerializedObject(this._request.result)) {
-                this._result = JSON.parse(this._request.result);
-                if (
-                    this._result &&
-                    typeof this._result === 'object' &&
-                    Object.keys(this._result).length === 1 &&
-                    'result' in this._result
-                ) {
-                    this._result = this._result.result as Record<
-                        string,
-                        unknown
-                    >;
+            this._tag = 'WS';
+            if (this._request.__subtype !== 'received') {
+                if (isSerializedObject(this._request.params)) {
+                    this._params = JSON.parse(this._request.params);
+                    if (
+                        this._params &&
+                        typeof this._params === 'object' &&
+                        Object.keys(this._params).length === 1 &&
+                        'params' in this._params
+                    ) {
+                        this._params = this._params.params as Record<
+                            string,
+                            unknown
+                        >;
+                    }
+                } else {
+                    this._params = { raw: this._request.params };
                 }
-            } else {
-                this._result = { raw: this._request.result };
+            }
+            if (this._request.__subtype !== 'sent') {
+                if (isSerializedObject(this._request.result)) {
+                    this._result = JSON.parse(this._request.result);
+                    if (
+                        this._result &&
+                        typeof this._result === 'object' &&
+                        Object.keys(this._result).length === 1 &&
+                        'result' in this._result
+                    ) {
+                        this._result = this._result.result as Record<
+                            string,
+                            unknown
+                        >;
+                    }
+                } else {
+                    this._result = { raw: this._request.result };
+                }
             }
         }
     }
@@ -134,20 +145,9 @@ export default class WebSocketItem
         return new WebSocketItem({
             __type: 'websocket',
             timestamp: new Date(input.startedDateTime).getTime(),
-            duration: input.time,
             params: input.request.postData?.text || '',
             result: input.response.content.text || '',
-            isError: input.response.statusText === 'error',
-            meta: {
-                request: {
-                    title: 'Request',
-                    items: input.request.headers
-                },
-                response: {
-                    title: 'Response',
-                    items: input.response.headers
-                }
-            }
+            isError: input.response.statusText === 'error'
         });
     }
 
@@ -198,7 +198,7 @@ export default class WebSocketItem
     }
 
     getMeta(): PropTreeProps['data'] | null {
-        return this._meta;
+        return this._meta || null;
     }
 
     getContent(): TContent {

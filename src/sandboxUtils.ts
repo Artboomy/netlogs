@@ -138,11 +138,13 @@ export async function wrapSandbox(): Promise<void> {
                         portToBackground.postMessage({
                             type: 'debugger.attach'
                         });
+                        analytics.fireEvent('debugger.attach');
                         break;
                     case 'debugger.detach':
                         portToBackground.postMessage({
                             type: 'debugger.detach'
                         });
+                        analytics.fireEvent('debugger.detach');
                         break;
                     case 'debugger.getStatus':
                         portToBackground.postMessage({
@@ -161,9 +163,7 @@ export async function wrapSandbox(): Promise<void> {
                         });
                         break;
                     case 'analytics.hotkey':
-                        analytics.fireEvent('hotkey', {
-                            key: data
-                        });
+                        analytics.fireEvent(`hotkey-${data}`);
                         break;
                     case 'analytics.fileOpen':
                         analytics.fireEvent('fileOpen', {
@@ -207,7 +207,10 @@ if (isExtension()) {
         processMessage(message);
     });
     portToBackground.onDisconnect.addListener(() => {
-        // console.log('portToBackground disconnected', tabId);
+        console.log('portToBackground disconnected', tabId);
+        portToBackground = window.chrome.runtime.connect({
+            name: `netlogs-${tabId}`
+        });
     });
 } else {
     console.log('no portToBackground');

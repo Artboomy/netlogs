@@ -21,7 +21,7 @@ export interface IProfile {
 export interface IProfileWebSocket {
     functions: {
         getName: (payload: string) => string;
-        getTag: (request: IItemWebSocketCfg) => string;
+        getTag: (request: IItemWebSocketCfg, name?: string) => string;
         getParams: (payload: string) => Record<string, unknown>;
         getResult: (payload: string) => Record<string, unknown> | unknown;
         getMeta: (request: IItemWebSocketCfg) => PropTreeProps['data'] | null;

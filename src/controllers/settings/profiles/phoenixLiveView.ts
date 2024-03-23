@@ -55,7 +55,10 @@ export const phoenixLiveViewProfile: IProfileWebSocket = {
             const parsed: PhoenixLiveViewParams = JSON.parse(payload);
             return `${parsed[INDEX.caller]}.${parsed[INDEX.event]}`;
         },
-        getTag(): string {
+        getTag(_request, name?: string): string {
+            if (name === 'phoenix.heartbeat') {
+                return 'LV♥';
+            }
             return 'LV';
         },
         getParams(payload: string): Record<string, unknown> {
@@ -65,9 +68,10 @@ export const phoenixLiveViewProfile: IProfileWebSocket = {
             return JSON.parse(payload)[INDEX.payload];
         },
         getMeta(i) {
-            return i.meta;
+            return i.meta || null;
         },
         isError(request): boolean {
+            if (!request.result) return false;
             return (
                 request.isError ||
                 JSON.parse(request.result)[INDEX.payload].status === 'error'
@@ -77,20 +81,22 @@ export const phoenixLiveViewProfile: IProfileWebSocket = {
             return true;
         },
         getResult(payload: string): Record<string, unknown> | unknown {
+            if (!payload) return {};
             const parsed: PhoenixLiveViewResult = JSON.parse(payload);
             return parsed[INDEX.payload].response;
         }
     },
     isMatch(request) {
-        if (!isSerializedObject(request.result)) {
+        const payloadStr = request.params || request.result;
+        if (!payloadStr || !isSerializedObject(payloadStr)) {
             return false;
         }
         try {
-            const result = JSON.parse(request.result);
-            const isLengthMatch = result.length === 5;
+            const payload = JSON.parse(payloadStr);
+            const isLengthMatch = payload.length === 5;
             const isArgTypeMatch =
-                result[INDEX.caller] === 'phoenix' ||
-                /^lv:phx-/.test(result[INDEX.caller]);
+                payload[INDEX.caller].includes('phoenix') ||
+                /^lv:phx-/.test(payload[INDEX.caller]);
             return isLengthMatch && isArgTypeMatch;
         } catch (e) {
             return false;

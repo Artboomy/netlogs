@@ -186,7 +186,7 @@ export const Header: FC<IProps> = ({
             </div>
             {secondRowVisible && (
                 <div className={styles.row}>
-                    <label>
+                    <label style={{ display: 'flex' }}>
                         <input
                             type='checkbox'
                             onChange={handlePreserveChange}
