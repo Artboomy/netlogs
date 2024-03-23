@@ -1,5 +1,10 @@
-import { isWebSocketFrameError, isWebSocketFrameReceived, isWebSocketFrameSent, TWebSocketFrameSent } from './types';
-import { type IItemWebSocketCfg } from '../models/types';
+import {
+    isWebSocketFrameError,
+    isWebSocketFrameReceived,
+    isWebSocketFrameSent,
+    TWebSocketFrameSent
+} from './types';
+import { IItemWebSocketCfg } from '../models/types';
 import { defaultSettings } from '../controllers/settings/base';
 import Port = chrome.runtime.Port;
 
@@ -26,12 +31,12 @@ const ports: Record<number, chrome.runtime.Port> = {};
 
 const cache: Record<TabId, Message[]> = {};
 
-type Message = { type: string; value: string | Record<string | number, unknown> };
+type Message = {
+    type: string;
+    value: string | Record<string | number, unknown>;
+};
 
-function sendMessageToPort(
-    id: number | undefined,
-    message: Message
-) {
+function sendMessageToPort(id: number | undefined, message: Message) {
     if (!id) {
         return;
     }
@@ -56,12 +61,12 @@ function attachDebugger(id: number) {
     if (!isDebuggerEnabled) {
         return false;
     }
-    chrome.debugger.attach({ tabId: id }, '1.2', function() {
+    chrome.debugger.attach({ tabId: id }, '1.2', function () {
         chrome.debugger.sendCommand(
             { tabId: id },
             'Network.enable',
             {},
-            function() {
+            function () {
                 if (chrome.runtime.lastError) {
                     console.error(chrome.runtime.lastError);
                 } else {
@@ -157,7 +162,7 @@ function unsubscribeFromDebugger() {
         return;
     }
     chrome.debugger.onEvent.removeListener(handleDebuggerEvent);
-    chrome.debugger.onDetach.removeListener(function(source, reason) {
+    chrome.debugger.onDetach.removeListener(function (source, _reason) {
         cleanup(source.tabId);
     });
     Object.keys(ports).forEach((id) => {
@@ -166,8 +171,9 @@ function unsubscribeFromDebugger() {
     isDebuggerSubscribed = false;
 }
 
-chrome.runtime.onConnect.addListener(function(port) {
+chrome.runtime.onConnect.addListener(function (port) {
     if (port.name.startsWith('netlogs-')) {
+        // console.log('connected', port.name);
         const id = Number(port.name.split('-')[1]);
         ports[id] = port;
         framePairs[id] = {};
@@ -178,6 +184,7 @@ chrome.runtime.onConnect.addListener(function(port) {
             cleanup(id);
             port.onMessage.removeListener(portMessageHandler);
             detachDebugger(id);
+            // console.log('disconnected', port.name);
         });
     }
 });
@@ -215,7 +222,7 @@ const framePairs: Record<
 const handleDebuggerEvent = (
     source: { tabId?: number },
     method: string,
-    params?: Object
+    params?: unknown
 ) => {
     if (!source.tabId) {
         return;

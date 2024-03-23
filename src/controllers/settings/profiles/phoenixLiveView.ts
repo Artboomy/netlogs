@@ -45,14 +45,14 @@ const INDEX = {
     caller: 2,
     event: 3,
     payload: 4
-};
+} as const;
 export const phoenixLiveViewProfile: IProfileWebSocket = {
     functions: {
         getName(payload): string {
             if (!payload) {
                 return 'Event';
             }
-            const parsed = JSON.parse(payload);
+            const parsed: PhoenixLiveViewParams = JSON.parse(payload);
             return `${parsed[INDEX.caller]}.${parsed[INDEX.event]}`;
         },
         getTag(): string {
@@ -77,7 +77,8 @@ export const phoenixLiveViewProfile: IProfileWebSocket = {
             return true;
         },
         getResult(payload: string): Record<string, unknown> | unknown {
-            return JSON.parse(payload)[INDEX.payload].response;
+            const parsed: PhoenixLiveViewResult = JSON.parse(payload);
+            return parsed[INDEX.payload].response;
         }
     },
     isMatch(request) {

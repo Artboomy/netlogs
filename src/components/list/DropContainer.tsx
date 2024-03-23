@@ -19,10 +19,11 @@ const useStyles = createUseStyles({
         height: '100%',
         width: '100%',
         boxSizing: 'border-box',
-        overflow: 'auto'
+        overflow: 'auto',
+        border: '4px solid transparent'
     },
     dropZoneActive: {
-        borderColor: '4px dashed #ccc'
+        border: '4px dashed #ccc'
     }
 });
 

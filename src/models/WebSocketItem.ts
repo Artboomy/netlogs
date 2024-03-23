@@ -12,6 +12,7 @@ import { isVisible } from 'react-inspector';
 import { isMimeType } from '../components/InspectorWrapper';
 import { TransactionItemAbstract } from './TransactionItem';
 import { phoenixLiveViewProfile } from '../controllers/settings/profiles/phoenixLiveView';
+import { isSerializedObject } from '../utils';
 
 type TContent = IItemTransactionCfg['result'];
 export default class WebSocketItem
@@ -19,12 +20,12 @@ export default class WebSocketItem
     public readonly id: string;
     public readonly type: ItemType = ItemType.WebSocket;
     public readonly timestamp: number;
-    private _name: string = '';
+    private _name = '';
     private _result: TContent | unknown = {};
     private readonly _request: IItemWebSocketCfg;
     private _isError: boolean;
     private _params: IItemTransactionCfg['params'] = {};
-    private _tag: string = '';
+    private _tag = '';
     private readonly _meta: IItemWebSocketCfg['meta'];
     private readonly _duration: number;
 
@@ -56,8 +57,38 @@ export default class WebSocketItem
         } else {
             this._name = 'WebSocket';
             this._tag = 'WS';
-            this._params = { raw: this._request.params };
-            this._result = { raw: this._request.result };
+            if (isSerializedObject(this._request.params)) {
+                this._params = JSON.parse(this._request.params);
+                if (
+                    this._params &&
+                    typeof this._params === 'object' &&
+                    Object.keys(this._params).length === 1 &&
+                    'params' in this._params
+                ) {
+                    this._params = this._params.params as Record<
+                        string,
+                        unknown
+                    >;
+                }
+            } else {
+                this._params = { raw: this._request.params };
+            }
+            if (isSerializedObject(this._request.result)) {
+                this._result = JSON.parse(this._request.result);
+                if (
+                    this._result &&
+                    typeof this._result === 'object' &&
+                    Object.keys(this._result).length === 1 &&
+                    'result' in this._result
+                ) {
+                    this._result = this._result.result as Record<
+                        string,
+                        unknown
+                    >;
+                }
+            } else {
+                this._result = { raw: this._request.result };
+            }
         }
     }
 

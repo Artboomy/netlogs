@@ -4,12 +4,17 @@ import ContentOnlyItem from '../models/ContentOnlyItem';
 import TransactionItem from '../models/TransactionItem';
 import WebSocketItem from '../models/WebSocketItem';
 
-function isWebsocketItem(cfg: any) {
-    return '__type' in cfg && cfg.__type === 'websocket';
+function isWebsocketItem(cfg: unknown) {
+    return (
+        cfg &&
+        typeof cfg === 'object' &&
+        '__type' in cfg &&
+        cfg.__type === 'websocket'
+    );
 }
 
-function isContentOnlyItem(cfg: any) {
-    return 'content' in cfg;
+function isContentOnlyItem(cfg: unknown) {
+    return cfg && typeof cfg === 'object' && 'content' in cfg;
 }
 
 class EventsController {

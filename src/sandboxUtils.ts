@@ -189,9 +189,15 @@ let portToBackground: chrome.runtime.Port;
 let cache: { type: string; value: string | undefined }[] = [];
 if (isExtension()) {
     console.log('created backport');
+    const tabId = window.chrome.devtools.inspectedWindow.tabId;
     portToBackground = window.chrome.runtime.connect({
-        name: `netlogs-${window.chrome.devtools.inspectedWindow.tabId}`
+        name: `netlogs-${tabId}`
     });
+
+    const lastError = chrome.runtime.lastError;
+    if (lastError) {
+        console.error('lastError', lastError);
+    }
 
     portToBackground.onMessage.addListener((message) => {
         if (!isIframeReady) {
@@ -199,6 +205,9 @@ if (isExtension()) {
             return;
         }
         processMessage(message);
+    });
+    portToBackground.onDisconnect.addListener(() => {
+        // console.log('portToBackground disconnected', tabId);
     });
 } else {
     console.log('no portToBackground');
