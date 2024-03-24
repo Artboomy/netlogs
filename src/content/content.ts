@@ -34,6 +34,10 @@ let portToSend: chrome.runtime.Port;
 
 // initiate a connection
 portFromContent.postMessage({ type: 'connectionTest' });
+const lastError = window.chrome.runtime.lastError;
+if (lastError) {
+    console.error('lastError', lastError);
+}
 portFromContent.onDisconnect.addListener(() => {
     if (window.chrome.runtime.lastError) {
         portFromContent.onMessage.removeListener(messageCallback);

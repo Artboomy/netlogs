@@ -36,6 +36,12 @@ type AnalyticsEventName =
     | 'analytics.error'
     | 'analytics.searchOnPage';
 
+type DebuggerEventName =
+    | 'debugger.attach'
+    | 'debugger.detach'
+    | 'debugger.status'
+    | 'debugger.getStatus';
+
 export type EventName =
     | 'onIframeReady'
     | TabEventName
@@ -44,7 +50,8 @@ export type EventName =
     | NetworkEventName
     | DevtoolsEventName
     | CustomEventName
-    | AnalyticsEventName;
+    | AnalyticsEventName
+    | DebuggerEventName;
 
 export type IframeEvent = {
     type: EventName;

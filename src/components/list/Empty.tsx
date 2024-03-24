@@ -29,6 +29,16 @@ const useStyles = createUseStyles({
     },
     line: {
         margin: '0.5em 0'
+    },
+    newBlock: {
+        color: 'white',
+        backgroundColor: 'orange',
+        content: 'close-quote',
+        padding: '2px',
+        borderRadius: '4px',
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        fontSize: '10px'
     }
 });
 
@@ -60,6 +70,18 @@ export const Empty: FC = () => {
                     </p>
                 </div>
                 <div className={styles.column}>
+                    <p className={styles.line}>
+                        🔴 <span className={styles.newBlock}>(New)</span> Click
+                        the circle in the header for Websocket sniffing. This is
+                        an experimental feature utilizing{' '}
+                        <Link
+                            href={
+                                'https://developer.chrome.com/docs/extensions/reference/api/debugger'
+                            }
+                            text='CDP'
+                        />
+                        .
+                    </p>
                     <p className={styles.line}>
                         ⛰️ <Link href='https://nextjs.org/' text='Next' />
                         /

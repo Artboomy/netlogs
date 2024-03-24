@@ -3,7 +3,7 @@ import { createUseStyles } from 'react-jss';
 import { theme } from '../theme/light';
 import cn from 'classnames';
 
-type TItem = {
+export type TItem = {
     name: string;
     value: ReactNode;
 };

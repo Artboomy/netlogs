@@ -1,6 +1,6 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-import { google } from 'base16';
+import { google, solarized } from 'base16';
 import { ItemType } from '../models/types';
 import { theme } from '../theme/light';
 import cn from 'classnames';
@@ -45,8 +45,14 @@ function getColor(
     if (['GQL'].includes(content) && !color) {
         return theme.graphql;
     }
+    if (content.includes('LV') && !color) {
+        return theme.phoenixLiveView;
+    }
     if (type === ItemType.Transaction) {
         return color;
+    }
+    if (type === ItemType.WebSocket) {
+        return color ? color : solarized.base0B;
     }
     return google.base0C;
 }
