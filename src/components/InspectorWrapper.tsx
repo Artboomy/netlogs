@@ -4,6 +4,7 @@ import { Image } from './render/Image';
 import { useListStore } from '../controllers/network';
 import { Webm } from './render/Webm';
 import { isSerializedObject } from '../utils';
+import { AudioPreview } from './render/AudioPreview';
 
 const customTheme = {
     ...chromeLight,
@@ -53,7 +54,8 @@ export type TAnyData =
     | TXmlData
     | TDomData
     | TImageData
-    | TVideoWebmData;
+    | TVideoWebmData
+    | TAudioData;
 
 type TImageData = {
     __mimeType: `image/${string}`;
@@ -62,6 +64,11 @@ type TImageData = {
 
 type TVideoWebmData = {
     __mimeType: `video/webm`;
+    __getRaw: () => string;
+};
+
+type TAudioData = {
+    __mimeType: `audio/${string}`;
     __getRaw: () => string;
 };
 
@@ -75,6 +82,10 @@ const isImage = (data: unknown): data is TImageData => {
 
 const isWebm = (data: unknown): data is TVideoWebmData => {
     return Boolean(isMimeType(data) && data.__mimeType === 'video/webm');
+};
+
+const isAudio = (data: unknown): data is TAudioData => {
+    return Boolean(isMimeType(data) && data.__mimeType.startsWith('audio'));
 };
 
 const isXml = (data: unknown): data is TXmlData => {
@@ -132,6 +143,11 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     }
     if (isWebm(data)) {
         return <Webm base64={data.__getRaw()} />;
+    }
+    if (isAudio(data)) {
+        return (
+            <AudioPreview base64={data.__getRaw()} mimeType={data.__mimeType} />
+        );
     }
     if (isTextHtml(data)) {
         const domParser = new DOMParser();

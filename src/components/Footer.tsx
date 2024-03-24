@@ -31,12 +31,12 @@ const useStyles = createUseStyles({
 export const Footer: FC<{
     value: string;
     onValueChange: (newValue: string) => void;
-    visibleCount?: number;
-    totalCount?: number;
-}> = ({ value, onValueChange, visibleCount = 0, totalCount = 0 }) => {
+}> = ({ value, onValueChange }) => {
     const styles = useStyles();
     const { version } = runtime.getManifest();
     const isPreserve = useListStore((state) => state.isPreserve);
+    const visibleCount = useListStore((state) => state.visibleCount);
+    const totalCount = useListStore((state) => state.totalCount);
     const [settings, setSettings] = useSettings();
     const { tagsToolbarVisible } = settings;
     const setTagListVisible = (newValue: boolean) => {

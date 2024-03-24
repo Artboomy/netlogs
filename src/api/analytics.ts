@@ -23,6 +23,19 @@ class Analytics {
     constructor(debug = false, noSend = false) {
         this.debug = debug;
         this.noSend = noSend;
+        this.checkNewUser();
+    }
+
+    async checkNewUser() {
+        try {
+            const { firstTime } = await chrome.storage.local.get('firstTime');
+            if (!firstTime) {
+                await chrome.storage.local.set({ firstTime: false });
+                this.fireEvent('first_open');
+            }
+        } catch (e) {
+            // pass
+        }
     }
 
     // Returns the client id, or creates a new one if one doesn't exist.

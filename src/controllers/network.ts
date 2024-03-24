@@ -21,6 +21,9 @@ type TStore = {
     clear: () => void;
     mimeTypes: Set<string>;
     setList: (newList: ItemList, isDynamic?: boolean) => void;
+
+    totalCount: number;
+    visibleCount: number;
 };
 
 export const useListStore = create<TStore>((set, get) => ({
@@ -29,6 +32,9 @@ export const useListStore = create<TStore>((set, get) => ({
     isPreserve: false,
     isUnpack: true,
     mimeTypes: new Set(),
+
+    totalCount: 0,
+    visibleCount: 0,
     clear: () => set({ list: [], isDynamic: true, mimeTypes: new Set() }),
     setList: (newList: ItemList, isDynamic = true) => {
         const newState = {
