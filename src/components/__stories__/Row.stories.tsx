@@ -14,7 +14,9 @@ const networkItem = new NetworkItem({
     request: (har.log.entries[0] as unknown) as Entry
 });
 
-export const Transaction = (): ReactNode => <Component item={networkItem} />;
+export const Transaction = (): ReactNode => (
+    <Component idx={0} item={networkItem} />
+);
 
 const contentItem = new ContentOnlyItem({
     timestamp: new Date().getTime(),
@@ -27,4 +29,6 @@ const contentItem = new ContentOnlyItem({
         otherData: []
     }
 });
-export const ContentOnly = (): ReactNode => <Component item={contentItem} />;
+export const ContentOnly = (): ReactNode => (
+    <Component idx={0} item={contentItem} />
+);

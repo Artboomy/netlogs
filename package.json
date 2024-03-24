@@ -8,21 +8,16 @@
     "license": "MIT",
     "private": true,
     "scripts": {
-        "postinstall": "npx husky install",
         "lint": "npx tsc --noEmit && npx eslint ./src --max-warnings=0 --ext .ts,.tsx",
+        "lint:ci": "echo '{\"api_secret\": \"mockData\", \"measurement_id\": \"mockData\"}' > src/secrets.json && yarn run lint",
         "build": "npx webpack --config webpack.dev.js",
-        "build:prod": "npm run lint && npx webpack --config webpack.prod.js",
-        "build:analyze": "npm run lint && npx webpack --config webpack.analyze.js",
+        "build:prod": "yarn run lint && npx webpack --config webpack.prod.js",
+        "build:analyze": "yarn run lint && npx webpack --config webpack.analyze.js",
         "build:watch": "npx webpack --config webpack.dev.js --watch",
-        "package": "npm run build:prod && tar -C dist -caf netlogs.zip *",
+        "package": "yarn run lint && yarn run build:prod && tar -C dist -caf netlogs.zip *",
         "site": "http-server dist",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npx tsc --noEmit && lint-staged"
-        }
     },
     "dependencies": {
         "base16": "1.0.0",
@@ -69,8 +64,6 @@
         "eslint": "^7.17.0",
         "eslint-plugin-prettier": "^3.4.1",
         "eslint-plugin-react": "^7.22.0",
-        "husky": "4.3.6",
-        "lint-staged": "10.5.3",
         "prettier": "2.2.1",
         "style-loader": "2.0.0",
         "tsconfig-paths-webpack-plugin": "3.3.0",
@@ -79,14 +72,5 @@
         "webpack-bundle-analyzer": "^4.4.0",
         "webpack-cli": "^4.3.1",
         "webpack-merge": "^5.7.3"
-    },
-    "lint-staged": {
-        "*.(js|jsx|ts|tsx|scss|md|html|json)": [
-            "npx prettier --write",
-            "git add"
-        ],
-        "*.{js,jsx,ts,tsx}": [
-            "npx eslint --cache --fix --max-warnings=0 --ext .ts,.tsx"
-        ]
     }
 }

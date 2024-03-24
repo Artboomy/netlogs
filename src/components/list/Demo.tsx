@@ -39,7 +39,7 @@ export const ListDemo: FC = () => {
         <DndProvider backend={HTML5Backend}>
             <ModalContainer>
                 <DropContainer>
-                    <ListContainer onCountChange={() => null} />
+                    <ListContainer />
                 </DropContainer>
             </ModalContainer>
         </DndProvider>
