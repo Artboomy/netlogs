@@ -6,20 +6,14 @@ import React, {
     useRef,
     useState
 } from 'react';
-import { useListStore } from '../../controllers/network';
-import { Row } from '../Row';
+import { useListStore } from 'controllers/network';
 import { List } from '../List';
 import { SearchContext, useSearchParams } from 'react-inspector';
-import { FilterContext } from '../../context/FilterContext';
+import { FilterContext } from 'context/FilterContext';
 import shallow from 'zustand/shallow';
-import { useSettings } from '../../hooks/useSettings';
+import { useSettings } from 'hooks/useSettings';
 
-export const ListContainer: FC<{
-    onCountChange: (count: {
-        totalCount: number;
-        visibleCount: number;
-    }) => void;
-}> = ({ onCountChange }) => {
+export const ListContainer: FC = () => {
     const [settings] = useSettings();
     const list = useListStore((state) => state.list, shallow);
     const [visibleList, setVisibleList] = useState(list);
@@ -35,8 +29,9 @@ export const ListContainer: FC<{
     const filterMapRef = useRef(new WeakMap());
     // recalculate map entirely on new filter values
     useEffect(() => {
+        const currentList = useListStore.getState().list;
         const filterMap = filterMapRef.current;
-        const visibleList = list.filter((i) => {
+        const visibleList = currentList.filter((i) => {
             const shouldShow =
                 !settings.hiddenTags[i.getTag()] &&
                 !hiddenMimeTypes.has(i.toJSON().response?.content.mimeType) &&
@@ -49,11 +44,11 @@ export const ListContainer: FC<{
             return shouldShow;
         });
         setVisibleList(visibleList);
-        onCountChange({
-            totalCount: list.length,
-            visibleCount: visibleList.length
+        useListStore.setState({
+            visibleCount: visibleList.length,
+            totalCount: currentList.length
         });
-    }, [filterValue, searchValue, marker, settings]);
+    }, [filterValue, searchValue, marker, settings, hiddenMimeTypes]);
     // use map in useEffect on new item to detect if it visible
     useEffect(() => {
         const filterMap = filterMapRef.current;
@@ -75,13 +70,10 @@ export const ListContainer: FC<{
             return computedVisibility;
         });
         setVisibleList(visibleList);
-        onCountChange({
-            totalCount: list.length,
-            visibleCount: visibleList.length
+        useListStore.setState({
+            visibleCount: visibleList.length,
+            totalCount: list.length
         });
-    }, [list]);
-    const content = visibleList.map((networkItem) => {
-        return <Row key={networkItem.id} item={networkItem} />;
-    });
-    return <List content={content} />;
+    }, [list, hiddenMimeTypes]);
+    return <List items={visibleList} />;
 };

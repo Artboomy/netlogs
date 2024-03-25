@@ -1,7 +1,9 @@
-import React, { FC, ReactElement } from 'react';
+import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Empty } from './list/Empty';
 import { mediaQuerySmallOnly } from '../utils';
+import { ItemList } from '../controllers/network';
+import { Row } from './Row';
 
 const useStyles = createUseStyles({
     content: {
@@ -15,25 +17,19 @@ const useStyles = createUseStyles({
             gridTemplateColumns: 'min-content auto',
             rowGap: 0
         }
-    },
-    oddRow: {
-        backgroundColor: 'rgba(245, 245, 245)'
     }
 });
 
-export const List: FC<{ content: ReactElement[] }> = ({ content }) => {
+export const List: FC<{ items: ItemList }> = ({ items }) => {
     const styles = useStyles();
-    return content.length ? (
+    if (!items.length) {
+        return <Empty />;
+    }
+    return (
         <div className={styles.content}>
-            {content.map((i, idx) =>
-                idx % 2
-                    ? React.cloneElement(i, {
-                          className: styles.oddRow
-                      })
-                    : i
-            )}
+            {items.map((networkItem, idx) => (
+                <Row key={networkItem.id} item={networkItem} idx={idx} />
+            ))}
         </div>
-    ) : (
-        <Empty />
     );
 };

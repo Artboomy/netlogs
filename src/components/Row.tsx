@@ -32,12 +32,16 @@ const useStyles = createUseStyles(() => ({
     dateClickable: {
         cursor: 'pointer',
         textDecoration: 'underline'
+    },
+    oddRow: {
+        backgroundColor: 'rgba(245, 245, 245)'
     }
 }));
 
 interface IRowProps {
     className?: string;
     item: ContentOnlyItem | TransactionItemAbstract;
+    idx: number;
 }
 
 /*function timeToString(timestamp: number): string {
@@ -47,7 +51,7 @@ interface IRowProps {
     ).padStart(3, '0')}`;
 }*/
 
-export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
+export const Row: React.FC<IRowProps> = memo(({ item, idx }) => {
     const styles = useStyles();
     const { setValue } = useContext(ModalContext);
     const tag = item.getTag();
@@ -70,18 +74,14 @@ export const Row: React.FC<IRowProps> = memo(({ item, className }) => {
         };
     }, []);
     const commonProps = {
-        className,
+        className: idx % 2 ? styles.oddRow : '',
         date: (
             <div
-                className={cn(
-                    styles.date,
-                    {
-                        [styles.dateClickable]: !!meta,
-                        [styles.dateContentOnly]:
-                            item instanceof ContentOnlyItem
-                    },
-                    className
-                )}
+                className={cn(styles.date, {
+                    [styles.dateClickable]: !!meta,
+                    [styles.dateContentOnly]: item instanceof ContentOnlyItem,
+                    [styles.oddRow]: idx % 2
+                })}
                 onClick={handleClick}>
                 {item.getDuration().toFixed(2)} ms
             </div>
