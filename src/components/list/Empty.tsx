@@ -25,7 +25,9 @@ const useStyles = createUseStyles({
     noItemsLine: {
         width: '100%',
         textAlign: 'center',
-        padding: '8px 0'
+        padding: '8px 0',
+        display: 'block!important',
+        fontSize: '1.4em'
     },
     line: {
         margin: '0.5em 0'
@@ -34,11 +36,11 @@ const useStyles = createUseStyles({
         color: 'white',
         backgroundColor: 'orange',
         content: 'close-quote',
-        padding: '2px',
+        padding: '2px 4px',
         borderRadius: '4px',
         fontWeight: 'bold',
         textTransform: 'uppercase',
-        fontSize: '10px'
+        fontSize: '9px'
     }
 });
 
@@ -50,7 +52,7 @@ export const Empty: FC = () => {
     return (
         <section>
             <p className={cn(styles.line, styles.noItemsLine)}>
-                ¯\_(ツ)_/¯ No items ¯\_(ツ)_/¯
+                👀 No items 👀
             </p>
             <div className={styles.columns}>
                 <div className={cn(styles.column, styles.hotkeys)}>
@@ -71,7 +73,7 @@ export const Empty: FC = () => {
                 </div>
                 <div className={styles.column}>
                     <p className={styles.line}>
-                        🔴 <span className={styles.newBlock}>(New)</span> Click
+                        🔴 <span className={styles.newBlock}>New</span> Click
                         the circle in the header for Websocket sniffing. This is
                         an experimental feature utilizing{' '}
                         <Link
