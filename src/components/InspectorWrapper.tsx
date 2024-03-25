@@ -1,23 +1,15 @@
-import React, { FC } from 'react';
-import Inspector, { chromeLight, DOMInspector } from 'react-inspector';
+import React, { FC, useMemo } from 'react';
+import Inspector, {
+    chromeDark,
+    chromeLight,
+    DOMInspector
+} from 'react-inspector';
 import { Image } from './render/Image';
 import { useListStore } from '../controllers/network';
 import { Webm } from './render/Webm';
 import { isSerializedObject } from '../utils';
 import { AudioPreview } from './render/AudioPreview';
-
-const customTheme = {
-    ...chromeLight,
-    ...{
-        OBJECT_PREVIEW_OBJECT_MAX_PROPERTIES: 1,
-        OBJECT_PREVIEW_ARRAY_MAX_PROPERTIES: 3,
-        BASE_BACKGROUND_COLOR: 'transparent',
-        BASE_FONT_SIZE: '12px',
-        BASE_LINE_HEIGHT: 1.4,
-        TREENODE_FONT_SIZE: '12px',
-        TREENODE_LINE_HEIGHT: 1.4
-    }
-};
+import { useSettings } from '../hooks/useSettings';
 
 type TDomData = {
     __mimeType: 'text/html';
@@ -137,6 +129,22 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     data,
     tagName
 }) => {
+    const [{ theme }] = useSettings();
+    const customTheme = useMemo(
+        () => ({
+            ...(theme === 'light' ? chromeLight : chromeDark),
+            ...{
+                OBJECT_PREVIEW_OBJECT_MAX_PROPERTIES: 1,
+                OBJECT_PREVIEW_ARRAY_MAX_PROPERTIES: 3,
+                BASE_BACKGROUND_COLOR: 'transparent',
+                BASE_FONT_SIZE: '12px',
+                BASE_LINE_HEIGHT: 1.4,
+                TREENODE_FONT_SIZE: '12px',
+                TREENODE_LINE_HEIGHT: 1.4
+            }
+        }),
+        [theme]
+    );
     const isUnpack = useListStore((state) => state.isUnpack);
     if (isImage(data)) {
         return <Image base64={data.__getRaw()} mimeType={data.__mimeType} />;

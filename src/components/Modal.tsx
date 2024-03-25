@@ -1,10 +1,10 @@
 import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
 import { mediaQuerySmallOnly } from '../utils';
-import { theme } from '../theme/light';
 import { IconButton, ICONS } from './IconButton';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
         display: 'flex',
         flexDirection: 'column',
@@ -15,9 +15,9 @@ const useStyles = createUseStyles({
         bottom: 0,
         // NOTE: should be larger than codemirror z-index
         zIndex: 10,
-        backgroundColor: 'white',
+        backgroundColor: theme.mainBg,
         paddingLeft: '8px',
-        borderLeft: '1px solid #eaeaea',
+        borderLeft: `1px solid ${theme.borderColor}`,
         [mediaQuerySmallOnly]: {
             left: '60px'
         }
@@ -30,7 +30,8 @@ const useStyles = createUseStyles({
         overflow: 'auto',
         overflowWrap: 'break-word'
     }
-});
+}));
+
 type ModalProps = {
     children: ReactNode;
     onClose: () => void;

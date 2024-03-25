@@ -16,10 +16,11 @@ import cn from 'classnames';
 import { ContentOnly } from './row/ContentOnly';
 import { Transaction } from './row/Transaction';
 import { mediaQuerySmallOnly } from '../utils';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles(() => ({
+const useStyles = createUseStyles<Theme>((theme) => ({
     date: {
-        color: google.base02,
+        color: theme.dateColor,
         fontSize: '12px',
         padding: '4px 4px 4px 8px',
         whiteSpace: 'nowrap'
@@ -34,7 +35,7 @@ const useStyles = createUseStyles(() => ({
         textDecoration: 'underline'
     },
     oddRow: {
-        backgroundColor: 'rgba(245, 245, 245)'
+        backgroundColor: theme.oddRowBg
     }
 }));
 

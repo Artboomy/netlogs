@@ -2,6 +2,8 @@ import React, { FC, useContext } from 'react';
 import { createUseStyles } from 'react-jss';
 import { chromeLight } from 'react-inspector';
 import { ModalContext } from '../modal/Context';
+import { theme as themeLight } from 'theme/light';
+import { theme as themeDark } from 'theme/dark';
 
 const useStyles = createUseStyles({
     tag: {
@@ -36,7 +38,10 @@ export const Image: FC<{
     ) => {
         const target = event.target as HTMLDivElement;
         target.style.backgroundColor =
-            target.style.backgroundColor === '' ? 'black' : '';
+            target.style.backgroundColor === themeLight.mainBg ||
+            !target.style.backgroundColor
+                ? themeDark.mainBg
+                : themeLight.mainBg;
     };
     const handleClick = () => {
         setValue(

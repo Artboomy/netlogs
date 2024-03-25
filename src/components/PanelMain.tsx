@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import { Header } from './Header';
 import { createUseStyles } from 'react-jss';
-import { SettingsContainer } from './SettingsContainer';
 import { ModalContainer } from './modal/Container';
 import { ListContainer } from './list/Container';
 import { SearchContext } from 'react-inspector';
@@ -16,15 +15,28 @@ import { useHotkey } from '../hooks/useHotkey';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { callParentVoid, subscribeParent } from '../utils';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     '@global': {
         html: {
             height: '100%',
-            backgroundColor: 'white',
+            backgroundColor: theme.mainBg,
             fontFamily: '"Segoe UI", Tahoma, sans-serif',
-            fontSize: '13px'
+            fontSize: '13px',
+            color: theme.mainFont,
+            colorScheme: theme.name
         },
+        ...(theme.linkColor && {
+            a: {
+                color: theme.linkColor,
+                textDecorationColor: theme.linkColor
+            },
+            'a:visited': {
+                color: theme.linkVisitedColor,
+                textDecorationColor: theme.linkVisitedColor
+            }
+        }),
         body: {
             height: '100%',
             margin: 0,
@@ -34,12 +46,13 @@ const useStyles = createUseStyles({
             height: '100%'
         },
         kbd: {
-            backgroundColor: '#eee',
+            backgroundColor: theme.mainBg,
             borderRadius: '3px',
-            border: '1px solid #b4b4b4',
-            boxShadow:
-                '0 1px 1px rgba(0, 0, 0, .2), 0 2px 0 0 rgba(255, 255, 255, .7) inset',
-            color: '#333',
+            border: `1px solid ${theme.borderColor}`,
+            boxShadow: `0 1px 1px rgba(0, 0, 0, .2), 0 2px 0 0 rgba(255, 255, 255, .${
+                theme.name === 'light' ? '7' : '3'
+            }) inset`,
+            color: theme.mainFont,
             display: 'inline-block',
             fontWeight: 700,
             lineHeight: 1,
@@ -57,7 +70,7 @@ const useStyles = createUseStyles({
         position: 'sticky',
         top: 0
     }
-});
+}));
 export const PanelMain: React.FC = () => {
     const styles = useStyles();
     const [searchValue, setSearchValue] = useState('');
@@ -84,40 +97,38 @@ export const PanelMain: React.FC = () => {
     }, []);
     return (
         <DndProvider backend={HTML5Backend}>
-            <SettingsContainer>
-                <ModalContainer>
-                    <div className={styles.root}>
-                        <SearchContext.Provider
-                            value={{
-                                value: debSearchValue,
-                                hideUnrelated,
-                                caseSensitive
-                            }}>
-                            <Header
-                                className={styles.header}
-                                searchValue={searchValue}
-                                hideUnrelated={hideUnrelated}
-                                onSearchChange={setSearchValue}
-                                onHideUnrelatedChange={setHideUnrelated}
-                                caseSensitive={caseSensitive}
-                                onCaseSensitiveChange={setCaseSensitive}
+            <ModalContainer>
+                <div className={styles.root}>
+                    <SearchContext.Provider
+                        value={{
+                            value: debSearchValue,
+                            hideUnrelated,
+                            caseSensitive
+                        }}>
+                        <Header
+                            className={styles.header}
+                            searchValue={searchValue}
+                            hideUnrelated={hideUnrelated}
+                            onSearchChange={setSearchValue}
+                            onHideUnrelatedChange={setHideUnrelated}
+                            caseSensitive={caseSensitive}
+                            onCaseSensitiveChange={setCaseSensitive}
+                        />
+                        <FilterContext.Provider value={debFilterValue}>
+                            <ErrorBoundary>
+                                <DropContainer>
+                                    <ListContainer />
+                                </DropContainer>
+                            </ErrorBoundary>
+                            <Footer
+                                value={filterValue}
+                                onValueChange={setFilterValue}
                             />
-                            <FilterContext.Provider value={debFilterValue}>
-                                <ErrorBoundary>
-                                    <DropContainer>
-                                        <ListContainer />
-                                    </DropContainer>
-                                </ErrorBoundary>
-                                <Footer
-                                    value={filterValue}
-                                    onValueChange={setFilterValue}
-                                />
-                            </FilterContext.Provider>
-                        </SearchContext.Provider>
-                        <ToastContainer />
-                    </div>
-                </ModalContainer>
-            </SettingsContainer>
+                        </FilterContext.Provider>
+                    </SearchContext.Provider>
+                    <ToastContainer />
+                </div>
+            </ModalContainer>
         </DndProvider>
     );
 };

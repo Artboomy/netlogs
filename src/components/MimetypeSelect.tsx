@@ -5,8 +5,9 @@ import { MultiSelect } from 'react-multi-select-component';
 import isEqual from 'lodash.isequal';
 import settings from '../controllers/settings';
 import { callParentVoid } from '../utils';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
         marginLeft: 'auto',
         '--rmsc-h': '24px!important',
@@ -16,9 +17,14 @@ const useStyles = createUseStyles({
         '& .item-renderer': {
             alignItems: 'center!important',
             lineHeight: '10px'
-        }
+        },
+        '--rmsc-bg': theme.mainBg,
+        '--rmsc-main': theme.mainFont,
+        '--rmsc-border': theme.borderColor,
+        '--rmsc-selected': theme.oddRowBg,
+        '--rmsc-hover': theme.icon.hover
     }
-});
+}));
 
 const useHiddenMimeTypes = () => {
     const [hidden, setHidden] = useState(
