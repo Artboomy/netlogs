@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
-import { theme } from '../theme/light';
 import cn from 'classnames';
+import { Theme } from '../theme/types';
 
 export type TItem = {
     name: string;
@@ -11,7 +11,7 @@ export type TSection = {
     title: string;
     items: TItem[];
 };
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
         borderBottom: '1px solid #eaeaea',
         marginBottom: '4px',
@@ -25,12 +25,12 @@ const useStyles = createUseStyles({
         color: theme.section.key
     },
     valueNumber: {
-        color: 'rgb(28, 0, 207)'
+        color: theme.valueNumber
     },
     valueString: {
-        color: 'rgb(196, 26, 22)'
+        color: theme.valueString
     }
-});
+}));
 
 const isQuoted = (s: unknown) =>
     typeof s === 'string' && s.startsWith('"') && s.endsWith('"');

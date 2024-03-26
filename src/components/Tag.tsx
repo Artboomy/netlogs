@@ -4,8 +4,9 @@ import { google, solarized } from 'base16';
 import { ItemType } from '../models/types';
 import { theme } from '../theme/light';
 import cn from 'classnames';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
         display: 'inline-block',
         boxSizing: 'border-box',
@@ -22,11 +23,11 @@ const useStyles = createUseStyles({
         backgroundColor: (color) => color || google.base03
     },
     inactive: {
-        color: 'black',
+        color: theme.inactiveTag,
         backgroundColor: 'transparent',
-        border: '1px black dashed'
+        border: `1px ${theme.inactiveTag} dashed`
     }
-});
+}));
 type TProps = {
     color?: string;
     content: string;

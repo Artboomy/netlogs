@@ -2,6 +2,7 @@ import { ISettings } from './types';
 import { NetworkRequest } from '../../models/types';
 
 export const defaultSettings: ISettings = {
+    theme: 'light',
     matcher: (_request: NetworkRequest) => {
         return 'default';
     },

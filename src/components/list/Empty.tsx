@@ -3,8 +3,9 @@ import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
 import { isMacOs, mediaQuerySmallOnly } from '../../utils';
 import { Link } from '../Link';
+import { Theme } from '../../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     columns: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
@@ -33,7 +34,7 @@ const useStyles = createUseStyles({
         margin: '0.5em 0'
     },
     newBlock: {
-        color: 'white',
+        color: theme.mainBg,
         backgroundColor: 'orange',
         content: 'close-quote',
         padding: '2px 4px',
@@ -42,7 +43,7 @@ const useStyles = createUseStyles({
         textTransform: 'uppercase',
         fontSize: '9px'
     }
-});
+}));
 
 const url =
     'https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf';
@@ -72,6 +73,10 @@ export const Empty: FC = () => {
                     </p>
                 </div>
                 <div className={styles.column}>
+                    <p className={styles.line}>
+                        🌑 <span className={styles.newBlock}>New</span> Click on
+                        Sun/Moon in the footer to change theme
+                    </p>
                     <p className={styles.line}>
                         🔴 <span className={styles.newBlock}>New</span> Click
                         the circle in the header for Websocket sniffing. This is

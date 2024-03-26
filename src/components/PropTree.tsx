@@ -12,7 +12,7 @@ const useStyles = createUseStyles({
     root: {
         fontFamily: 'Tahoma, sans-serif',
         fontSize: '12px',
-        lineHeight: 1.5
+        lineHeight: 1.7
     }
 });
 

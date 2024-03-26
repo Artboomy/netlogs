@@ -83,7 +83,11 @@ export const phoenixLiveViewProfile: IProfileWebSocket = {
         getResult(payload: string): Record<string, unknown> | unknown {
             if (!payload) return {};
             const parsed: PhoenixLiveViewResult = JSON.parse(payload);
-            return parsed[INDEX.payload].response;
+            const data = parsed[INDEX.payload];
+            if ('response' in data) {
+                return data.response;
+            }
+            return data;
         }
     },
     isMatch(request) {

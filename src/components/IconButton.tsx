@@ -2,17 +2,18 @@ import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import largeIcons from '../icons/largeIcons.svg';
 import cn from 'classnames';
-import { theme } from '../theme/light';
 import { google } from 'base16';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     button: {
         appearance: 'none',
         padding: '0',
         background: 'transparent',
         border: 'none',
         cursor: 'pointer',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: theme.icon.normal
     },
     icon: {
         backgroundColor: theme.icon.normal,
@@ -42,7 +43,7 @@ const useStyles = createUseStyles({
             color: theme.accent
         }
     }
-});
+}));
 
 export type IconButtonProps = {
     className?: string;

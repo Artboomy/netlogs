@@ -25,11 +25,11 @@ import { Instructions } from './options/Instructions';
 import { Demo } from './options/Demo';
 import { useSettings } from '../hooks/useSettings';
 import cn from 'classnames';
-import { theme } from '../theme/light';
 import { HiddenTagList } from './options/HiddenTagList';
 import { Link } from './Link';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     '@global': {
         html: {
             height: '100%',
@@ -109,7 +109,7 @@ const useStyles = createUseStyles({
     checkboxRow: {
         padding: '4px 0'
     }
-});
+}));
 
 const handleExport = (name: string, data: IProfile | IProfileSerialized) => {
     downloadAsFile(
@@ -366,6 +366,18 @@ export const Options: FC = () => {
                         <span title='Extracts window.__NUTXT__ value'>❓</span>
                     </label>
                 </div>
+                <select
+                    id='themeColor'
+                    onChange={(e) => {
+                        setSettings({
+                            ...settings,
+                            theme: e.target.value as 'light' | 'dark'
+                        });
+                    }}
+                    value={settings.theme}>
+                    <option value='light'>Light</option>
+                    <option value='dark'>Dark</option>
+                </select>
             </section>
             <section className={styles.block}>
                 <h2>Hidden tags</h2>

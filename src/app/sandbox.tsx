@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { PanelMain } from 'components/PanelMain';
 import { callParent, callParentVoid, isMacOs } from '../utils';
 
 import EventsController from 'controllers/events';
+import { PanelApp } from '../components/PanelApp';
 
 EventsController.subscribe();
 
 callParent('onIframeReady').then(() => {
-    ReactDOM.render(<PanelMain />, document.getElementById('root'));
+    ReactDOM.render(<PanelApp />, document.getElementById('root'));
 });
 
 const F5_CODE = 'F5';

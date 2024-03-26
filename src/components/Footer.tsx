@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
-import { theme } from '../theme/light';
 import { IconButton, ICONS } from './IconButton';
 import { TagList } from './TagList';
 import { useSettings } from '../hooks/useSettings';
 import { useListStore } from '../controllers/network';
 import { Link } from './Link';
 import runtime from '../api/runtime';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
         backgroundColor: theme.panelColor,
         borderTop: `1px solid ${theme.borderColor}`
@@ -26,8 +26,18 @@ const useStyles = createUseStyles({
     version: {
         fontStyle: 'italic',
         paddingRight: '4px'
+    },
+    themeButton: {
+        border: `1px solid ${theme.borderColor}`,
+        borderRadius: '6px',
+        marginRight: '4px',
+        width: '24px',
+        height: '24px',
+        display: 'flex',
+        justifyContent: 'center',
+        cursor: 'pointer'
     }
-});
+}));
 export const Footer: FC<{
     value: string;
     onValueChange: (newValue: string) => void;
@@ -43,6 +53,12 @@ export const Footer: FC<{
         setSettings({
             ...settings,
             tagsToolbarVisible: newValue
+        });
+    };
+    const handleThemeChange = () => {
+        setSettings({
+            ...settings,
+            theme: settings.theme === 'light' ? 'dark' : 'light'
         });
     };
     return (
@@ -69,6 +85,12 @@ export const Footer: FC<{
                     {visibleCount} / {totalCount} requests
                     {isPreserve && ', log preserved'}
                 </span>
+                <button
+                    className={styles.themeButton}
+                    onClick={handleThemeChange}
+                    title='Change theme'>
+                    {settings.theme === 'light' ? '🌞' : '🌑'}
+                </button>
                 <div className={styles.version}>v.{version}</div>
                 <Link
                     text='Github'

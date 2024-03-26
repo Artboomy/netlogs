@@ -3,7 +3,6 @@ import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
 import { useListStore } from '../controllers/network';
 import runtime from '../api/runtime';
-import { theme } from '../theme/light';
 import { Har } from 'har-format';
 import { callParent, isExtension } from '../utils';
 import { IconButton, ICONS } from './IconButton';
@@ -11,8 +10,9 @@ import { useHotkey } from '../hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
 import { toast } from 'react-toastify';
 import { DebuggerButton } from './DebuggerButton';
+import { Theme } from '../theme/types';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
         borderBottom: `1px solid ${theme.borderColor}`,
         zIndex: 2
@@ -30,7 +30,7 @@ const useStyles = createUseStyles({
     hideUnrelated: {
         display: 'flex'
     }
-});
+}));
 
 interface IProps {
     className?: string;
