@@ -11,6 +11,7 @@ import { defaultProfile } from './settings/profiles/default';
 import { NetworkRequest } from '../models/types';
 import { isJsonRpc, jsonRpcProfile } from './settings/profiles/jsonRpc';
 import { graphqlProfile, isGraphql } from './settings/profiles/graphql';
+import { i18n } from '../translations/i18n';
 
 function deserializeFunctionRaw<T>(strFunction: string): T {
     return isSandbox() ? new Function(`return ${strFunction}`)() : strFunction;
@@ -99,6 +100,10 @@ function injectStaticProfiles(settings: ISettings): void {
     settings.profiles.graphql = graphqlProfile;
 }
 
+function setLanguage(language: string) {
+    i18n.locale = language;
+}
+
 class Settings {
     private settings: ISettings = defaultSettings;
     private listeners: Listener[] = [];
@@ -117,6 +122,7 @@ class Settings {
                     changes.settings.newValue
                 ) {
                     this.settings = deserialize(changes.settings.newValue);
+                    setLanguage(this.settings.language);
                     injectStaticProfiles(this.settings);
                     this.listeners.forEach(
                         (listener) => this.settings && listener(this.settings)
@@ -140,6 +146,7 @@ class Settings {
                             ...defaultSettings,
                             ...deserialize(settings)
                         };
+                        setLanguage(this.settings.language);
                     } catch (e) {
                         this.settings = defaultSettings;
                     }

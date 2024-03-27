@@ -37,6 +37,10 @@ export type IProfileSerialized = Omit<IProfile, 'functions'> & {
 
 export interface ISettings {
     theme: 'light' | 'dark';
+    language: 'en-US' | 'ru-RU' | string;
+    newFeatureFlags: {
+        language: boolean;
+    };
     matcher: (request: NetworkRequest) => ProfileName;
     sendAnalytics: boolean;
     profiles: Record<ProfileName, IProfile>;

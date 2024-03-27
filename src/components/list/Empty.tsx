@@ -1,9 +1,10 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
-import { isMacOs, mediaQuerySmallOnly } from '../../utils';
+import { isMacOs, mediaQuerySmallOnly } from 'utils';
 import { Link } from '../Link';
-import { Theme } from '../../theme/types';
+import { Theme } from 'theme/types';
+import { i18n } from '../../translations/i18n';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     columns: {
@@ -53,34 +54,35 @@ export const Empty: FC = () => {
     return (
         <section>
             <p className={cn(styles.line, styles.noItemsLine)}>
-                👀 No items 👀
+                👀 {i18n.t('noItems')} 👀
             </p>
             <div className={styles.columns}>
                 <div className={cn(styles.column, styles.hotkeys)}>
                     <p>
-                        Focus search: <kbd>{modifierKey}</kbd>+<kbd>F</kbd>
+                        {i18n.t('focusSearch')}: <kbd>{modifierKey}</kbd>+
+                        <kbd>F</kbd>
                     </p>
                     <p>
-                        Clear log: <kbd>{modifierKey}</kbd>+<kbd>L</kbd>
+                        {i18n.t('clearLog')}: <kbd>{modifierKey}</kbd>+
+                        <kbd>L</kbd>
                     </p>
                     <p>
-                        Toggle show/hide unrelated: <kbd>{modifierKey}</kbd>+
+                        {i18n.t('toggleUnrelated')}: <kbd>{modifierKey}</kbd>+
                         <kbd>Shift</kbd>+<kbd>U</kbd>
                     </p>
                     <p>
-                        Toggle preserve log: <kbd>{modifierKey}</kbd>+
+                        {i18n.t('togglePreserve')}: <kbd>{modifierKey}</kbd>+
                         <kbd>P</kbd>
                     </p>
                 </div>
                 <div className={styles.column}>
                     <p className={styles.line}>
-                        🌑 <span className={styles.newBlock}>New</span> Click on
-                        Sun/Moon in the footer to change theme
+                        🌑 <span className={styles.newBlock}>New</span>
+                        {i18n.t('themeHelper')}
                     </p>
                     <p className={styles.line}>
-                        🔴 <span className={styles.newBlock}>New</span> Click
-                        the circle in the header for Websocket sniffing. This is
-                        an experimental feature utilizing{' '}
+                        🔴 <span className={styles.newBlock}>New</span>{' '}
+                        {i18n.t('webSocketHelper')}{' '}
                         <Link
                             href={
                                 'https://developer.chrome.com/docs/extensions/reference/api/debugger'
@@ -92,26 +94,24 @@ export const Empty: FC = () => {
                     <p className={styles.line}>
                         ⛰️ <Link href='https://nextjs.org/' text='Next' />
                         /
-                        <Link href='https://nuxt.com/' text='Nuxt' /> state will
-                        appear here as row if available
+                        <Link href='https://nuxt.com/' text='Nuxt' />{' '}
+                        {i18n.t('nextHelper')}
                     </p>
+                    <p className={styles.line}>👆 {i18n.t('timeHelper')}</p>
                     <p className={styles.line}>
-                        👆 Press on item date to show headers
-                    </p>
-                    <p className={styles.line}>
-                        📖 You can find readme{' '}
+                        📖 {i18n.t('readmeHelper')}{' '}
                         <Link
                             href='https://github.com/Artboomy/netlogs#readme'
-                            text='here'
+                            text={i18n.t('here')}
                         />
                     </p>
                     <p className={styles.line}>
-                        📦 Drop HAR/netlogs.zip file to see what&apos;s inside
+                        📦 {i18n.t('dropHelper', { name: 'HAR/netlogs.zip' })}
                     </p>
                     <p className={styles.line}>
-                        ❤️ If you like the extension -{' '}
-                        <Link href={url} text='share' /> with your friends and
-                        colleagues
+                        ❤️ {i18n.t('shareHelper')} -{' '}
+                        <Link href={url} text={i18n.t('share')} />{' '}
+                        {i18n.t('shareHelper2')}
                     </p>
                 </div>
             </div>

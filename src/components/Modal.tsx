@@ -1,8 +1,9 @@
 import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
-import { mediaQuerySmallOnly } from '../utils';
+import { mediaQuerySmallOnly } from 'utils';
 import { IconButton, ICONS } from './IconButton';
-import { Theme } from '../theme/types';
+import { Theme } from 'theme/types';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
@@ -45,7 +46,7 @@ export const Modal: FC<ModalProps> = ({ children, onClose }) => {
                 <IconButton
                     icon={ICONS.cross}
                     onClick={onClose}
-                    title='Close'
+                    title={i18n.t('close')}
                 />
             </div>
             <div className={styles.wrapper}>{children}</div>

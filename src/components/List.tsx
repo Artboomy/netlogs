@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Empty } from './list/Empty';
-import { mediaQuerySmallOnly } from '../utils';
-import { ItemList } from '../controllers/network';
+import { mediaQuerySmallOnly } from 'utils';
+import { ItemList } from 'controllers/network';
 import { Row } from './Row';
 
 const useStyles = createUseStyles({

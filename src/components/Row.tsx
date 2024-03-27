@@ -6,7 +6,7 @@ import React, {
     useRef
 } from 'react';
 import ContentOnlyItem from '../models/ContentOnlyItem';
-import { TransactionItemAbstract } from '../models/TransactionItem';
+import { TransactionItemAbstract } from 'models/TransactionItem';
 import { createUseStyles } from 'react-jss';
 import { google } from 'base16';
 import { Tag } from './Tag';
@@ -15,8 +15,8 @@ import { ModalContext } from './modal/Context';
 import cn from 'classnames';
 import { ContentOnly } from './row/ContentOnly';
 import { Transaction } from './row/Transaction';
-import { mediaQuerySmallOnly } from '../utils';
-import { Theme } from '../theme/types';
+import { mediaQuerySmallOnly } from 'utils';
+import { Theme } from 'theme/types';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     date: {

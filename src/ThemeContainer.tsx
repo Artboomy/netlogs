@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 import { ThemeProvider } from 'react-jss';
-import { useSettings } from './hooks/useSettings';
+import { useSettings } from 'hooks/useSettings';
 import { theme as themeLight } from './theme/light';
 import { theme as themeDark } from './theme/dark';
 

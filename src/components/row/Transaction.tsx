@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from 'react';
-import { TransactionItemAbstract } from '../../models/TransactionItem';
+import { TransactionItemAbstract } from 'models/TransactionItem';
 import { createUseStyles } from 'react-jss';
-import { mediaQuerySmallOnly, nameTrimmer } from '../../utils';
+import { mediaQuerySmallOnly, nameTrimmer } from 'utils';
 import cn from 'classnames';
 import { Response } from '../Response';
 import { InspectorWrapper } from '../InspectorWrapper';

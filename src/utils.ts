@@ -1,6 +1,6 @@
 import { EventName, IframeEvent } from './types';
 import { nanoid } from 'nanoid';
-import { ItemList } from './controllers/network';
+import { ItemList } from 'controllers/network';
 
 export const mediaQuerySmallOnly = '@media (max-width: 700px)';
 

@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
-import { useListStore } from '../controllers/network';
+import { useListStore } from 'controllers/network';
 import { Tag } from './Tag';
 import { google } from 'base16';
-import { ItemType } from '../models/types';
-import { useSettings } from '../hooks/useSettings';
+import { ItemType } from 'models/types';
+import { useSettings } from 'hooks/useSettings';
 import { createUseStyles } from 'react-jss';
 import shallow from 'zustand/shallow';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles({
     root: {
@@ -57,7 +58,7 @@ export const TagList: FC = () => {
     const values = Object.values(tags);
     return (
         <div className={styles.root}>
-            {!values.length && 'No tags'}
+            {!values.length && i18n.t('noTags')}
             {values.map(({ content, color, type }) => (
                 <button
                     className={styles.button}

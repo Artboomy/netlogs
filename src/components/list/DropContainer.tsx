@@ -13,6 +13,7 @@ import TransactionItem from '../../models/TransactionItem';
 import { toast } from 'react-toastify';
 import { callParentVoid } from '../../utils';
 import WebSocketItem from '../../models/WebSocketItem';
+import { i18n } from '../../translations/i18n';
 
 const useStyles = createUseStyles({
     dropZone: {
@@ -36,22 +37,22 @@ export const DropContainer: FC = ({ children }) => {
             async drop(item: { files: File[] }) {
                 const file = item.files[0];
                 if (!isFileSupported(file.name)) {
-                    toast.error('Only json files are supported');
+                    toast.error(i18n.t('onlyJSONSupported'));
                 }
                 let log: Har | null = null;
-                const toastId = toast('Loading file...');
+                const toastId = toast(i18n.t('loadingFile'));
                 try {
                     log = await parseFile<Har>(file);
                     toast.dismiss(toastId);
                 } catch (e) {
                     toast.dismiss(toastId);
-                    toast.error('Error parsing file');
+                    toast.error(i18n.t('errorParsingFile'));
                 }
                 if (!log) {
                     return;
                 }
                 if (!log?.log?.entries) {
-                    toast.error('Invalid har file');
+                    toast.error(i18n.t('invalidHAR'));
                     return;
                 }
                 try {
@@ -60,7 +61,9 @@ export const DropContainer: FC = ({ children }) => {
                             new ContentOnlyItem({
                                 timestamp: new Date().getTime(),
                                 tag: 'NET LOGS',
-                                content: `Opened file "${file.name}"`
+                                content: i18n.t('fileOpened', {
+                                    name: file.name
+                                })
                             }),
                             ...log.log.entries.map((request) => {
                                 let ItemConstructor;
@@ -88,7 +91,7 @@ export const DropContainer: FC = ({ children }) => {
                     );
                 } catch (e) {
                     console.log('Error occurred:', e);
-                    toast.error('Invalid har file');
+                    toast.error(i18n.t('invalidHAR'));
                 }
             },
             collect: (monitor) => ({

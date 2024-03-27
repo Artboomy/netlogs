@@ -1,10 +1,10 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { google, solarized } from 'base16';
-import { ItemType } from '../models/types';
-import { theme } from '../theme/light';
+import { ItemType } from 'models/types';
+import { theme } from 'theme/light';
 import cn from 'classnames';
-import { Theme } from '../theme/types';
+import { Theme } from 'theme/types';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     root: {

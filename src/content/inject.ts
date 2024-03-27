@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { IItemContentOnlyCfg, IItemTransactionCfg } from '../models/types';
-import { ISettings } from '../controllers/settings/types';
+import { IItemContentOnlyCfg, IItemTransactionCfg } from 'models/types';
+import { ISettings } from 'controllers/settings/types';
 
 declare global {
     interface Window {

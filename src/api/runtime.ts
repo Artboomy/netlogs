@@ -1,11 +1,11 @@
-import { callParentVoid, isSandbox } from '../utils';
+import { callParentVoid, isSandbox } from 'utils';
 
 class SandboxRuntime {
     getManifest(): ReturnType<typeof chrome.runtime.getManifest> {
         return {
             manifest_version: 3,
             name: 'Net logs',
-            version: '1.5.0'
+            version: '1.6.0'
         };
     }
 

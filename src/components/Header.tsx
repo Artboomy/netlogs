@@ -1,16 +1,17 @@
 import React, { FC, useRef, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
-import { useListStore } from '../controllers/network';
+import { useListStore } from 'controllers/network';
 import runtime from '../api/runtime';
 import { Har } from 'har-format';
-import { callParent, isExtension } from '../utils';
+import { callParent, isExtension } from 'utils';
 import { IconButton, ICONS } from './IconButton';
-import { useHotkey } from '../hooks/useHotkey';
+import { useHotkey } from 'hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
 import { toast } from 'react-toastify';
 import { DebuggerButton } from './DebuggerButton';
-import { Theme } from '../theme/types';
+import { Theme } from 'theme/types';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
@@ -73,9 +74,9 @@ const doExport = () => {
             })
         ),
         {
-            pending: 'Exporting...',
-            success: 'Exported',
-            error: 'Error exporting'
+            pending: i18n.t('exporting'),
+            success: i18n.t('exported'),
+            error: i18n.t('exportError')
         }
     );
 };
@@ -126,17 +127,17 @@ export const Header: FC<IProps> = ({
                 <IconButton
                     icon={ICONS.clear}
                     onClick={clear}
-                    title='Clear [Ctrl+L]'
+                    title={`${i18n.t('clear')} [Ctrl+L]`}
                 />
                 <DebuggerButton />
                 <IconButton
                     icon={ICONS.panelDown}
                     onClick={() => setSecondRowVisible(!secondRowVisible)}
-                    title='Filter options'
+                    title={i18n.t('filterOptions')}
                     active={secondRowVisible}
                 />
                 <IconButton
-                    title='Case sensitive'
+                    title={i18n.t('caseSensitive')}
                     onClick={() => onCaseSensitiveChange(!caseSensitive)}
                     active={caseSensitive}>
                     Aa
@@ -145,14 +146,15 @@ export const Header: FC<IProps> = ({
                     active={isUnpack}
                     icon={ICONS.brackets}
                     onClick={handleToggleUnpack}
-                    title='Unpack JSON from strings'
+                    title={i18n.t('decodeJSON')}
                 />
                 <input
+                    className={styles.searchBox}
                     ref={ref}
                     type='search'
-                    placeholder='Search in params/result'
+                    placeholder={i18n.t('searchHelp')}
                     value={searchValue}
-                    title='Search [Ctrl+F]'
+                    title={`${i18n.t('search')} [Ctrl+F]`}
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
                 {searchValue && (
@@ -163,7 +165,7 @@ export const Header: FC<IProps> = ({
                             onChange={(e) =>
                                 onHideUnrelatedChange(e.target.checked)
                             }
-                            title='Toggle unrelated[Ctrl+U]'
+                            title={`${i18n.t('toggleUnrelated')} [Ctrl+U]`}
                         />
                         Hide unrelated
                     </label>
@@ -174,14 +176,14 @@ export const Header: FC<IProps> = ({
                         className={styles.optionsButton}
                         icon={ICONS.settings}
                         onClick={() => runtime.openOptionsPage()}
-                        title='Options'
+                        title={i18n.t('options')}
                     />
                 )}
                 <IconButton
                     className={cn({ [styles.optionsButton]: !isExtension() })}
                     icon={ICONS.export}
                     onClick={doExport}
-                    title='Export'
+                    title={i18n.t('export')}
                 />
             </div>
             {secondRowVisible && (
@@ -192,7 +194,7 @@ export const Header: FC<IProps> = ({
                             onChange={handlePreserveChange}
                             checked={isPreserve}
                         />
-                        Preserve log
+                        {i18n.t('preserveLog')}
                     </label>
                 </div>
             )}

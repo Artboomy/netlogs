@@ -4,8 +4,8 @@ import NetworkItem from '../models/NetworkItem';
 import ContentOnlyItem from '../models/ContentOnlyItem';
 import network from '../api/network';
 import TransactionItem from '../models/TransactionItem';
-import { NetworkRequest } from '../models/types';
-import { insertSorted } from '../utils';
+import { NetworkRequest } from 'models/types';
+import { insertSorted } from 'utils';
 import Settings from './settings';
 import WebSocketItem from '../models/WebSocketItem';
 
