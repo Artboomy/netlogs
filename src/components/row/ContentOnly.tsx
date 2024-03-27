@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import ContentOnlyItem from '../../models/ContentOnlyItem';
 import { createUseStyles } from 'react-jss';
-import { mediaQuerySmallOnly } from '../../utils';
+import { mediaQuerySmallOnly } from 'utils';
 import cn from 'classnames';
 import { Response } from '../Response';
 
