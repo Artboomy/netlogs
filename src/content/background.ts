@@ -11,7 +11,7 @@ import Port = chrome.runtime.Port;
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
         id: 'netlogs',
-        title: 'Search in Netlogs',
+        title: chrome.i18n.getMessage('searchIn'),
         type: 'normal',
         contexts: ['selection']
     });

@@ -36,7 +36,9 @@ const useStyles = createUseStyles<Theme>((theme) => ({
         height: '24px',
         display: 'flex',
         justifyContent: 'center',
-        cursor: 'pointer'
+        alignItems: 'center',
+        cursor: 'pointer',
+        flexWrap: 'wrap'
     }
 }));
 export const Footer: FC<{

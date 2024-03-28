@@ -4,7 +4,7 @@ import cn from 'classnames';
 import { isMacOs, mediaQuerySmallOnly } from 'utils';
 import { Link } from '../Link';
 import { Theme } from 'theme/types';
-import { i18n } from '../../translations/i18n';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     columns: {
@@ -77,12 +77,12 @@ export const Empty: FC = () => {
                 </div>
                 <div className={styles.column}>
                     <p className={styles.line}>
-                        🌑 <span className={styles.newBlock}>New</span>
-                        {i18n.t('themeHelper')}
+                        🌎 <span className={styles.newBlock}>New</span>{' '}
+                        {i18n.t('changeLanguage')}
                     </p>
+                    <p className={styles.line}>🌑 {i18n.t('themeHelper')}</p>
                     <p className={styles.line}>
-                        🔴 <span className={styles.newBlock}>New</span>{' '}
-                        {i18n.t('webSocketHelper')}{' '}
+                        🔴 {i18n.t('webSocketHelper')}{' '}
                         <Link
                             href={
                                 'https://developer.chrome.com/docs/extensions/reference/api/debugger'

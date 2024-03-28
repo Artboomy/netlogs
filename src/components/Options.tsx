@@ -277,7 +277,11 @@ export const Options: FC = () => {
                     }}
                     value={settings.language}>
                     <option value='en-US'>English</option>
+                    <option value='de-DE'>Deutsch</option>
                     <option value='ru-RU'>Русский</option>
+                    <option value='es-ES'>Español</option>
+                    <option value='hi'>हिंदी</option>
+                    <option value='zh-CN'>中文</option>
                 </select>
             </section>
 
