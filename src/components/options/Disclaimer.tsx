@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles({
     root: {
@@ -18,15 +19,10 @@ export const Disclaimer: FC = () => {
     return (
         <fieldset className={styles.root}>
             <legend>
-                <h3 className={styles.title}>Disclaimer</h3>
+                <h3 className={styles.title}>{i18n.t('disclaimer')}</h3>
             </legend>
-            <p className={styles.line}>
-                Always carefully review the code you write on this page.
-                especially when received from 3rd parties.
-            </p>
-            <p className={styles.line}>
-                Do not paste untrusted code in any of the functions.
-            </p>
+            <p className={styles.line}>{i18n.t('disclaimerReview')}</p>
+            <p className={styles.line}>{i18n.t('disclaimerNoUntrusted')}</p>
         </fieldset>
     );
 };

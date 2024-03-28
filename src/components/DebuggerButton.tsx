@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { IconButton, ICONS } from './IconButton';
-import { callParentVoid, subscribeParent } from '../utils';
+import { callParentVoid, subscribeParent } from 'utils';
+import { i18n } from 'translations/i18n';
 
 export const DebuggerButton: FC = () => {
     const [isActive, setIsActive] = useState(false);
@@ -11,8 +12,8 @@ export const DebuggerButton: FC = () => {
     };
     const icon = isActive ? ICONS.debugOn : ICONS.debugOff;
     const title = isActive
-        ? 'WebSockets are listened'
-        : 'Click to listen WebSockets';
+        ? i18n.t('websocketsActive')
+        : i18n.t('clickToListen');
 
     useEffect(() => {
         callParentVoid('debugger.getStatus');

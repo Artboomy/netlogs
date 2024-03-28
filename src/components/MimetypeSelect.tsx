@@ -1,11 +1,13 @@
-import React, { FC, memo, useCallback, useState } from 'react';
+import React, { FC, memo, useCallback, useMemo, useState } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useListStore } from '../controllers/network';
+import { useListStore } from 'controllers/network';
 import { MultiSelect } from 'react-multi-select-component';
 import isEqual from 'lodash.isequal';
 import settings from '../controllers/settings';
-import { callParentVoid } from '../utils';
-import { Theme } from '../theme/types';
+import { callParentVoid } from 'utils';
+import { Theme } from 'theme/types';
+import { useSettings } from 'hooks/useSettings';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
@@ -40,6 +42,7 @@ const useHiddenMimeTypes = () => {
 
 export const MimetypeSelect: FC = memo(() => {
     const styles = useStyles();
+    const [{ language }] = useSettings();
     const mimeTypes = useListStore((state) => state.mimeTypes, isEqual);
     const sortedMimeTypes = Array.from(mimeTypes).sort();
     const [hiddenMimeTypes, setHiddenMimeTypes] = useHiddenMimeTypes();
@@ -47,6 +50,20 @@ export const MimetypeSelect: FC = memo(() => {
         .filter((type) => !hiddenMimeTypes.has(type))
         .map((i) => ({ label: i, value: i }));
     const options = sortedMimeTypes.map((i) => ({ label: i, value: i }));
+
+    const overrideStrings = useMemo(
+        () => ({
+            allItemsAreSelected: i18n.t('allSelected'),
+            clearSearch: i18n.t('clearSearch'),
+            clearSelected: i18n.t('clearSelected'),
+            noOptions: i18n.t('noOptions'),
+            search: i18n.t('search'),
+            selectAll: i18n.t('selectAll'),
+            selectAllFiltered: i18n.t('selectAllFiltered'),
+            selectSomeItems: i18n.t('selectSomeItems')
+        }),
+        [language]
+    );
 
     const handleOnChange = (
         selectedOptions: { label: string; value: string }[]
@@ -67,6 +84,7 @@ export const MimetypeSelect: FC = memo(() => {
             value={selectedTypes}
             labelledBy='Mimetype'
             onChange={handleOnChange}
+            overrideStrings={overrideStrings}
         />
     );
 });

@@ -5,7 +5,7 @@ import React, {
     useEffect,
     useState
 } from 'react';
-import { deserializeFunctionsRaw, serialize } from '../controllers/settings';
+import { deserializeFunctionsRaw, serialize } from 'controllers/settings';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
 import 'codemirror/mode/javascript/javascript';
@@ -17,17 +17,18 @@ import {
     IProfileSerialized,
     ISettings,
     ISettingsSerialized
-} from '../controllers/settings/types';
+} from 'controllers/settings/types';
 import downloadAsFile from '../utils';
 import { CodeEditor } from './options/CodeEditor';
-import { parseFile } from '../controllers/file';
+import { parseFile } from 'controllers/file';
 import { Instructions } from './options/Instructions';
 import { Demo } from './options/Demo';
-import { useSettings } from '../hooks/useSettings';
+import { useSettings } from 'hooks/useSettings';
 import cn from 'classnames';
 import { HiddenTagList } from './options/HiddenTagList';
 import { Link } from './Link';
-import { Theme } from '../theme/types';
+import { Theme } from 'theme/types';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     '@global': {
@@ -135,6 +136,10 @@ export const Options: FC = () => {
     const [currentProfile, setCurrentProfile] = useState(
         getInitialProfileName(settings.profiles)
     );
+
+    useEffect(() => {
+        i18n.locale = settings.language;
+    }, [settings.language]);
     useEffect(() => {
         setFunctions(
             Object.assign(
@@ -183,12 +188,12 @@ export const Options: FC = () => {
             clonedSettings.matcher = matcher;
             setSettings(clonedSettings);
         } catch (e) {
-            alert('Cannot save invalid settings');
+            alert(i18n.t('cannotSaveInvalid'));
         }
     };
 
     const handleReset = () => {
-        if (window.confirm('This will wipe all custom settings. Continue?')) {
+        if (window.confirm(i18n.t('wipeSettings'))) {
             localStorage.removeItem(CURRENT_PROFILE_KEY);
             setCurrentProfile('default');
             resetSettings();
@@ -208,7 +213,7 @@ export const Options: FC = () => {
     };
 
     const handleNewProfile = () => {
-        const name = window.prompt('Profile name');
+        const name = window.prompt(i18n.t('profileNamePrompt'));
         if (name) {
             settings.profiles[name] = cloneDeep(settings.profiles.default);
             setSettings(settings);
@@ -231,9 +236,12 @@ export const Options: FC = () => {
                 // @ts-ignore
                 settings.profiles[newProfile.name] = newProfile.data;
                 setSettings(settings);
-                window.alert(`Profile ${newProfile.name} imported`);
+                window.alert(
+                    i18n.t('profileImported', { name: newProfile.name })
+                );
             },
-            (e) => window.alert(`Invalid profile ${e.message}`)
+            (e) =>
+                window.alert(i18n.t('invalidProfile', { message: e.message }))
         );
     };
 
@@ -243,22 +251,57 @@ export const Options: FC = () => {
     return (
         <div>
             <section className={cn(styles.titleRow, styles.block)}>
-                <h1>Options page</h1>
+                <h1>{i18n.t('optionsTitle')}</h1>
                 <div>
-                    Links:{' '}
+                    {i18n.t('links')}:{' '}
                     <Link
                         href='https://github.com/Artboomy/netlogs'
                         text='Github'
                     />{' '}
                     <Link
                         href='https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf'
-                        text='Chrome store'
+                        text={i18n.t('chromeStore')}
                     />{' '}
-                    <Link href='https://twitter.com/Artboomy' text='Tweet me' />
                 </div>
             </section>
+
             <section className={styles.block}>
-                <h2>Integrations</h2>
+                <h2>{i18n.t('language')}</h2>
+                <select
+                    id='language'
+                    onChange={(e) => {
+                        setSettings({
+                            ...settings,
+                            language: e.target.value
+                        });
+                    }}
+                    value={settings.language}>
+                    <option value='en-US'>English</option>
+                    <option value='de-DE'>Deutsch</option>
+                    <option value='ru-RU'>Русский</option>
+                    <option value='es-ES'>Español</option>
+                    <option value='hi'>हिंदी</option>
+                    <option value='zh-CN'>中文</option>
+                </select>
+            </section>
+
+            <section className={styles.block}>
+                <h2>{i18n.t('theme')}</h2>
+                <select
+                    id='themeColor'
+                    onChange={(e) => {
+                        setSettings({
+                            ...settings,
+                            theme: e.target.value as 'light' | 'dark'
+                        });
+                    }}
+                    value={settings.theme}>
+                    <option value='light'>{i18n.t('light')}</option>
+                    <option value='dark'>{i18n.t('dark')}</option>
+                </select>
+            </section>
+            <section className={styles.block}>
+                <h2>{i18n.t('integrations')}</h2>
                 <div className={styles.checkboxRow}>
                     <label>
                         <input
@@ -272,8 +315,11 @@ export const Options: FC = () => {
                                 })
                             }
                         />
-                        Next.js integration{' '}
-                        <span title='Extracts window.__NEXT_DATA__ value'>
+                        Next.js {i18n.t('integration')}{' '}
+                        <span
+                            title={i18n.t('extractsNext', {
+                                name: 'window.__NEXT_DATA__'
+                            })}>
                             ❓
                         </span>
                     </label>
@@ -291,12 +337,12 @@ export const Options: FC = () => {
                                 })
                             }
                         />
-                        Unwrap{' '}
+                        {i18n.t('Unwrap')}{' '}
                         <Link
                             text='JSON-RPC'
                             href='https://www.jsonrpc.org/specification'
                         />{' '}
-                        requests
+                        {i18n.t('requests')}
                     </label>
                 </div>
                 <div className={styles.checkboxRow}>
@@ -312,7 +358,7 @@ export const Options: FC = () => {
                                 })
                             }
                         />
-                        Send analytics
+                        {i18n.t('sendAnalytics')}
                     </label>
                 </div>
                 <div className={styles.checkboxRow}>
@@ -328,7 +374,7 @@ export const Options: FC = () => {
                                 })
                             }
                         />
-                        Autoattach debugger (for WebSocket listening)
+                        {i18n.t('autoattachDebugger')}
                     </label>
                 </div>
                 <div className={styles.checkboxRow}>
@@ -344,9 +390,9 @@ export const Options: FC = () => {
                                 })
                             }
                         />
-                        Unwrap{' '}
+                        {i18n.t('Unwrap')}{' '}
                         <Link text='GraphQL' href='https://graphql.org/' />{' '}
-                        requests
+                        {i18n.t('requests')}
                     </label>
                 </div>
                 <div className={styles.checkboxRow}>
@@ -362,40 +408,38 @@ export const Options: FC = () => {
                                 })
                             }
                         />
-                        NuxtJS integration{' '}
-                        <span title='Extracts window.__NUTXT__ value'>❓</span>
+                        NuxtJS {i18n.t('integration')}{' '}
+                        <span
+                            title={i18n.t('extractsNext', {
+                                name: 'window.__NUXT__'
+                            })}>
+                            ❓
+                        </span>
                     </label>
                 </div>
-                <select
-                    id='themeColor'
-                    onChange={(e) => {
-                        setSettings({
-                            ...settings,
-                            theme: e.target.value as 'light' | 'dark'
-                        });
-                    }}
-                    value={settings.theme}>
-                    <option value='light'>Light</option>
-                    <option value='dark'>Dark</option>
-                </select>
             </section>
             <section className={styles.block}>
-                <h2>Hidden tags</h2>
+                <h2>{i18n.t('hiddenTags')}</h2>
                 <HiddenTagList />
             </section>
             <section className={cn(styles.block, styles.profilesBlock)}>
-                <h2>Profiles</h2>
+                <h2>{i18n.t('profiles')}</h2>
                 <section className={styles.root}>
                     <div className={styles.left}>
                         <div className={styles.header}>
                             <section className={styles.section}>
-                                <button onClick={handleSave}>Save</button>
-                                <button onClick={handleReset}>Reset</button>
+                                <button onClick={handleSave}>
+                                    {i18n.t('save')}
+                                </button>
+                                <button onClick={handleReset}>
+                                    {' '}
+                                    {i18n.t('reset')}
+                                </button>
                                 <label
                                     htmlFor='file-selector'
                                     role='button'
                                     className={styles.importButton}>
-                                    Import profile
+                                    {i18n.t('importProfile')}
                                     <input
                                         type='file'
                                         id='file-selector'
@@ -406,7 +450,7 @@ export const Options: FC = () => {
                                 </label>
 
                                 <button onClick={handleNewProfile}>
-                                    New profile
+                                    {i18n.t('newProfile')}
                                 </button>
                             </section>
                             <section className={styles.section}>
@@ -432,26 +476,23 @@ export const Options: FC = () => {
                                     onClick={() =>
                                         handleExport(currentProfile, profile)
                                     }>
-                                    Export profile
+                                    {i18n.t('exportProfile')}
                                 </button>
                                 {isDefaultProfile ? (
                                     <h4 className={styles.defaultProfileNote}>
-                                        Default profile is not editable
+                                        {i18n.t('defaultNotEditable')}
                                     </h4>
                                 ) : (
                                     <button onClick={handleDeleteProfile}>
-                                        Delete profile
+                                        {i18n.t('deleteProfile')}
                                     </button>
                                 )}
                             </section>
                         </div>
                         <Instructions />
                         <section className={styles.codeBlock}>
-                            <h3 id='matcher'>Profile matcher</h3>
-                            <i>
-                                If returned name is not found - default profile
-                                will be used
-                            </i>
+                            <h3 id='matcher'>{i18n.t('profileMatcher')}</h3>
+                            <i>{i18n.t('profileMatcherHelper')}</i>
                             <CodeEditor
                                 onBeforeChange={(editor, data, value) => {
                                     setMatcher(value);
@@ -469,7 +510,9 @@ export const Options: FC = () => {
                                     <section
                                         key={key}
                                         className={styles.codeBlock}>
-                                        <h3 id={key}>Function {key}</h3>
+                                        <h3 id={key}>
+                                            {i18n.t('function')} {key}
+                                        </h3>
                                         <CodeEditor
                                             onBeforeChange={(
                                                 editor,

@@ -3,7 +3,7 @@ import { createUseStyles } from 'react-jss';
 import largeIcons from '../icons/largeIcons.svg';
 import cn from 'classnames';
 import { google } from 'base16';
-import { Theme } from '../theme/types';
+import { Theme } from 'theme/types';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     button: {

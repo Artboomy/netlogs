@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Section, TSection } from './Section';
-import { callParentVoid } from '../utils';
+import { callParentVoid } from 'utils';
 
 export type PropTreeProps = {
     data: {

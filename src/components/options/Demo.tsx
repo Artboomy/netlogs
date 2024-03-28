@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react';
-import { wrapSandbox } from '../../sandboxUtils';
+import { wrapSandbox } from 'sandboxUtils';
 import { createUseStyles } from 'react-jss';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles({
     demoWrapper: {
@@ -21,12 +22,12 @@ export const Demo: FC = () => {
 
     return (
         <section>
-            <h3>Interactive demo</h3>
+            <h3>{i18n.t('demo')}</h3>
             <p>
-                <i>Try changing the profile and hit save</i>
+                <i>{i18n.t('demoHelp1')}</i>
             </p>
             <p>
-                <i>You can drop your own log to experiment</i>
+                <i>{i18n.t('demoHelp2')}</i>
             </p>
             <div className={styles.demoWrapper}>
                 <iframe

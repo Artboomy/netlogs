@@ -2,11 +2,12 @@ import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import { IconButton, ICONS } from './IconButton';
 import { TagList } from './TagList';
-import { useSettings } from '../hooks/useSettings';
-import { useListStore } from '../controllers/network';
+import { useSettings } from 'hooks/useSettings';
+import { useListStore } from 'controllers/network';
 import { Link } from './Link';
 import runtime from '../api/runtime';
-import { Theme } from '../theme/types';
+import { Theme } from 'theme/types';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     root: {
@@ -35,7 +36,9 @@ const useStyles = createUseStyles<Theme>((theme) => ({
         height: '24px',
         display: 'flex',
         justifyContent: 'center',
-        cursor: 'pointer'
+        alignItems: 'center',
+        cursor: 'pointer',
+        flexWrap: 'wrap'
     }
 }));
 export const Footer: FC<{
@@ -72,23 +75,23 @@ export const Footer: FC<{
                 <IconButton
                     icon={ICONS.panelUp}
                     onClick={() => setTagListVisible(!tagsToolbarVisible)}
-                    title='Tag list'
+                    title={i18n.t('tagList')}
                     active={tagsToolbarVisible}
                 />
                 <input
                     type='text'
-                    placeholder='Filter by url'
+                    placeholder={i18n.t('filterByUrl')}
                     value={value}
                     onChange={(e) => onValueChange(e.target.value)}
                 />
                 <span className={styles.countWrapper}>
-                    {visibleCount} / {totalCount} requests
-                    {isPreserve && ', log preserved'}
+                    {visibleCount} / {totalCount} {i18n.t('requests')}
+                    {isPreserve && `, ${i18n.t('log preserved')}`}
                 </span>
                 <button
                     className={styles.themeButton}
                     onClick={handleThemeChange}
-                    title='Change theme'>
+                    title={i18n.t('changeTheme')}>
                     {settings.theme === 'light' ? '🌞' : '🌑'}
                 </button>
                 <div className={styles.version}>v.{version}</div>

@@ -5,11 +5,11 @@ import Inspector, {
     DOMInspector
 } from 'react-inspector';
 import { Image } from './render/Image';
-import { useListStore } from '../controllers/network';
+import { useListStore } from 'controllers/network';
 import { Webm } from './render/Webm';
-import { isSerializedObject } from '../utils';
+import { isSerializedObject } from 'utils';
 import { AudioPreview } from './render/AudioPreview';
-import { useSettings } from '../hooks/useSettings';
+import { useSettings } from 'hooks/useSettings';
 
 type TDomData = {
     __mimeType: 'text/html';

@@ -10,12 +10,13 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DropContainer } from './list/DropContainer';
 import useDebounce from 'react-use/lib/useDebounce';
 import { Footer } from './Footer';
-import { FilterContext } from '../context/FilterContext';
-import { useHotkey } from '../hooks/useHotkey';
+import { FilterContext } from 'context/FilterContext';
+import { useHotkey } from 'hooks/useHotkey';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { callParentVoid, subscribeParent } from '../utils';
-import { Theme } from '../theme/types';
+import { callParentVoid, subscribeParent } from 'utils';
+import { Theme } from 'theme/types';
+import { useSettings } from 'hooks/useSettings';
 
 const useStyles = createUseStyles<Theme>((theme) => ({
     '@global': {
@@ -73,6 +74,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
 }));
 export const PanelMain: React.FC = () => {
     const styles = useStyles();
+    const [{ language }] = useSettings();
     const [searchValue, setSearchValue] = useState('');
     const [hideUnrelated, setHideUnrelated] = useState(true);
     const [caseSensitive, setCaseSensitive] = useState(false);
@@ -84,7 +86,15 @@ export const PanelMain: React.FC = () => {
     useHotkey('toggleHideUnrelated', () => setHideUnrelated(!hideUnrelated), [
         hideUnrelated
     ]);
-
+    /*const useOnce = useRef(true);
+    useEffect(() => {
+        if (useOnce.current) {
+            useOnce.current = false;
+            return;
+        }
+        toast.info(i18n.t('langChange'));
+    }, [language]);
+*/
     useEffect(() => {
         callParentVoid('analytics.init');
     }, []);
@@ -96,7 +106,7 @@ export const PanelMain: React.FC = () => {
         });
     }, []);
     return (
-        <DndProvider backend={HTML5Backend}>
+        <DndProvider backend={HTML5Backend} key={language}>
             <ModalContainer>
                 <div className={styles.root}>
                     <SearchContext.Provider

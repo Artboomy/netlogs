@@ -1,4 +1,5 @@
 import JSZip from 'jszip';
+import { i18n } from 'translations/i18n';
 
 export function isFileSupported(fileName: string): boolean {
     return Boolean(fileName.match(/\.json|\.har|\.zip/));
@@ -47,7 +48,7 @@ function readAsZip<T>(file: File): Promise<T> {
                             .async('text')
                             .then((text) => resolve(JSON.parse(text)), reject);
                     } else {
-                        reject('Archive does not contain har file');
+                        reject(i18n.t('archiveNoHar'));
                     }
                 }, reject);
             }

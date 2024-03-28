@@ -4,6 +4,7 @@ import { chromeLight } from 'react-inspector';
 import { ModalContext } from '../modal/Context';
 import { theme as themeLight } from 'theme/light';
 import { theme as themeDark } from 'theme/dark';
+import { i18n } from 'translations/i18n';
 
 const useStyles = createUseStyles({
     tag: {
@@ -49,7 +50,7 @@ export const Image: FC<{
                 <img
                     src={`data:${mimeType};base64,${base64}`}
                     alt='Image'
-                    title='Click to toggle background'
+                    title={i18n.t('clickImage')}
                     className={styles.imageFull}
                 />
             </div>

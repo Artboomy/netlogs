@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
-import { Theme } from '../theme/types';
+import { Theme } from 'theme/types';
 
 export type TItem = {
     name: string;

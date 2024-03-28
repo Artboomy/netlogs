@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo } from 'react';
-import { callParentVoid } from '../utils';
+import { callParentVoid } from 'utils';
+import { i18n } from 'translations/i18n';
 
 type TState = { hasError: boolean; error: Error | null };
 export default class ErrorBoundary extends Component<
@@ -17,13 +18,9 @@ export default class ErrorBoundary extends Component<
     }
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-        // You can also log the error to an error reporting service
-        console.info(
-            'A following error occurred. This may indicate problems with custom functions or bug in the extension'
-        );
         console.error(error, errorInfo);
         callParentVoid(
-            'analytics.error',
+            `analytics.error`,
             JSON.stringify({
                 message: error.message,
                 stack: errorInfo.componentStack
@@ -37,7 +34,7 @@ export default class ErrorBoundary extends Component<
             const error = this.state.error;
             return (
                 <div>
-                    <h1>Something went wrong.</h1>
+                    <h1>{i18n.t('errorOccurred')}</h1>
                     <div>{error?.message}</div>
                     <pre>{error?.stack}</pre>
                 </div>

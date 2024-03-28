@@ -4,14 +4,14 @@ import {
     isWebSocketFrameSent,
     TWebSocketFrameSent
 } from './types';
-import { IItemWebSocketCfg } from '../models/types';
-import { defaultSettings } from '../controllers/settings/base';
+import { IItemWebSocketCfg } from 'models/types';
+import { defaultSettings } from 'controllers/settings/base';
 import Port = chrome.runtime.Port;
 
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
         id: 'netlogs',
-        title: 'Search in Netlogs',
+        title: chrome.i18n.getMessage('searchIn'),
         type: 'normal',
         contexts: ['selection']
     });
