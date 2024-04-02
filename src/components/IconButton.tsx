@@ -94,5 +94,6 @@ export const ICONS: Record<string, IconButtonProps['icon']> = {
     panelUp: '136px -72px',
     debugOff: '-172px 264px',
     debugOn: '-88px 24px',
-    inspect: '136px -72px'
+    inspect: '136px -72px',
+    drop: '52px -72px'
 } as const;

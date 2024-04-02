@@ -7,7 +7,7 @@
 
 [Install for Chrome/Edge](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
 
-This is extendable network request viewer extension for Chromium-based browsers.
+This is a more high-level version of a Network tab for easier debugging.
 
 ## 💡 Features
 
@@ -16,7 +16,7 @@ The extension will appear in devtools as a `📜 Net logs` tab.
 * 🔍 **Advanced Search**: Filter requests by URL and search within parameters/results.
 * ⛰️ **Framework Integration**: View Next.js & NuxtJS hydration state.
 * 🎨 **Protocol Presets**: Streamlined unpacking for GraphQL and JSON-RPC.
-* 🛠️ **Customization**: Modify request names, parameters, and responses with JavaScript.
+* 📡 **WebSocket Listening**: Capture and analyze WebSocket traffic in real-time.
 * ✨ **Log Viewing**: Analyze live or import logs from HAR/*.netlogs.zip files.
 * 🤝 **Collaboration**: Export and share logs for team debugging.
 
@@ -44,10 +44,6 @@ Features: query name extraction, result unwrapping, colored tag.
 Features: method extraction, result unwrapping, coloring for error responses.
 
 ![json-rpc.png](./img/json-rpc.png)
-
-### Custom profiles
-
-If you need custom request/response processing, please refer to the [documentation](CUSTOM_PROFILES.md).
 
 ## ⛰️ [Next.js](https://nextjs.org/) and [NuxtJS](https://nuxtjs.org/) debugging
 
@@ -139,34 +135,30 @@ page**.
 
 ## 🐜Troubleshooting
 
-If something goes wrong and functions crash the view, do the following:
+If something goes wrong:
 
-1. [Export a *.har log](https://developer.chrome.com/docs/devtools/network/reference/#save-as-har) from network tab
-2. Open options page
-3. Drop exported log in the interactive demo
-4. Open console
+1. Reopen the devtools
+2. Try to fully close and open browser
 
-You should see the errors in the console.
-
-Alternatively, you can open a devtools on the devtools. To do so, undock the devtools and press `Ctrl+Shift+J`, or press
-right-click and choose `Inpsect`.
-
-This will open new debugger window, where you can find console log with errors.
+If the issue persist -
+please [open new bug report](https://github.com/Artboomy/netlogs/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=%5BBUG%5D).
+Make sure to include *.har file if possible.
 
 ## 🔐 Security & privacy
 
-All your custom javascript runs in
+Extension panel runs in
 a [sandbox environment](https://developer.chrome.com/docs/extensions/mv2/manifest/sandbox/).
 
-Extension does not transmit any data to the servers.
+Extension collects anonymous analytics with Google Analytics 4. You can opt out in the Options.
 
 All settings are stored locally.
 
 ## 🤝 Permissions
 
 * `storage` - used to store your custom settings. Does not sync.
-* `content_scripts` - used to extract Nextjs/Nuxtjs data from page.
+* `content_scripts` - used to extract NextJS/NuxtJS data from page.
 * `contextMenus` - used to extract selected text for search
+* `debugger` - used for WebSocket listening.
 
 The list may extend in the future.
 

@@ -2,18 +2,20 @@
 
 ## 🏗️ Building
 
-1. Clone `git clone git@github.com:Artboomy/netlogs.git`
+1. Install node v16.20.2. Newer versions crash the building process.
+2. Clone `git clone git@github.com:Artboomy/netlogs.git`
 
-2. Install dependencies `cd netlogs && yarn`
+3. Install dependencies `cd netlogs && yarn`
 
-3. Build `yarn run build`
+4. Build `yarn run build`
 
-4. Enable developer mode in browser at chrome://extensions/ and click **"Load unpacked"** from `dist` folder.
+5. Enable developer mode in browser at chrome://extensions/ and click **"Load unpacked"** from `dist` folder.
 
-5. You are ready to go! If you don't see the tab in devtools - just reopen it.
+6. You are ready to go! If you don't see the tab in devtools - just reopen it.
 
-6. You can run `yarn run build:watch` for active development.
+7. You can run `yarn run build:watch` for active development.
    _Hot reload won't work, you'll need to manually reopen devtools on every change._
+8. Sometimes pressing the "Reload extension" is needed. Usually when modifying background script.
 
 ## 📦 Packaging
 
