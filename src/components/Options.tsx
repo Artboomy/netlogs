@@ -100,6 +100,9 @@ const useStyles = createUseStyles<Theme>((theme) => ({
     profilesBlock: {
         height: '100%'
     },
+    hidden: {
+        display: 'none'
+    },
     titleRow: {
         display: 'flex',
         alignItems: 'baseline',
@@ -163,6 +166,7 @@ export const Options: FC = () => {
     const [matcher, setMatcher] = useState<ISettingsSerialized['matcher']>(
         settings.matcher.toString()
     );
+    const isDefaultMatcher = Object.keys(settings.profiles).length === 3;
 
     useEffect(() => {
         const newFunctions = Object.assign(
@@ -282,6 +286,7 @@ export const Options: FC = () => {
                     <option value='es-ES'>Español</option>
                     <option value='hi'>हिंदी</option>
                     <option value='zh-CN'>中文</option>
+                    <option value='ja-JP'>日本語</option>
                 </select>
             </section>
 
@@ -422,7 +427,10 @@ export const Options: FC = () => {
                 <h2>{i18n.t('hiddenTags')}</h2>
                 <HiddenTagList />
             </section>
-            <section className={cn(styles.block, styles.profilesBlock)}>
+            <section
+                className={cn(styles.block, styles.profilesBlock, {
+                    [styles.hidden]: isDefaultMatcher
+                })}>
                 <h2>{i18n.t('profiles')}</h2>
                 <section className={styles.root}>
                     <div className={styles.left}>

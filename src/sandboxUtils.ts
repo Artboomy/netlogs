@@ -11,6 +11,7 @@ import {
 import runtime from './api/runtime';
 import JSZip from 'jszip';
 import analytics from './api/analytics';
+import { EventName } from 'types';
 import AreaName = chrome.storage.AreaName;
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
@@ -152,7 +153,7 @@ export async function wrapSandbox(): Promise<void> {
                         });
                         break;
                     case 'analytics.init':
-                        analyticsInit();
+                        analyticsInit(id, type);
                         break;
                     case 'analytics.mimeFilterChange':
                         analytics.fireEvent('mimeFilterChange');
@@ -235,26 +236,29 @@ function analyticsError(data: string) {
     analytics.fireErrorEvent(error);
 }
 
-async function analyticsInit() {
+async function analyticsInit(id: string, type: EventName) {
     // determine if settings matcher is equal to default settings matcher
     const settings = await chrome.storage.local
         .get({
             settings: serialize(defaultSettings)
         })
         .then((data) => JSON.parse(data.settings));
-    const strSettings = settings.matcher.toString();
-    const strDefaultSettings = defaultSettings.matcher.toString();
+
     if (!settings.sendAnalytics) {
         analytics.noSend = true;
     }
     // fire event with payload flag
-    if (strSettings === strDefaultSettings) {
+    const isDefaultProfile = Object.keys(settings.profiles).length === 3;
+    if (isDefaultProfile) {
         analytics.fireEvent('matcherTypeDefault', {});
     } else {
-        analytics.fireEvent('matcherTypeCustom', {
-            source: `"${strSettings}"`
-        });
+        analytics.fireEvent(Object.keys(settings.profiles).join('-'));
     }
+    postSandbox({
+        id,
+        type,
+        data: String(isDefaultProfile)
+    });
 }
 
 function openTab(data: string) {

@@ -1,4 +1,4 @@
-import { wrapSandbox } from '../sandboxUtils';
+import { wrapSandbox } from 'sandboxUtils';
 import { createEventPayload, isExtension, postSandbox } from '../utils';
 import analytics from '../api/analytics';
 import Port = chrome.runtime.Port;
