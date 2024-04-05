@@ -1,28 +1,5 @@
-import React, {
-    ChangeEvent,
-    ChangeEventHandler,
-    FC,
-    useEffect,
-    useState
-} from 'react';
-import { deserializeFunctionsRaw, serialize } from 'controllers/settings';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
-import 'codemirror/mode/javascript/javascript';
-import cloneDeep from 'lodash.clonedeep';
-import isEqual from 'lodash.isequal';
+import React, { FC, useEffect } from 'react';
 import { createUseStyles } from 'react-jss';
-import {
-    IProfile,
-    IProfileSerialized,
-    ISettings,
-    ISettingsSerialized
-} from 'controllers/settings/types';
-import downloadAsFile from '../utils';
-import { CodeEditor } from './options/CodeEditor';
-import { parseFile } from 'controllers/file';
-import { Instructions } from './options/Instructions';
-import { Demo } from './options/Demo';
 import { useSettings } from 'hooks/useSettings';
 import cn from 'classnames';
 import { HiddenTagList } from './options/HiddenTagList';
@@ -53,55 +30,13 @@ const useStyles = createUseStyles<Theme>((theme) => ({
         display: 'flex',
         gap: '8px'
     },
-    left: {
-        width: '50%',
-        paddingLeft: '8px',
-        overflow: 'auto'
-    },
-    right: {
-        width: '50%',
-        overflow: 'auto'
-    },
-    header: {
-        // sticky position results in content occlusion when clicking on relative links
-        /*position: 'sticky',
-        top: 0,
-        zIndex: 100,*/
-        backgroundColor: 'white'
-    },
-    codeBlock: {
-        '& .CodeMirror': {
-            height: 'auto'
-        }
-    },
-    importButton: {
-        border: '1px solid rgb(118, 118, 118)',
-        height: '22px',
-        fontSize: '13.333px',
-        fontFamily: 'Arial',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '1px 6px',
-        verticalAlign: 'middle',
-        backgroundColor: 'rgb(239, 239, 239)',
-        cursor: 'pointer'
-    },
     section: {
         display: 'flex',
         gap: '4px',
         marginBottom: '4px'
     },
-    defaultProfileNote: {
-        margin: 0
-    },
     block: {
         padding: '0 8px'
-    },
-    profilesBlock: {
-        height: '100%'
-    },
-    hidden: {
-        display: 'none'
     },
     titleRow: {
         display: 'flex',
@@ -115,141 +50,12 @@ const useStyles = createUseStyles<Theme>((theme) => ({
     }
 }));
 
-const handleExport = (name: string, data: IProfile | IProfileSerialized) => {
-    downloadAsFile(
-        serialize(
-            {
-                name,
-                data
-            },
-            '    '
-        ),
-        `${name}.json`
-    );
-};
-const CURRENT_PROFILE_KEY = 'CURRENT_PROFILE_KEY';
-
-function getInitialProfileName(profiles: ISettings['profiles']): string {
-    const local = localStorage.getItem(CURRENT_PROFILE_KEY);
-    return local && profiles.hasOwnProperty(local) ? local : 'default';
-}
-
 export const Options: FC = () => {
-    const [settings, setSettings, resetSettings] = useSettings();
-    const [currentProfile, setCurrentProfile] = useState(
-        getInitialProfileName(settings.profiles)
-    );
+    const [settings, setSettings] = useSettings();
 
     useEffect(() => {
         i18n.locale = settings.language;
     }, [settings.language]);
-    useEffect(() => {
-        setFunctions(
-            Object.assign(
-                {},
-                ...Object.entries(profile.functions).map(([key, value]) => ({
-                    [key]: value.toString()
-                }))
-            )
-        );
-    }, [currentProfile]);
-    const profile = settings.profiles[currentProfile];
-    const [functions, setFunctions] = useState<IProfileSerialized['functions']>(
-        Object.assign(
-            {},
-            ...Object.entries(profile.functions).map(([key, value]) => ({
-                [key]: value.toString()
-            }))
-        )
-    );
-
-    const [matcher, setMatcher] = useState<ISettingsSerialized['matcher']>(
-        settings.matcher.toString()
-    );
-    const isDefaultMatcher = Object.keys(settings.profiles).length === 3;
-
-    useEffect(() => {
-        const newFunctions = Object.assign(
-            {},
-            ...Object.entries(profile.functions).map(([key, value]) => ({
-                [key]: value.toString()
-            }))
-        );
-        if (!isEqual(newFunctions, functions)) {
-            setFunctions(newFunctions);
-        }
-    }, [settings]);
-
-    const handleSave = () => {
-        try {
-            deserializeFunctionsRaw(functions);
-            const clonedSettings = cloneDeep(settings);
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            clonedSettings.profiles[currentProfile].functions = functions;
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            clonedSettings.matcher = matcher;
-            setSettings(clonedSettings);
-        } catch (e) {
-            alert(i18n.t('cannotSaveInvalid'));
-        }
-    };
-
-    const handleReset = () => {
-        if (window.confirm(i18n.t('wipeSettings'))) {
-            localStorage.removeItem(CURRENT_PROFILE_KEY);
-            setCurrentProfile('default');
-            resetSettings();
-        }
-    };
-
-    const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        setCurrentProfile(e.target.value);
-        localStorage.setItem(CURRENT_PROFILE_KEY, e.target.value);
-    };
-
-    const handleDeleteProfile = () => {
-        delete settings.profiles[currentProfile];
-        setCurrentProfile('default');
-        localStorage.removeItem(CURRENT_PROFILE_KEY);
-        setSettings(settings);
-    };
-
-    const handleNewProfile = () => {
-        const name = window.prompt(i18n.t('profileNamePrompt'));
-        if (name) {
-            settings.profiles[name] = cloneDeep(settings.profiles.default);
-            setSettings(settings);
-            setCurrentProfile(name);
-            localStorage.setItem(CURRENT_PROFILE_KEY, name);
-        }
-    };
-
-    const handleImportProfile: ChangeEventHandler<HTMLInputElement> = (e) => {
-        const file = e.target.files?.[0];
-        if (!file) {
-            return;
-        }
-        parseFile<{ name: string; data: IProfileSerialized }>(file).then(
-            (newProfile) => {
-                if (newProfile.name in settings.profiles) {
-                    newProfile.name += '(Copy)';
-                }
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                settings.profiles[newProfile.name] = newProfile.data;
-                setSettings(settings);
-                window.alert(
-                    i18n.t('profileImported', { name: newProfile.name })
-                );
-            },
-            (e) =>
-                window.alert(i18n.t('invalidProfile', { message: e.message }))
-        );
-    };
-
-    const isDefaultProfile = currentProfile === 'default';
 
     const styles = useStyles();
     return (
@@ -426,120 +232,6 @@ export const Options: FC = () => {
             <section className={styles.block}>
                 <h2>{i18n.t('hiddenTags')}</h2>
                 <HiddenTagList />
-            </section>
-            <section
-                className={cn(styles.block, styles.profilesBlock, {
-                    [styles.hidden]: isDefaultMatcher
-                })}>
-                <h2>{i18n.t('profiles')}</h2>
-                <section className={styles.root}>
-                    <div className={styles.left}>
-                        <div className={styles.header}>
-                            <section className={styles.section}>
-                                <button onClick={handleSave}>
-                                    {i18n.t('save')}
-                                </button>
-                                <button onClick={handleReset}>
-                                    {' '}
-                                    {i18n.t('reset')}
-                                </button>
-                                <label
-                                    htmlFor='file-selector'
-                                    role='button'
-                                    className={styles.importButton}>
-                                    {i18n.t('importProfile')}
-                                    <input
-                                        type='file'
-                                        id='file-selector'
-                                        accept='.json'
-                                        style={{ display: 'none' }}
-                                        onChange={handleImportProfile}
-                                    />
-                                </label>
-
-                                <button onClick={handleNewProfile}>
-                                    {i18n.t('newProfile')}
-                                </button>
-                            </section>
-                            <section className={styles.section}>
-                                <select
-                                    id='profile'
-                                    onChange={handleChange}
-                                    value={currentProfile}>
-                                    {Object.keys(settings.profiles)
-                                        .filter(
-                                            (key) =>
-                                                ![
-                                                    'jsonRpc',
-                                                    'graphql'
-                                                ].includes(key)
-                                        )
-                                        .map((name) => (
-                                            <option key={name} value={name}>
-                                                {name}
-                                            </option>
-                                        ))}
-                                </select>
-                                <button
-                                    onClick={() =>
-                                        handleExport(currentProfile, profile)
-                                    }>
-                                    {i18n.t('exportProfile')}
-                                </button>
-                                {isDefaultProfile ? (
-                                    <h4 className={styles.defaultProfileNote}>
-                                        {i18n.t('defaultNotEditable')}
-                                    </h4>
-                                ) : (
-                                    <button onClick={handleDeleteProfile}>
-                                        {i18n.t('deleteProfile')}
-                                    </button>
-                                )}
-                            </section>
-                        </div>
-                        <Instructions />
-                        <section className={styles.codeBlock}>
-                            <h3 id='matcher'>{i18n.t('profileMatcher')}</h3>
-                            <i>{i18n.t('profileMatcherHelper')}</i>
-                            <CodeEditor
-                                onBeforeChange={(editor, data, value) => {
-                                    setMatcher(value);
-                                }}
-                                value={matcher}
-                            />
-                        </section>
-                        <Demo />
-                    </div>
-                    <div className={styles.right}>
-                        {Object.entries(functions)
-                            .sort(([a], [b]) => (a > b ? 1 : -1))
-                            .map(([key, value]) => {
-                                return (
-                                    <section
-                                        key={key}
-                                        className={styles.codeBlock}>
-                                        <h3 id={key}>
-                                            {i18n.t('function')} {key}
-                                        </h3>
-                                        <CodeEditor
-                                            onBeforeChange={(
-                                                editor,
-                                                data,
-                                                value
-                                            ) => {
-                                                functions[key] = value;
-                                                setFunctions(
-                                                    cloneDeep(functions)
-                                                );
-                                            }}
-                                            readOnly={isDefaultProfile}
-                                            value={value}
-                                        />
-                                    </section>
-                                );
-                            })}
-                    </div>
-                </section>
             </section>
         </div>
     );

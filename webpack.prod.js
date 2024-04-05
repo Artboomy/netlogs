@@ -6,10 +6,6 @@ module.exports = merge(common, {
     mode: 'production',
     optimization: {
         minimize: true,
-        minimizer: [
-            new TerserPlugin({
-                exclude: /settings|inject/
-            })
-        ]
+        minimizer: [new TerserPlugin()]
     }
 });
