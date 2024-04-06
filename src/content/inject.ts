@@ -1,3 +1,4 @@
+// NOTE: no non-type imports in this file or build will FAIL!
 /* eslint-disable */
 import { IItemContentOnlyCfg, IItemTransactionCfg } from 'models/types';
 import { ISettings } from 'controllers/settings/types';

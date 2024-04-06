@@ -46,7 +46,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
         scale: 3,
         transform: 'translateY(-4px)',
         '-webkit-mask-position': ICONS.drop as `${number}px ${number}px`,
-        '-webkit-mask-image': `url(${largeIcons})`
+        '-webkit-mask-image': `url(js/${largeIcons})`
     }
 }));
 

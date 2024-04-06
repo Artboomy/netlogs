@@ -2,9 +2,12 @@
     "compilerOptions": {
         "sourceMap": true,
         "target": "es6",
-        "module": "commonjs",
+        "module": "es2022",
         "jsx": "react",
         "strict": true,
+        "incremental": true,
+        "moduleResolution": "Node",
+        "tsBuildInfoFile": ".cache/tsbuildinfo",
         "noImplicitReturns": true,
         "noImplicitAny": true,
         "noEmitOnError": true,
@@ -15,5 +18,6 @@
         "baseUrl": "src"
     },
     "include": ["src/**/*"],
+    "references": [{ "path": "./tsconfig.node.json" }],
     "exclude": ["node_modules"]
 }

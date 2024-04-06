@@ -86,8 +86,13 @@ async function detachDebugger(id: number) {
     if (!isDebuggerEnabled) {
         return;
     }
-    await chrome.debugger.sendCommand({ tabId: id }, 'Network.disable');
-    await chrome.debugger.detach({ tabId: id });
+    // if tab is closed this will fail
+    try {
+        await chrome.debugger.sendCommand({ tabId: id }, 'Network.disable');
+        await chrome.debugger.detach({ tabId: id });
+    } catch (e) {
+        // pass
+    }
     delete debuggerAttachedMap[id];
     sendMessageToPort(id, {
         type: 'debugger.status',

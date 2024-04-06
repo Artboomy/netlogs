@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { createUseStyles } from 'react-jss';
 import cn from 'classnames';
-import { isMacOs, mediaQuerySmallOnly } from 'utils';
+import { isExtension, isMacOs, mediaQuerySmallOnly } from 'utils';
 import { Link } from '../Link';
 import { Theme } from 'theme/types';
 import { i18n } from 'translations/i18n';
@@ -154,13 +154,17 @@ export const Empty: FC = () => {
                     </p>
                 </div>
             </div>
-            <div className={styles.languageLine}>
-                🌎 {i18n.t('changeLanguage')}
-            </div>
+            {isExtension() && (
+                <div className={styles.languageLine}>
+                    🌎 {i18n.t('changeLanguage')}
+                </div>
+            )}
             <div className={styles.themeLine}>🎨 {i18n.t('themeHelper')}</div>
-            <div className={styles.websocketsLine}>
-                🔴 {i18n.t('webSocketHelper')}
-            </div>
+            {isExtension() && (
+                <div className={styles.websocketsLine}>
+                    🔴 {i18n.t('webSocketHelper')}
+                </div>
+            )}
         </section>
     );
 };

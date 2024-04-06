@@ -18,7 +18,7 @@ const useStyles = createUseStyles<Theme>((theme) => ({
     icon: {
         backgroundColor: theme.icon.normal,
         '-webkit-mask-position': ({ icon }) => icon,
-        '-webkit-mask-image': `url(${largeIcons})`,
+        '-webkit-mask-image': `url(js/${largeIcons})`,
         width: '21px',
         height: '24px',
         '&:hover': {

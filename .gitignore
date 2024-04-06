@@ -6,3 +6,4 @@ node_modules/
 roadmap.md
 yarn-error.log
 src/secrets.json
+stats-*.html

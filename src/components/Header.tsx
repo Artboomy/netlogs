@@ -129,7 +129,7 @@ export const Header: FC<IProps> = ({
                     onClick={clear}
                     title={`${i18n.t('clear')} [Ctrl+L]`}
                 />
-                <DebuggerButton />
+                {isExtension() && <DebuggerButton />}
                 <IconButton
                     icon={ICONS.panelDown}
                     onClick={() => setSecondRowVisible(!secondRowVisible)}
