@@ -19,15 +19,15 @@ type ContentOptional = Omit<IItemContentOnlyCfg, 'timestamp'> & {
     timestamp?: number;
 };
 
-let settings: Partial<ISettings> = {};
-
-window.addEventListener('message', (event) => {
-    if (event.source != window) return;
+function settingsListener(event: MessageEvent): void {
     if (event.data.type === 'settings') {
-        settings = JSON.parse(event.data.value);
-        injectAfterSettings();
+        const settings = JSON.parse(event.data.value);
+        injectAfterSettings(settings);
+        window.removeEventListener('message', settingsListener);
     }
-});
+}
+
+window.addEventListener('message', settingsListener);
 
 const netlogs = function (cfg: TransactionOptional | ContentOptional | any) {
     let event = cfg;
@@ -99,7 +99,7 @@ netlogs.help = (): void => {
 
 window.netlogs = netlogs;
 
-function injectAfterSettings() {
+function injectAfterSettings(settings: Partial<ISettings>) {
     if ('__NEXT_DATA__' in window && settings.nextjsIntegration) {
         netlogs({
             timestamp: new Date().getTime(),
