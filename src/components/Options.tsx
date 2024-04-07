@@ -1,13 +1,29 @@
 import React, { FC, useEffect } from 'react';
-import { createUseStyles } from 'react-jss';
 import { useSettings } from 'hooks/useSettings';
-import cn from 'classnames';
 import { HiddenTagList } from './options/HiddenTagList';
 import { Link } from './Link';
-import { Theme } from 'theme/types';
 import { i18n } from 'translations/i18n';
+import { Global } from '@emotion/react';
+import styled from '@emotion/styled';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
+const Block = styled.section`
+    padding: 0 8px;
+`;
+
+const TitleRow = styled.section(({ theme }) => ({
+    padding: '0 8px',
+    display: 'flex',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    backgroundColor: theme.panelColor,
+    borderBottom: `1px solid ${theme.borderColor}`
+}));
+
+const CheckboxRow = styled.div`
+    padding: 4px 0;
+`;
+
+const globalStyles = {
     '@global': {
         html: {
             height: '100%',
@@ -24,31 +40,8 @@ const useStyles = createUseStyles<Theme>((theme) => ({
         ':target': {
             backgroundColor: '#ffa'
         }
-    },
-    root: {
-        height: '100%',
-        display: 'flex',
-        gap: '8px'
-    },
-    section: {
-        display: 'flex',
-        gap: '4px',
-        marginBottom: '4px'
-    },
-    block: {
-        padding: '0 8px'
-    },
-    titleRow: {
-        display: 'flex',
-        alignItems: 'baseline',
-        justifyContent: 'space-between',
-        backgroundColor: theme.panelColor,
-        borderBottom: `1px solid ${theme.borderColor}`
-    },
-    checkboxRow: {
-        padding: '4px 0'
     }
-}));
+};
 
 export const Options: FC = () => {
     const [settings, setSettings] = useSettings();
@@ -57,10 +50,10 @@ export const Options: FC = () => {
         i18n.locale = settings.language;
     }, [settings.language]);
 
-    const styles = useStyles();
     return (
         <div>
-            <section className={cn(styles.titleRow, styles.block)}>
+            <Global styles={globalStyles} />
+            <TitleRow>
                 <h1>{i18n.t('optionsTitle')}</h1>
                 <div>
                     {i18n.t('links')}:{' '}
@@ -73,9 +66,9 @@ export const Options: FC = () => {
                         text={i18n.t('chromeStore')}
                     />{' '}
                 </div>
-            </section>
+            </TitleRow>
 
-            <section className={styles.block}>
+            <Block>
                 <h2>{i18n.t('language')}</h2>
                 <select
                     id='language'
@@ -94,9 +87,9 @@ export const Options: FC = () => {
                     <option value='zh-CN'>中文</option>
                     <option value='ja-JP'>日本語</option>
                 </select>
-            </section>
+            </Block>
 
-            <section className={styles.block}>
+            <Block>
                 <h2>{i18n.t('theme')}</h2>
                 <select
                     id='themeColor'
@@ -110,10 +103,10 @@ export const Options: FC = () => {
                     <option value='light'>{i18n.t('light')}</option>
                     <option value='dark'>{i18n.t('dark')}</option>
                 </select>
-            </section>
-            <section className={styles.block}>
+            </Block>
+            <Block>
                 <h2>{i18n.t('integrations')}</h2>
-                <div className={styles.checkboxRow}>
+                <CheckboxRow>
                     <label>
                         <input
                             type='checkbox'
@@ -134,8 +127,8 @@ export const Options: FC = () => {
                             ❓
                         </span>
                     </label>
-                </div>
-                <div className={styles.checkboxRow}>
+                </CheckboxRow>
+                <CheckboxRow>
                     <label>
                         <input
                             type='checkbox'
@@ -155,8 +148,8 @@ export const Options: FC = () => {
                         />{' '}
                         {i18n.t('requests')}
                     </label>
-                </div>
-                <div className={styles.checkboxRow}>
+                </CheckboxRow>
+                <CheckboxRow>
                     <label>
                         <input
                             type='checkbox'
@@ -171,8 +164,8 @@ export const Options: FC = () => {
                         />
                         {i18n.t('sendAnalytics')}
                     </label>
-                </div>
-                <div className={styles.checkboxRow}>
+                </CheckboxRow>
+                <CheckboxRow>
                     <label>
                         <input
                             type='checkbox'
@@ -187,8 +180,8 @@ export const Options: FC = () => {
                         />
                         {i18n.t('autoattachDebugger')}
                     </label>
-                </div>
-                <div className={styles.checkboxRow}>
+                </CheckboxRow>
+                <CheckboxRow>
                     <label>
                         <input
                             type='checkbox'
@@ -205,8 +198,8 @@ export const Options: FC = () => {
                         <Link text='GraphQL' href='https://graphql.org/' />{' '}
                         {i18n.t('requests')}
                     </label>
-                </div>
-                <div className={styles.checkboxRow}>
+                </CheckboxRow>
+                <CheckboxRow>
                     <label>
                         <input
                             type='checkbox'
@@ -227,12 +220,12 @@ export const Options: FC = () => {
                             ❓
                         </span>
                     </label>
-                </div>
-            </section>
-            <section className={styles.block}>
+                </CheckboxRow>
+            </Block>
+            <Block>
                 <h2>{i18n.t('hiddenTags')}</h2>
                 <HiddenTagList />
-            </section>
+            </Block>
         </div>
     );
 };

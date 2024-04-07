@@ -1,13 +1,11 @@
 import React from 'react';
-import { createUseStyles } from 'react-jss';
 import { google, solarized } from 'base16';
 import { ItemType } from 'models/types';
 import { theme } from 'theme/light';
-import cn from 'classnames';
-import { Theme } from 'theme/types';
+import styled from '@emotion/styled';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
-    root: {
+const Container = styled.div<{ active: boolean }>(
+    ({ theme, active, color }) => ({
         display: 'inline-block',
         boxSizing: 'border-box',
         borderRadius: '20px',
@@ -16,18 +14,19 @@ const useStyles = createUseStyles<Theme>((theme) => ({
         marginRight: '4px',
         height: '16px',
         lineHeight: '12px',
-        userSelect: 'none'
-    },
-    active: {
-        color: google.base07,
-        backgroundColor: (color) => color || google.base03
-    },
-    inactive: {
-        color: theme.inactiveTag,
-        backgroundColor: 'transparent',
-        border: `1px ${theme.inactiveTag} dashed`
-    }
-}));
+        userSelect: 'none',
+        ...(active
+            ? {
+                  color: google.base07,
+                  backgroundColor: color || google.base03
+              }
+            : {
+                  color: theme.inactiveTag,
+                  backgroundColor: 'transparent',
+                  border: `1px ${theme.inactiveTag} dashed`
+              })
+    })
+);
 type TProps = {
     color?: string;
     content: string;
@@ -65,14 +64,9 @@ export const Tag: React.FC<TProps> = ({
     active = true
 }) => {
     const computedColor = getColor(color, content, type);
-    const styles = useStyles(computedColor);
     return (
-        <div
-            className={cn(
-                styles.root,
-                active ? styles.active : styles.inactive
-            )}>
+        <Container active={active} color={computedColor}>
             {content}
-        </div>
+        </Container>
     );
 };

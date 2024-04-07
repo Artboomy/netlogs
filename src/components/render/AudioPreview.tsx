@@ -1,26 +1,27 @@
 import React, { FC, useContext } from 'react';
 import { ModalContext } from '../modal/Context';
-import { createUseStyles } from 'react-jss';
-import { chromeLight } from 'react-inspector';
+import { chromeDark, chromeLight } from 'react-inspector';
+import styled from '@emotion/styled';
 
-const useStyles = createUseStyles({
-    tag: {
-        color: String(chromeLight.OBJECT_NAME_COLOR),
-        marginRight: '4px',
-        fontFamily: String(chromeLight.BASE_FONT_FAMILY),
-        fontSize: '12px'
-    },
-    base64: {
-        wordBreak: 'break-all',
-        whiteSpace: 'pre-wrap'
-    }
+const TagText = styled.span(({ theme }) => ({
+    color:
+        theme.name === 'light'
+            ? chromeLight.OBJECT_NAME_COLOR
+            : chromeDark.OBJECT_NAME_COLOR,
+    marginRight: '4px',
+    fontFamily: chromeLight.BASE_FONT_FAMILY,
+    fontSize: '12px'
+}));
+
+const Base64Text = styled.pre({
+    wordBreak: 'break-all',
+    whiteSpace: 'pre-wrap'
 });
 
 export const AudioPreview: FC<{
     base64: string;
     mimeType: string;
 }> = ({ base64, mimeType }) => {
-    const styles = useStyles();
     const { setValue } = useContext(ModalContext);
     const normalizedType = mimeType === 'audio/mpeg3' ? 'audio/mp3' : mimeType;
     const handleClick = () => {
@@ -31,14 +32,14 @@ export const AudioPreview: FC<{
                 </audio>
                 <details>
                     <summary>Base64</summary>
-                    <pre className={styles.base64}>{base64}</pre>
+                    <Base64Text>{base64}</Base64Text>
                 </details>
             </div>
         );
     };
     return (
         <>
-            <span className={styles.tag}>{mimeType}: </span>
+            <TagText>{mimeType}: </TagText>
             <button onClick={handleClick}>Listen audio</button>
         </>
     );

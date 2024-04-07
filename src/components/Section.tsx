@@ -1,60 +1,64 @@
 import React, { FC, ReactNode } from 'react';
-import { createUseStyles } from 'react-jss';
-import cn from 'classnames';
-import { Theme } from 'theme/types';
+import styled from '@emotion/styled';
 
 export type TItem = {
     name: string;
     value: ReactNode;
 };
+
 export type TSection = {
     title: string;
     items: TItem[];
 };
-const useStyles = createUseStyles<Theme>((theme) => ({
-    root: {
-        borderBottom: '1px solid #eaeaea',
-        marginBottom: '4px',
-        paddingBottom: '4px'
-    },
-    item: {
-        marginLeft: '16px'
-    },
-    key: {
-        fontWeight: 'bold',
-        color: theme.section.key
-    },
-    valueNumber: {
-        color: theme.valueNumber
-    },
-    valueString: {
-        color: theme.valueString
-    }
+
+const Container = styled.details({
+    borderBottom: '1px solid #eaeaea',
+    marginBottom: '4px',
+    paddingBottom: '4px'
+});
+
+const Item = styled.div({
+    marginLeft: '16px'
+});
+
+const Key = styled.span(({ theme }) => ({
+    fontWeight: 'bold',
+    color: theme.section.key
 }));
+
+const Value = styled.span<{ type: 'number' | 'string' | '' }>(
+    ({ theme, type }) => ({
+        ...(type === 'number' && { color: theme.valueNumber }),
+        ...(type === 'string' && { color: theme.valueString })
+    })
+);
 
 const isQuoted = (s: unknown) =>
     typeof s === 'string' && s.startsWith('"') && s.endsWith('"');
+
 export const Section: FC<TSection> = ({ title, items }) => {
-    const styles = useStyles();
+    const getValueType = (v: unknown) => {
+        if (isQuoted(v)) {
+            return 'string';
+        }
+        if (typeof v === 'number' || !isNaN(Number(v))) {
+            return 'number';
+        }
+        return '';
+    };
     return (
-        <details className={styles.root} open>
+        <Container open>
             <summary>
                 <strong>{title}</strong>
             </summary>
-            {items.map(({ name, value }, index) => (
-                <div key={`${name}${index}`} className={styles.item}>
-                    <span className={styles.key}>{name}</span>:{' '}
-                    <span
-                        className={cn({
-                            [styles.valueString]: isQuoted(value),
-                            [styles.valueNumber]:
-                                typeof value === 'number' ||
-                                !isNaN(Number(value))
-                        })}>
-                        {value}
-                    </span>
-                </div>
-            ))}
-        </details>
+            {items.map(({ name, value }, index) => {
+                return (
+                    <Item key={`${name}${index}`}>
+                        <Key>{name}</Key>:{' '}
+                        <Value type={getValueType(value)}>{value}</Value>
+                    </Item>
+                );
+            })}
+        </Container>
     );
 };

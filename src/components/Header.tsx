@@ -1,6 +1,4 @@
 import React, { FC, useRef, useState } from 'react';
-import { createUseStyles } from 'react-jss';
-import cn from 'classnames';
 import { useListStore } from 'controllers/network';
 import runtime from '../api/runtime';
 import { Har } from 'har-format';
@@ -10,28 +8,25 @@ import { useHotkey } from 'hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
 import { toast } from 'react-toastify';
 import { DebuggerButton } from './DebuggerButton';
-import { Theme } from 'theme/types';
 import { i18n } from 'translations/i18n';
+import styled from '@emotion/styled';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
-    root: {
-        borderBottom: `1px solid ${theme.borderColor}`,
-        zIndex: 2
-    },
-    row: {
-        display: 'flex',
-        backgroundColor: theme.panelColor,
-        padding: '2px 4px',
-        alignItems: 'center',
-        gap: '8px'
-    },
-    optionsButton: {
-        // marginLeft: 'auto'
-    },
-    hideUnrelated: {
-        display: 'flex'
-    }
+const Root = styled.header(({ theme }) => ({
+    borderBottom: `1px solid ${theme.borderColor}`,
+    zIndex: 2
 }));
+
+const Row = styled.div(({ theme }) => ({
+    display: 'flex',
+    backgroundColor: theme.panelColor,
+    padding: '2px 4px',
+    alignItems: 'center',
+    gap: '8px'
+}));
+
+const HideUnrelated = styled.label({
+    display: 'flex'
+});
 
 interface IProps {
     className?: string;
@@ -90,7 +85,6 @@ export const Header: FC<IProps> = ({
     caseSensitive,
     onCaseSensitiveChange
 }) => {
-    const styles = useStyles();
     const clear = useListStore((state) => state.clear);
     const isPreserve = useListStore((state) => state.isPreserve);
     const isUnpack = useListStore((state) => state.isUnpack);
@@ -122,8 +116,8 @@ export const Header: FC<IProps> = ({
         }));
     };
     return (
-        <header className={cn(styles.root, className)}>
-            <div className={styles.row}>
+        <Root className={className}>
+            <Row>
                 <IconButton
                     icon={ICONS.clear}
                     onClick={clear}
@@ -149,7 +143,6 @@ export const Header: FC<IProps> = ({
                     title={i18n.t('decodeJSON')}
                 />
                 <input
-                    className={styles.searchBox}
                     ref={ref}
                     type='search'
                     placeholder={i18n.t('searchHelp')}
@@ -158,7 +151,7 @@ export const Header: FC<IProps> = ({
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
                 {searchValue && (
-                    <label className={styles.hideUnrelated}>
+                    <HideUnrelated>
                         <input
                             type='checkbox'
                             checked={hideUnrelated}
@@ -168,26 +161,24 @@ export const Header: FC<IProps> = ({
                             title={`${i18n.t('toggleUnrelated')} [Ctrl+U]`}
                         />
                         Hide unrelated
-                    </label>
+                    </HideUnrelated>
                 )}
                 <MimetypeSelect />
                 {isExtension() && (
                     <IconButton
-                        className={styles.optionsButton}
                         icon={ICONS.settings}
                         onClick={() => runtime.openOptionsPage()}
                         title={i18n.t('options')}
                     />
                 )}
                 <IconButton
-                    className={cn({ [styles.optionsButton]: !isExtension() })}
                     icon={ICONS.export}
                     onClick={doExport}
                     title={i18n.t('export')}
                 />
-            </div>
+            </Row>
             {secondRowVisible && (
-                <div className={styles.row}>
+                <Row>
                     <label style={{ display: 'flex' }}>
                         <input
                             type='checkbox'
@@ -196,8 +187,8 @@ export const Header: FC<IProps> = ({
                         />
                         {i18n.t('preserveLog')}
                     </label>
-                </div>
+                </Row>
             )}
-        </header>
+        </Root>
     );
 };

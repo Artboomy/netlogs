@@ -1,23 +1,21 @@
 import React, { FC, useEffect, useRef } from 'react';
-import { createUseStyles } from 'react-jss';
 import { Section, TSection } from './Section';
 import { callParentVoid } from 'utils';
+import styled from '@emotion/styled';
 
 export type PropTreeProps = {
     data: {
         [key: string]: TSection;
     };
 };
-const useStyles = createUseStyles({
-    root: {
-        fontFamily: 'Tahoma, sans-serif',
-        fontSize: '12px',
-        lineHeight: 1.7
-    }
+
+const Container = styled.section({
+    fontFamily: 'Tahoma, sans-serif',
+    fontSize: '12px',
+    lineHeight: 1.7
 });
 
 export const PropTree: FC<PropTreeProps> = ({ data }) => {
-    const styles = useStyles();
     const openedRef = useRef(Date.now());
     useEffect(() => {
         return () => {
@@ -28,10 +26,10 @@ export const PropTree: FC<PropTreeProps> = ({ data }) => {
         };
     }, []);
     return (
-        <section className={styles.root}>
+        <Container>
             {Object.entries(data).map(([key, sectionData]) => (
                 <Section key={key} {...sectionData} />
             ))}
-        </section>
+        </Container>
     );
 };

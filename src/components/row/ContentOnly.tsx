@@ -1,9 +1,8 @@
 import React, { FC, ReactNode } from 'react';
 import ContentOnlyItem from '../../models/ContentOnlyItem';
-import { createUseStyles } from 'react-jss';
 import { mediaQuerySmallOnly } from 'utils';
-import cn from 'classnames';
 import { Response } from '../Response';
+import styled from '@emotion/styled';
 
 interface IContentOnlyProp {
     className?: string;
@@ -12,26 +11,22 @@ interface IContentOnlyProp {
     tag: ReactNode;
 }
 
-const useStyles = createUseStyles(() => {
-    const minHeight = '20px';
-    return {
-        contentOnly: {
-            display: 'flex',
-            alignItems: 'baseline',
-            gridColumn: '2/5',
-            padding: '4px 8px',
-            [mediaQuerySmallOnly]: {
-                gridColumn: '1/3',
-                flexDirection: 'column'
-            }
-        },
-        content: {
-            minHeight,
-            [mediaQuerySmallOnly]: {
-                paddingTop: '4px'
-            }
-        }
-    };
+const Container = styled.div({
+    display: 'flex',
+    alignItems: 'baseline',
+    gridColumn: '2/5',
+    padding: '4px 8px',
+    [mediaQuerySmallOnly]: {
+        gridColumn: '1/3',
+        flexDirection: 'column'
+    }
+});
+
+const ResponseStyled = styled(Response)({
+    minHeight: '20px',
+    [mediaQuerySmallOnly]: {
+        paddingTop: '4px'
+    }
 });
 
 export const ContentOnly: FC<IContentOnlyProp> = ({
@@ -40,14 +35,13 @@ export const ContentOnly: FC<IContentOnlyProp> = ({
     date,
     tag
 }) => {
-    const styles = useStyles();
     return (
         <>
             {date}
-            <div className={cn(styles.contentOnly, className)}>
+            <Container className={className}>
                 {tag}
-                <Response className={styles.content} item={item} />
-            </div>
+                <ResponseStyled item={item} />
+            </Container>
         </>
     );
 };

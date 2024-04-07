@@ -30,12 +30,12 @@ export default defineConfig({
         emptyOutDir: true,
         minify: process.env.NODE_ENV === 'production',
         cssMinify: process.env.NODE_ENV === 'production',
+        sourcemap: process.env.NODE_ENV !== 'production',
         rollupOptions: {
             input: {
                 devtools: './src/app/devtools.ts',
                 panel: './src/app/panel.ts',
                 sandbox: './src/app/sandbox.tsx',
-                sandboxSettings: './src/app/sandboxSettings.tsx',
                 options: './src/app/options.tsx',
                 settings: './src/controllers/settings.ts',
                 content: './src/content/content.ts',
