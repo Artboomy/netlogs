@@ -6,17 +6,18 @@ import {
     ItemType,
     SearchConfig
 } from './types';
-import { PropTreeProps } from '../components/PropTree';
+import { PropTreeProps } from 'components/PropTree';
 import { Entry } from 'har-format';
 import { isVisible } from 'react-inspector';
-import { isMimeType } from '../components/InspectorWrapper';
+import { isMimeType } from 'components/InspectorWrapper';
 import { TransactionItemAbstract } from './TransactionItem';
-import { phoenixLiveViewProfile } from '../controllers/settings/profiles/phoenixLiveView';
-import { isSerializedObject } from '../utils';
+import { phoenixLiveViewProfile } from 'controllers/settings/profiles/phoenixLiveView';
+import { isSerializedObject } from 'utils';
 
 type TContent = IItemTransactionCfg['result'];
 export default class WebSocketItem
-    implements TransactionItemAbstract, IContentItem<TContent> {
+    implements TransactionItemAbstract, IContentItem<TContent>
+{
     public readonly id: string;
     public readonly type: ItemType = ItemType.WebSocket;
     public readonly timestamp: number;

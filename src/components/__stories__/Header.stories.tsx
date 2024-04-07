@@ -1,12 +1,13 @@
 import React from 'react';
 import { Header as Component } from '../Header';
-import { action } from '@storybook/addon-actions';
 
 export default {
     title: 'Header',
     component: Component
 };
-
+const action = (i: string) => {
+    return () => console.log('i', i);
+};
 export const Header: React.FC = () => (
     <Component
         searchValue=''

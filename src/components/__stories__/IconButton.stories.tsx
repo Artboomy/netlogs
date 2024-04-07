@@ -1,6 +1,5 @@
 import React from 'react';
 import { IconButton as Component, IconButtonProps, ICONS } from '../IconButton';
-import { action } from '@storybook/addon-actions';
 
 export default {
     title: 'Button',
@@ -9,7 +8,9 @@ export default {
         icon: ICONS.clear
     }
 };
-
+const action = (i: string) => {
+    return () => console.log('i', i);
+};
 export const Button = (args: {
     icon: IconButtonProps['icon'];
 }): JSX.Element => (

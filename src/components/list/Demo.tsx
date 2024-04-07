@@ -29,7 +29,7 @@ export const ListDemo: FC = () => {
     useStyles();
 
     useEffect(() => {
-        const demoList = (data.log.entries as unknown) as NetworkRequest[];
+        const demoList = data.log.entries as unknown as NetworkRequest[];
         useListStore
             .getState()
             .setList(demoList.map((request) => new NetworkItem({ request })));

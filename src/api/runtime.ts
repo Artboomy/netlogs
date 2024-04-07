@@ -33,5 +33,5 @@ class LocalRuntime {
 export default isSandbox()
     ? sandboxRuntime
     : window.chrome?.runtime
-    ? window.chrome.runtime
-    : new LocalRuntime();
+      ? window.chrome.runtime
+      : new LocalRuntime();

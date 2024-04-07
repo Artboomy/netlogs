@@ -11,7 +11,7 @@ export default {
 };
 
 const networkItem = new NetworkItem({
-    request: (har.log.entries[0] as unknown) as Entry
+    request: har.log.entries[0] as unknown as Entry
 });
 
 export const Transaction = (): ReactNode => (

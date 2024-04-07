@@ -65,7 +65,10 @@ export async function wrapSandbox(): Promise<void> {
                             ) => {
                                 if (
                                     areaName === 'local' &&
-                                    changes.hasOwnProperty('settings') &&
+                                    Object.prototype.hasOwnProperty.call(
+                                        changes,
+                                        'settings'
+                                    ) &&
                                     changes.settings.newValue
                                 ) {
                                     postSandbox(

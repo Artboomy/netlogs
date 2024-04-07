@@ -1,6 +1,7 @@
 import { IProfile } from '../types';
 import { defaultProfile } from './default';
-import { NetworkRequest } from '../../../models/types';
+import { NetworkRequest } from 'models/types';
+
 type RpcResult = {
     jsonrpc: string;
     result?: unknown;
@@ -42,7 +43,7 @@ export const jsonRpcProfile: IProfile = {
             const errorByResult =
                 result &&
                 typeof result === 'object' &&
-                result.hasOwnProperty('error');
+                Object.prototype.hasOwnProperty.call(result, 'error');
             return Boolean(errorByResult || errorByCode);
         },
         shouldShow(_request: NetworkRequest): boolean {
@@ -80,6 +81,7 @@ const weakMatch = (obj: Record<string, unknown> | unknown): boolean => {
             'params' in obj
     );
 };
+
 export function isJsonRpc(
     params: Record<string, unknown>,
     result: unknown

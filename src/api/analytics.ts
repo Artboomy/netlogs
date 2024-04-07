@@ -35,7 +35,7 @@ class Analytics {
                 await chrome.storage.local.set({ firstTime: false });
                 this.fireEvent('first_open');
             }
-        } catch (e) {
+        } catch (_e) {
             // pass
         }
     }

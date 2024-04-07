@@ -25,7 +25,8 @@ export abstract class TransactionItemAbstract implements IContentItem<unknown> {
 
 type TContent = IItemTransactionCfg['result'];
 export default class TransactionItem
-    implements TransactionItemAbstract, IContentItem<TContent> {
+    implements TransactionItemAbstract, IContentItem<TContent>
+{
     public readonly id: string;
     public readonly type: ItemType = ItemType.Transaction;
     public readonly timestamp: number;

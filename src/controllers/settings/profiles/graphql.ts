@@ -49,7 +49,7 @@ export const graphqlProfile: IProfile = {
             const errorByResult =
                 result &&
                 typeof result === 'object' &&
-                result.hasOwnProperty('errors');
+                Object.prototype.hasOwnProperty.call(result, 'errors');
             return Boolean(errorByResult || errorByCode);
         },
         shouldShow(_request: NetworkRequest): boolean {
@@ -129,7 +129,7 @@ function isGraphqlResult(
 
 export function isGraphql(
     params: Record<string, unknown>,
-    result: unknown,
+    _result: unknown,
     resultText?: string
 ): boolean {
     return (

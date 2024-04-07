@@ -24,7 +24,8 @@ function injectMimeType<T>(obj: T, mimeType: string): void {
 
 type TContent = Record<string, unknown>;
 export default class NetworkItem
-    implements TransactionItemAbstract, IContentItem<TContent> {
+    implements TransactionItemAbstract, IContentItem<TContent>
+{
     public id = '';
     private readonly _request: NetworkRequest;
     public readonly type: ItemType = ItemType.Transaction;

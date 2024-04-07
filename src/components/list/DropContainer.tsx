@@ -66,7 +66,7 @@ export const DropContainer: FC = ({ children }) => {
                 try {
                     log = await parseFile<Har>(file);
                     toast.dismiss(toastId);
-                } catch (e) {
+                } catch (_e) {
                     toast.dismiss(toastId);
                     toast.error(i18n.t('errorParsingFile'));
                 }

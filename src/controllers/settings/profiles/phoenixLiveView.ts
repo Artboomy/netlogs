@@ -102,7 +102,7 @@ export const phoenixLiveViewProfile: IProfileWebSocket = {
                 payload[INDEX.caller].includes('phoenix') ||
                 /^lv:phx-/.test(payload[INDEX.caller]);
             return isLengthMatch && isArgTypeMatch;
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }
