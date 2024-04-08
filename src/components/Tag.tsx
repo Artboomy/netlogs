@@ -1,8 +1,8 @@
 import React from 'react';
 import { google, solarized } from 'base16';
-import { ItemType } from 'models/types';
 import { theme } from 'theme/light';
 import styled from '@emotion/styled';
+import { ItemType } from 'models/enums';
 
 const Container = styled.div<{ active: boolean }>(
     ({ theme, active, color }) => ({

@@ -1,25 +1,28 @@
 import { nanoid } from 'nanoid';
-import {
-    IContentItem,
-    IItemTransactionCfg,
-    ItemType,
-    SearchConfig
-} from './types';
+import { IContentItem, IItemTransactionCfg, SearchConfig } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { Entry } from 'har-format';
 import { isVisible } from 'react-inspector';
 import { isMimeType } from '../components/InspectorWrapper';
+import { ItemType } from 'models/enums';
 
 export abstract class TransactionItemAbstract implements IContentItem<unknown> {
     public readonly id: string = 'someId';
     public readonly type: ItemType = ItemType.Transaction;
     public readonly timestamp: number = 0;
+
     abstract getName(): string;
+
     abstract getTag(): string;
+
     abstract isError(): boolean;
+
     abstract getParams(): Record<string, unknown>;
+
     abstract getContent(): unknown;
+
     abstract getMeta(): PropTreeProps['data'] | null;
+
     abstract getDuration(): number;
 }
 

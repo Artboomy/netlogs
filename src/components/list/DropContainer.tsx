@@ -6,7 +6,6 @@ import { isFileSupported, parseFile } from 'controllers/file';
 import { Har } from 'har-format';
 import NetworkItem from '../../models/NetworkItem';
 import ContentOnlyItem from '../../models/ContentOnlyItem';
-import { ItemType } from 'models/types';
 import TransactionItem from '../../models/TransactionItem';
 import { toast } from 'react-toastify';
 import { callParentVoid } from 'utils';
@@ -15,6 +14,7 @@ import { i18n } from 'translations/i18n';
 import largeIcons from 'icons/largeIcons.svg';
 import { ICONS } from 'components/IconButton';
 import styled from '@emotion/styled';
+import { ItemType } from 'models/enums';
 
 const DropZone = styled.div({
     height: '100%',
@@ -48,7 +48,9 @@ const Icon = styled.div(({ theme }) => ({
     '-webkit-mask-image': `url(js/${largeIcons})`
 }));
 
-export const DropContainer: FC = ({ children }) => {
+export const DropContainer: FC<{ children?: React.ReactNode }> = ({
+    children
+}) => {
     const { setList } = useListStore.getState();
     const [{ canDrop, isOver }, dropRef] = useDrop(
         () => ({
@@ -56,22 +58,22 @@ export const DropContainer: FC = ({ children }) => {
             async drop(item: { files: File[] }) {
                 const file = item.files[0];
                 if (!isFileSupported(file.name)) {
-                    toast.error(i18n.t('onlyJSONSupported'));
+                    toast.error(i18n.t<string>('onlyJSONSupported'));
                 }
                 let log: Har | null = null;
-                const toastId = toast(i18n.t('loadingFile'));
+                const toastId = toast(i18n.t<string>('loadingFile'));
                 try {
                     log = await parseFile<Har>(file);
                     toast.dismiss(toastId);
                 } catch (_e) {
                     toast.dismiss(toastId);
-                    toast.error(i18n.t('errorParsingFile'));
+                    toast.error(i18n.t<string>('errorParsingFile'));
                 }
                 if (!log) {
                     return;
                 }
                 if (!log?.log?.entries) {
-                    toast.error(i18n.t('invalidHAR'));
+                    toast.error(i18n.t<string>('invalidHAR'));
                     return;
                 }
                 try {
@@ -80,7 +82,7 @@ export const DropContainer: FC = ({ children }) => {
                             new ContentOnlyItem({
                                 timestamp: new Date().getTime(),
                                 tag: 'NET LOGS',
-                                content: i18n.t('fileOpened', {
+                                content: i18n.t<string>('fileOpened', {
                                     name: file.name
                                 })
                             }),
@@ -110,7 +112,7 @@ export const DropContainer: FC = ({ children }) => {
                     );
                 } catch (e) {
                     console.log('Error occurred:', e);
-                    toast.error(i18n.t('invalidHAR'));
+                    toast.error(i18n.t<string>('invalidHAR'));
                 }
             },
             collect: (monitor) => ({
@@ -126,7 +128,7 @@ export const DropContainer: FC = ({ children }) => {
             {canDrop && isOver && (
                 <Overlay>
                     <Icon />
-                    {i18n.t('drop')}
+                    {i18n.t<string>('drop')}
                 </Overlay>
             )}
         </DropZone>

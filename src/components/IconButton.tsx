@@ -55,6 +55,7 @@ export type IconButtonProps = {
     onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     title: string;
     active?: boolean;
+    children?: React.ReactNode;
 };
 
 export const IconButton: FC<IconButtonProps> = ({
@@ -65,6 +66,7 @@ export const IconButton: FC<IconButtonProps> = ({
     active,
     children
 }) => {
+    console.log('icon button');
     let variant: '' | 'active' | 'red' = '';
     if (active && icon !== ICONS.debugOn) {
         variant = 'active';

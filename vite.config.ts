@@ -1,11 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import visualizer, { PluginVisualizerOptions } from 'rollup-plugin-visualizer';
+import { PluginVisualizerOptions, visualizer } from 'rollup-plugin-visualizer';
 import circleDependency from 'vite-plugin-circular-dependency';
+import { resolve } from 'node:url';
 
 const plugins = [circleDependency(), tsconfigPaths(), react()];
 if (process.env.ANALYZE) {
+    console.log('visualizer', visualizer);
     plugins.push(
         visualizer({
             template: process.env
@@ -19,7 +21,15 @@ export default defineConfig({
     plugins,
     resolve: {
         alias: {
-            // Define your path aliases if you have any
+            tslib: 'tslib/tslib.es6.js',
+            'react/jsx-dev-runtime.js': resolve(
+                __dirname,
+                'node_modules/react/jsx-dev-runtime.js'
+            ),
+            'react/jsx-runtime.js': resolve(
+                __dirname,
+                'node_modules/react/jsx-runtime.js'
+            )
         }
     },
     root: 'src',

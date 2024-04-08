@@ -3,7 +3,6 @@ import {
     IContentItem,
     IItemTransactionCfg,
     IItemWebSocketCfg,
-    ItemType,
     SearchConfig
 } from './types';
 import { PropTreeProps } from 'components/PropTree';
@@ -13,6 +12,7 @@ import { isMimeType } from 'components/InspectorWrapper';
 import { TransactionItemAbstract } from './TransactionItem';
 import { phoenixLiveViewProfile } from 'controllers/settings/profiles/phoenixLiveView';
 import { isSerializedObject } from 'utils';
+import { ItemType } from 'models/enums';
 
 type TContent = IItemTransactionCfg['result'];
 export default class WebSocketItem

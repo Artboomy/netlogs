@@ -30,7 +30,7 @@ const useHiddenMimeTypes = () => {
         () => new Set(settings.get().hiddenMimeTypes)
     );
 
-    const setHiddenToStore = useCallback(async (newArray) => {
+    const setHiddenToStore = useCallback(async (newArray: string[]) => {
         settings.set({ ...settings.get(), hiddenMimeTypes: newArray });
         setHidden(new Set(newArray));
     }, []);

@@ -2,11 +2,11 @@ import React, { FC } from 'react';
 import { useListStore } from 'controllers/network';
 import { Tag } from './Tag';
 import { google } from 'base16';
-import { ItemType } from 'models/types';
 import { useSettings } from 'hooks/useSettings';
 import shallow from 'zustand/shallow';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
+import { ItemType } from 'models/enums';
 
 const Container = styled.div({
     display: 'flex',

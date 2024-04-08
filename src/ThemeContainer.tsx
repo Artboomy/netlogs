@@ -8,7 +8,9 @@ const themeMap = {
     light: themeLight,
     dark: themeDark
 };
-export const ThemeContainer: FC = ({ children }) => {
+export const ThemeContainer: FC<{ children?: React.ReactNode }> = ({
+    children
+}) => {
     const [{ theme: themeKey }] = useSettings();
     const theme = useMemo(() => themeMap[themeKey], [themeKey]);
     return (

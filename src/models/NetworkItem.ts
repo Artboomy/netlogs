@@ -6,13 +6,13 @@ import { Entry } from 'har-format';
 import {
     IContentItem,
     IItemNetworkCfg,
-    ItemType,
     NetworkRequest,
     SearchConfig
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { isVisible } from 'react-inspector';
 import { isMimeType } from '../components/InspectorWrapper';
+import { ItemType } from 'models/enums';
 
 function injectMimeType<T>(obj: T, mimeType: string): void {
     Object.defineProperty(obj, '__mimeType', {

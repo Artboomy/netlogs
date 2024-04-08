@@ -1,13 +1,9 @@
 import { nanoid } from 'nanoid';
-import {
-    IContentItem,
-    IItemContentOnlyCfg,
-    ItemType,
-    SearchConfig
-} from './types';
+import { IContentItem, IItemContentOnlyCfg, SearchConfig } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { isVisible } from 'react-inspector';
 import { Entry } from 'har-format';
+import { ItemType } from 'models/enums';
 
 type TContent = IItemContentOnlyCfg['content'];
 export default class ContentOnlyItem implements IContentItem<TContent> {

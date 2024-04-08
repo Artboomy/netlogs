@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { callParentVoid } from 'utils';
 import { i18n } from 'translations/i18n';
 
@@ -41,6 +41,6 @@ export default class ErrorBoundary extends Component<
             );
         }
 
-        return this.props.children;
+        return this.props.children as ReactNode;
     }
 }
