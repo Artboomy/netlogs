@@ -1,15 +1,6 @@
 import { Entry } from 'har-format';
 import { PropTreeProps } from '../components/PropTree';
 
-// usage: tag color in Tag.getColor
-// usage: HAR export into comment field for reimport
-export enum ItemType {
-    ContentOnly = 'ContentOnly',
-    WithName = 'WithName',
-    Transaction = 'Transaction',
-    WebSocket = 'WebSocket'
-}
-
 export interface IContentItem<T> {
     getTag(): string;
 

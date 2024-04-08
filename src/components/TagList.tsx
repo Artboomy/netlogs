@@ -2,27 +2,25 @@ import React, { FC } from 'react';
 import { useListStore } from 'controllers/network';
 import { Tag } from './Tag';
 import { google } from 'base16';
-import { ItemType } from 'models/types';
 import { useSettings } from 'hooks/useSettings';
-import { createUseStyles } from 'react-jss';
 import shallow from 'zustand/shallow';
 import { i18n } from 'translations/i18n';
+import styled from '@emotion/styled';
+import { ItemType } from 'models/enums';
 
-const useStyles = createUseStyles({
-    root: {
-        display: 'flex',
-        flexWrap: 'wrap'
-    },
-    button: {
-        outline: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        background: 'none'
-    }
+const Container = styled.div({
+    display: 'flex',
+    flexWrap: 'wrap'
+});
+
+const Button = styled.button({
+    outline: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    background: 'none'
 });
 
 export const TagList: FC = () => {
-    const styles = useStyles();
     const list = useListStore((state) => state.list, shallow);
     const [settings, setSettings] = useSettings();
     const hiddenTags = { ...settings.hiddenTags };
@@ -57,11 +55,10 @@ export const TagList: FC = () => {
     };
     const values = Object.values(tags);
     return (
-        <div className={styles.root}>
+        <Container>
             {!values.length && i18n.t('noTags')}
             {values.map(({ content, color, type }) => (
-                <button
-                    className={styles.button}
+                <Button
                     key={content}
                     type='button'
                     onClick={() => handleClick(content)}>
@@ -71,8 +68,8 @@ export const TagList: FC = () => {
                         color={color}
                         active={!hiddenTags[content]}
                     />
-                </button>
+                </Button>
             ))}
-        </div>
+        </Container>
     );
 };

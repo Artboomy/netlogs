@@ -1,4 +1,4 @@
-import settings from '../controllers/settings';
+// NOTE: no non-type imports in this file or build will FAIL!
 
 function injectScript(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -15,12 +15,9 @@ function injectScript(path: string): Promise<void> {
     });
 }
 
-injectScript('js/inject.js').then(() => {
-    settings.refresh().then((settings) => {
-        window.postMessage(
-            { type: 'settings', value: JSON.stringify(settings) },
-            '*'
-        );
+injectScript('js/inject.mjs').then(() => {
+    chrome.storage.local.get('settings', (data) => {
+        window.postMessage({ type: 'settings', value: data.settings }, '*');
     });
 });
 

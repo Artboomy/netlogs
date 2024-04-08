@@ -1,4 +1,4 @@
-import { ISettings, ISettingsSerialized } from '../controllers/settings/types';
+import { ISettings, ISettingsSerialized } from 'controllers/settings/types';
 import { useEffect, useState } from 'react';
 import instance from '../controllers/settings';
 

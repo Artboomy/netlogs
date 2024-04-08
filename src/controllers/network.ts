@@ -1,4 +1,4 @@
-import create, { PartialState } from 'zustand';
+import { create } from 'zustand';
 
 import NetworkItem from '../models/NetworkItem';
 import ContentOnlyItem from '../models/ContentOnlyItem';
@@ -64,7 +64,7 @@ class Network {
         network.onRequestFinished.addListener((request: NetworkRequest) => {
             const { list, isDynamic, mimeTypes } = useListStore.getState();
             if (isDynamic) {
-                const newState: PartialState<TStore, 'mimeTypes' | 'list'> = {
+                const newState: Pick<TStore, 'mimeTypes' | 'list'> = {
                     list: insertSorted(new NetworkItem({ request }), list),
                     mimeTypes
                 };

@@ -6,12 +6,12 @@ import {
 } from './settings/types';
 import { defaultSettings } from './settings/base';
 import storage from '../api/storage';
-import { isSandbox } from '../utils';
+import { isSandbox } from 'utils';
 import { defaultProfile } from './settings/profiles/default';
-import { NetworkRequest } from '../models/types';
+import { NetworkRequest } from 'models/types';
 import { isJsonRpc, jsonRpcProfile } from './settings/profiles/jsonRpc';
 import { graphqlProfile, isGraphql } from './settings/profiles/graphql';
-import { i18n } from '../translations/i18n';
+import { i18n } from 'translations/i18n';
 
 function deserializeFunctionRaw<T>(strFunction: string): T {
     return isSandbox() ? new Function(`return ${strFunction}`)() : strFunction;
@@ -20,7 +20,7 @@ function deserializeFunctionRaw<T>(strFunction: string): T {
 function deserializeMatcher(strFunction: string): ISettings['matcher'] {
     try {
         return deserializeFunctionRaw(strFunction);
-    } catch (e) {
+    } catch (_e) {
         return defaultSettings.matcher;
     }
 }
@@ -42,7 +42,7 @@ function deserializeFunctions(
     let deserializedFunctions;
     try {
         deserializedFunctions = deserializeFunctionsRaw(functions);
-    } catch (e) {
+    } catch (_e) {
         deserializedFunctions = defaultProfile.functions;
     }
     return { ...defaultProfile.functions, ...deserializedFunctions };
@@ -82,7 +82,7 @@ export function serialize(
 ): string {
     return JSON.stringify(
         settings,
-        (key, value: unknown) => {
+        (_key, value: unknown) => {
             if (typeof value === 'function') {
                 return value.toString();
             }
@@ -118,15 +118,15 @@ class Settings {
             ) => {
                 if (
                     areaName === 'local' &&
-                    changes.hasOwnProperty('settings') &&
+                    Object.prototype.hasOwnProperty.call(changes, 'settings') &&
                     changes.settings.newValue
                 ) {
                     this.settings = deserialize(changes.settings.newValue);
                     setLanguage(this.settings.language);
                     injectStaticProfiles(this.settings);
-                    this.listeners.forEach(
-                        (listener) => this.settings && listener(this.settings)
-                    );
+                    this.listeners.forEach((listener) => {
+                        this.settings && listener(this.settings);
+                    });
                 }
             }
         );
@@ -147,7 +147,7 @@ class Settings {
                             ...deserialize(settings)
                         };
                         setLanguage(this.settings.language);
-                    } catch (e) {
+                    } catch (_e) {
                         this.settings = defaultSettings;
                     }
                     injectStaticProfiles(this.settings);

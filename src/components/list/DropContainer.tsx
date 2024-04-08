@@ -5,10 +5,7 @@ import { NativeTypes } from 'react-dnd-html5-backend';
 import { isFileSupported, parseFile } from 'controllers/file';
 import { Har } from 'har-format';
 import NetworkItem from '../../models/NetworkItem';
-import cn from 'classnames';
-import { createUseStyles } from 'react-jss';
 import ContentOnlyItem from '../../models/ContentOnlyItem';
-import { ItemType } from 'models/types';
 import TransactionItem from '../../models/TransactionItem';
 import { toast } from 'react-toastify';
 import { callParentVoid } from 'utils';
@@ -16,42 +13,44 @@ import WebSocketItem from '../../models/WebSocketItem';
 import { i18n } from 'translations/i18n';
 import largeIcons from 'icons/largeIcons.svg';
 import { ICONS } from 'components/IconButton';
-import { Theme } from 'theme/types';
+import styled from '@emotion/styled';
+import { ItemType } from 'models/enums';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
-    dropZone: {
-        height: '100%',
-        width: '100%',
-        boxSizing: 'border-box',
-        overflow: 'auto'
-    },
-    overlay: {
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        position: 'fixed',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: '2em',
-        backdropFilter: 'blur(2px)'
-    },
-    icon: {
-        backgroundColor: theme.icon.normal,
-        width: '21px',
-        height: '24px',
-        scale: 3,
-        transform: 'translateY(-4px)',
-        '-webkit-mask-position': ICONS.drop as `${number}px ${number}px`,
-        '-webkit-mask-image': `url(${largeIcons})`
-    }
+const DropZone = styled.div({
+    height: '100%',
+    width: '100%',
+    boxSizing: 'border-box',
+    overflow: 'auto'
+});
+
+const Overlay = styled.div({
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    position: 'fixed',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '2em',
+    backdropFilter: 'blur(2px)'
+});
+
+const Icon = styled.div(({ theme }) => ({
+    backgroundColor: theme.icon.normal,
+    width: '21px',
+    height: '24px',
+    scale: 3,
+    transform: 'translateY(-4px)',
+    '-webkit-mask-position': ICONS.drop as `${number}px ${number}px`,
+    '-webkit-mask-image': `url(js/${largeIcons})`
 }));
 
-export const DropContainer: FC = ({ children }) => {
-    const styles = useStyles();
+export const DropContainer: FC<{ children?: React.ReactNode }> = ({
+    children
+}) => {
     const { setList } = useListStore.getState();
     const [{ canDrop, isOver }, dropRef] = useDrop(
         () => ({
@@ -59,22 +58,22 @@ export const DropContainer: FC = ({ children }) => {
             async drop(item: { files: File[] }) {
                 const file = item.files[0];
                 if (!isFileSupported(file.name)) {
-                    toast.error(i18n.t('onlyJSONSupported'));
+                    toast.error(i18n.t<string>('onlyJSONSupported'));
                 }
                 let log: Har | null = null;
-                const toastId = toast(i18n.t('loadingFile'));
+                const toastId = toast(i18n.t<string>('loadingFile'));
                 try {
                     log = await parseFile<Har>(file);
                     toast.dismiss(toastId);
-                } catch (e) {
+                } catch (_e) {
                     toast.dismiss(toastId);
-                    toast.error(i18n.t('errorParsingFile'));
+                    toast.error(i18n.t<string>('errorParsingFile'));
                 }
                 if (!log) {
                     return;
                 }
                 if (!log?.log?.entries) {
-                    toast.error(i18n.t('invalidHAR'));
+                    toast.error(i18n.t<string>('invalidHAR'));
                     return;
                 }
                 try {
@@ -83,7 +82,7 @@ export const DropContainer: FC = ({ children }) => {
                             new ContentOnlyItem({
                                 timestamp: new Date().getTime(),
                                 tag: 'NET LOGS',
-                                content: i18n.t('fileOpened', {
+                                content: i18n.t<string>('fileOpened', {
                                     name: file.name
                                 })
                             }),
@@ -113,7 +112,7 @@ export const DropContainer: FC = ({ children }) => {
                     );
                 } catch (e) {
                     console.log('Error occurred:', e);
-                    toast.error(i18n.t('invalidHAR'));
+                    toast.error(i18n.t<string>('invalidHAR'));
                 }
             },
             collect: (monitor) => ({
@@ -124,18 +123,14 @@ export const DropContainer: FC = ({ children }) => {
         []
     );
     return (
-        <div
-            ref={dropRef}
-            className={cn({
-                [styles.dropZone]: true
-            })}>
+        <DropZone ref={dropRef}>
             {children}
             {canDrop && isOver && (
-                <div className={styles.overlay}>
-                    <div className={styles.icon} />
-                    {i18n.t('drop')}
-                </div>
+                <Overlay>
+                    <Icon />
+                    {i18n.t<string>('drop')}
+                </Overlay>
             )}
-        </div>
+        </DropZone>
     );
 };

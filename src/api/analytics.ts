@@ -1,6 +1,8 @@
+import { isExtension } from 'utils';
+import secrets from '../secrets.json';
+
 const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 const GA_DEBUG_ENDPOINT = 'https://www.google-analytics.com/debug/mp/collect';
-import secrets from '../secrets.json';
 // File taken from https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/tutorial.google-analytics/scripts/google-analytics.js
 // Get via https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag#recommended_parameters_for_reports
 const MEASUREMENT_ID = secrets.measurement_id;
@@ -33,7 +35,7 @@ class Analytics {
                 await chrome.storage.local.set({ firstTime: false });
                 this.fireEvent('first_open');
             }
-        } catch (e) {
+        } catch (_e) {
             // pass
         }
     }
@@ -157,4 +159,7 @@ class Analytics {
     }
 }
 
-export default new Analytics(false, process.env.NODE_ENV === 'development'); //process.env.NODE_ENV === 'development');
+export default new Analytics(
+    false,
+    import.meta.env.MODE === 'development' || !isExtension()
+); //process.env.NODE_ENV === 'development');

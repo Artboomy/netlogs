@@ -90,7 +90,7 @@ class SandboxStorage {
 const currentStorage = isSandbox()
     ? new SandboxStorage()
     : window.chrome?.storage
-    ? window.chrome?.storage
-    : InMemoryStorage;
+      ? window.chrome?.storage
+      : InMemoryStorage;
 
 export default currentStorage;

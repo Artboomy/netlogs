@@ -2,9 +2,11 @@ import { ModalContext } from './Context';
 import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import { Modal } from '../Modal';
 
-export const ModalContainer: FC = ({ children }) => {
+export const ModalContainer: FC<{ children?: React.ReactNode }> = ({
+    children
+}) => {
     const [value, setValue] = useState<ReactNode>(null);
-    const listener = useCallback((event) => {
+    const listener = useCallback((event: { key: string }) => {
         if (event.key === 'Escape') {
             setValue(null);
         }

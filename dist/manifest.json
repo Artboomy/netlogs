@@ -1,6 +1,6 @@
 {
     "name": "Net logs",
-    "version": "1.7.0",
+    "version": "2.0.0",
     "default_locale": "en",
     "manifest_version": 3,
     "minimum_chrome_version": "88",
@@ -18,7 +18,7 @@
         "debugger"
     ],
     "background": {
-      "service_worker": "js/background.js",
+      "service_worker": "js/background.mjs",
       "type": "module"
     },
     "sandbox": {
@@ -35,14 +35,14 @@
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["js/content.js"],
+            "js": ["js/content.mjs"],
             "run_at": "document_idle"
         }
     ],
     "web_accessible_resources": [
         {
           "resources": [
-            "js/inject.js"
+            "js/inject.mjs"
           ],
           "matches": [
             "*://*/*"

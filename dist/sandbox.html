@@ -5,12 +5,13 @@
   <meta
     http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'unsafe-inline'; img-src 'self' data:; media-src 'self' data:;">
+    <link rel="stylesheet" href="js/react-vendors.css">
 </head>
 <body>
-<div id="root"></div>
-<div id="modal"></div>
-<script src="js/react-vendors.js"></script>
-<script src="js/settings.js"></script>
-<script src="js/sandbox.js"></script>
+  <div id="root"></div>
+  <div id="modal"></div>
+  <script type="module" src="js/react-vendors.mjs"></script>
+  <script type="module" src="js/settings.mjs"></script>
+  <script type="module" src="js/sandbox.mjs"></script>
 </body>
 </html>

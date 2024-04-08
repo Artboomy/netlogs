@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { callParentVoid } from '../utils';
+import { callParentVoid } from 'utils';
 
 type LinkProps = {
     text: string;

@@ -2,18 +2,22 @@
     "compilerOptions": {
         "sourceMap": true,
         "target": "es6",
-        "module": "commonjs",
-        "jsx": "react",
+        "module": "es2022",
+        "jsx": "react-jsx",
+        "jsxImportSource": "@emotion/react",
         "strict": true,
+        "incremental": true,
+        "moduleResolution": "Node",
+        "tsBuildInfoFile": ".cache/tsbuildinfo",
         "noImplicitReturns": true,
         "noImplicitAny": true,
         "noEmitOnError": true,
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
-        "suppressImplicitAnyIndexErrors": true,
         "baseUrl": "src"
     },
     "include": ["src/**/*"],
+    "references": [{ "path": "./tsconfig.node.json" }],
     "exclude": ["node_modules"]
 }

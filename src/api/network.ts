@@ -46,7 +46,7 @@ class SandboxNetwork {
 
     onRequestFinished = {
         addListener(
-            callback: typeof SandboxNetwork['_requestHandlers'][number]
+            callback: (typeof SandboxNetwork)['_requestHandlers'][number]
         ) {
             SandboxNetwork._requestHandlers.push(callback);
         }
@@ -61,5 +61,5 @@ class SandboxNetwork {
 export default isSandbox()
     ? new SandboxNetwork()
     : window.chrome?.devtools
-    ? window.chrome.devtools.network
-    : NetworkStub;
+      ? window.chrome.devtools.network
+      : NetworkStub;

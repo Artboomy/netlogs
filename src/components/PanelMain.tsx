@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import { Header } from './Header';
-import { createUseStyles } from 'react-jss';
 import { ModalContainer } from './modal/Container';
 import { ListContainer } from './list/Container';
 import { SearchContext } from 'react-inspector';
@@ -17,9 +16,23 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { callParent, callParentVoid, subscribeParent } from 'utils';
 import { Theme } from 'theme/types';
 import { useSettings } from 'hooks/useSettings';
+import styled from '@emotion/styled';
+import { Global, useTheme } from '@emotion/react';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
-    '@global': {
+const Container = styled.div({
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'auto'
+});
+
+const StyledHeader = styled(Header)({
+    position: 'sticky',
+    top: 0
+});
+
+const getGlobalStyles = (theme: Theme) =>
+    ({
         html: {
             height: '100%',
             backgroundColor: theme.mainBg,
@@ -60,21 +73,11 @@ const useStyles = createUseStyles<Theme>((theme) => ({
             padding: '2px 4px',
             whiteSpace: 'nowrap'
         }
-    },
-    root: {
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'auto'
-    },
-    header: {
-        position: 'sticky',
-        top: 0
-    }
-}));
+    }) as const;
+
 export const PanelMain: React.FC = () => {
-    const styles = useStyles();
     const [{ language }] = useSettings();
+    const theme = useTheme();
     const [searchValue, setSearchValue] = useState('');
     const [hideUnrelated, setHideUnrelated] = useState(true);
     const [caseSensitive, setCaseSensitive] = useState(false);
@@ -86,15 +89,7 @@ export const PanelMain: React.FC = () => {
     useHotkey('toggleHideUnrelated', () => setHideUnrelated(!hideUnrelated), [
         hideUnrelated
     ]);
-    /*const useOnce = useRef(true);
-    useEffect(() => {
-        if (useOnce.current) {
-            useOnce.current = false;
-            return;
-        }
-        toast.info(i18n.t('langChange'));
-    }, [language]);
-*/
+    const globalStyles = useMemo(() => getGlobalStyles(theme), [theme]);
     useEffect(() => {
         callParent('analytics.init').then((isDefault) => {
             if (isDefault !== 'true') {
@@ -116,16 +111,16 @@ export const PanelMain: React.FC = () => {
     }, []);
     return (
         <DndProvider backend={HTML5Backend} key={language}>
+            <Global styles={globalStyles} />
             <ModalContainer>
-                <div className={styles.root}>
+                <Container>
                     <SearchContext.Provider
                         value={{
                             value: debSearchValue,
                             hideUnrelated,
                             caseSensitive
                         }}>
-                        <Header
-                            className={styles.header}
+                        <StyledHeader
                             searchValue={searchValue}
                             hideUnrelated={hideUnrelated}
                             onSearchChange={setSearchValue}
@@ -146,7 +141,7 @@ export const PanelMain: React.FC = () => {
                         </FilterContext.Provider>
                     </SearchContext.Provider>
                     <ToastContainer />
-                </div>
+                </Container>
             </ModalContainer>
         </DndProvider>
     );

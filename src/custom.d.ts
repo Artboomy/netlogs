@@ -3,3 +3,6 @@ declare module '*.svg' {
     const content: any;
     export default content;
 }
+
+// else import.meta.env is undefined
+import 'vite/client';

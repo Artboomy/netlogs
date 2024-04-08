@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { useSettings } from '../../hooks/useSettings';
 import { Tag } from '../Tag';
-import { ItemType } from '../../models/types';
 import { i18n } from 'translations/i18n';
+import { ItemType } from 'models/enums';
 
 export const HiddenTagList: FC = () => {
     const [settings] = useSettings();

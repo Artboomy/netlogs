@@ -7,36 +7,37 @@ import React, {
 } from 'react';
 import ContentOnlyItem from '../models/ContentOnlyItem';
 import { TransactionItemAbstract } from 'models/TransactionItem';
-import { createUseStyles } from 'react-jss';
 import { google } from 'base16';
 import { Tag } from './Tag';
 import { PropTree } from './PropTree';
 import { ModalContext } from './modal/Context';
-import cn from 'classnames';
 import { ContentOnly } from './row/ContentOnly';
 import { Transaction } from './row/Transaction';
 import { mediaQuerySmallOnly } from 'utils';
-import { Theme } from 'theme/types';
+import styled from '@emotion/styled';
+import { useTheme } from '@emotion/react';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
-    date: {
-        color: theme.dateColor,
-        fontSize: '12px',
-        padding: '4px 4px 4px 8px',
-        whiteSpace: 'nowrap'
-    },
-    dateContentOnly: {
+const Date = styled.div<{
+    clickable: boolean;
+    contentOnly: boolean;
+    oddRow: boolean;
+}>(({ theme, clickable, contentOnly, oddRow }) => ({
+    color: theme.dateColor,
+    fontSize: '12px',
+    padding: '4px 4px 4px 8px',
+    whiteSpace: 'nowrap',
+    ...(clickable && {
+        cursor: 'pointer',
+        textDecoration: 'underline'
+    }),
+    ...(contentOnly && {
         [mediaQuerySmallOnly]: {
             gridColumn: '1/3'
         }
-    },
-    dateClickable: {
-        cursor: 'pointer',
-        textDecoration: 'underline'
-    },
-    oddRow: {
+    }),
+    ...(oddRow && {
         backgroundColor: theme.oddRowBg
-    }
+    })
 }));
 
 interface IRowProps {
@@ -53,8 +54,8 @@ interface IRowProps {
 }*/
 
 export const Row: React.FC<IRowProps> = memo(({ item, idx }) => {
-    const styles = useStyles();
     const { setValue } = useContext(ModalContext);
+    const theme = useTheme();
     const tag = item.getTag();
     const meta = item.getMeta();
     const shouldClean = useRef(false);
@@ -75,17 +76,15 @@ export const Row: React.FC<IRowProps> = memo(({ item, idx }) => {
         };
     }, []);
     const commonProps = {
-        className: idx % 2 ? styles.oddRow : '',
+        css: idx % 2 ? { backgroundColor: theme.oddRowBg } : {},
         date: (
-            <div
-                className={cn(styles.date, {
-                    [styles.dateClickable]: !!meta,
-                    [styles.dateContentOnly]: item instanceof ContentOnlyItem,
-                    [styles.oddRow]: idx % 2
-                })}
+            <Date
+                clickable={!!meta}
+                contentOnly={item instanceof ContentOnlyItem}
+                oddRow={Boolean(idx % 2)}
                 onClick={handleClick}>
                 {item.getDuration().toFixed(2)} ms
-            </div>
+            </Date>
         ),
         tag: tag ? (
             <Tag

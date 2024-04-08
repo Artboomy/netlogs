@@ -27,7 +27,7 @@ export const defaultProfile: IProfile = {
                 if (postData.text) {
                     try {
                         params = JSON.parse(postData.text);
-                    } catch (e) {
+                    } catch (_e) {
                         params = {
                             text: postData.text
                         };
@@ -36,7 +36,7 @@ export const defaultProfile: IProfile = {
                     params = {};
                 }
             } else {
-                const internalParams = {};
+                const internalParams: Record<string, string> = {};
                 const url = new URL(request.request.url);
                 for (const [key, value] of url.searchParams) {
                     internalParams[key] = value;
@@ -79,9 +79,9 @@ export const defaultProfile: IProfile = {
                 },
                 Timings: {
                     title: 'Timings',
-                    items: Object.entries(
-                        request.timings
-                    ).map(([key, value]) => ({ name: key, value }))
+                    items: Object.entries(request.timings).map(
+                        ([key, value]) => ({ name: key, value })
+                    )
                 }
             };
         },
@@ -108,15 +108,13 @@ export const defaultProfile: IProfile = {
             // always use `content` arg
             // if you want IMAGE preview to work, do NOT edit this
             const { mimeType } = request.response.content;
-            let convertedContent:
-                | Record<string, unknown>
-                | string
-                | undefined = content;
+            let convertedContent: Record<string, unknown> | string | undefined =
+                content;
             if (mimeType.includes('json')) {
                 if (content) {
                     try {
                         convertedContent = JSON.parse(content);
-                    } catch (e) {
+                    } catch (_e) {
                         // this may indicate a problem with json structure
                         // or bad mimeType
                         // logging this may flood the console, so no console.error in default profile

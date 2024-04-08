@@ -103,12 +103,13 @@ export function isSandbox(): boolean {
 export const nameTrimmer = (value: string, limit = 100): string =>
     value.length > limit ? value.slice(0, limit) + '…' : value;
 
-export const createSearchMarker = (searchValue: string) => (
-    k: unknown,
-    v: unknown
-): boolean => {
-    return String(k).includes(searchValue) || String(v).includes(searchValue);
-};
+export const createSearchMarker =
+    (searchValue: string) =>
+    (k: unknown, v: unknown): boolean => {
+        return (
+            String(k).includes(searchValue) || String(v).includes(searchValue)
+        );
+    };
 
 export const insertSorted = (
     item: ItemList[number] | undefined,

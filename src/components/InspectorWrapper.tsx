@@ -100,7 +100,7 @@ function recursiveTextToObject<T extends RawType>(
     if (typeof data === 'string' && isSerializedObject(data)) {
         try {
             return JSON.parse(data);
-        } catch (e) {
+        } catch (_e) {
             // console.log('Error parsing JSON', e, data);
             return data;
         }
@@ -116,7 +116,9 @@ function recursiveTextToObject<T extends RawType>(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
         const result: any = Array.isArray(data) ? [] : {};
         for (const key in data) {
-            if (data.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+                // eslint-disable-next-line
+                // @ts-ignore
                 result[key] = recursiveTextToObject(data[key]);
             }
         }

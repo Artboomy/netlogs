@@ -1,49 +1,53 @@
 import React, { FC } from 'react';
-import { createUseStyles } from 'react-jss';
 import largeIcons from '../icons/largeIcons.svg';
-import cn from 'classnames';
 import { google } from 'base16';
-import { Theme } from 'theme/types';
+import styled from '@emotion/styled';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
-    button: {
+const Button = styled.button<{ activeText: boolean }>(
+    ({ theme, activeText }) => ({
         appearance: 'none',
         padding: '0',
         background: 'transparent',
         border: 'none',
         cursor: 'pointer',
         fontWeight: 'bold',
-        color: theme.icon.normal
-    },
-    icon: {
-        backgroundColor: theme.icon.normal,
-        '-webkit-mask-position': ({ icon }) => icon,
-        '-webkit-mask-image': `url(${largeIcons})`,
+        ...(activeText
+            ? {
+                  color: theme.accent,
+                  '&:hover': {
+                      color: theme.accent
+                  }
+              }
+            : { color: theme.icon.normal })
+    })
+);
+
+const Icon = styled.div<{ icon: string; variant: '' | 'active' | 'red' }>(
+    ({ theme, icon, variant }) => ({
+        '-webkit-mask-position': icon,
+        '-webkit-mask-image': `url(js/${largeIcons})`,
         width: '21px',
         height: '24px',
-        '&:hover': {
-            backgroundColor: theme.icon.hover
-        }
-    },
-    active: {
-        backgroundColor: theme.accent,
-        '&:hover': {
-            backgroundColor: theme.accent
-        }
-    },
-    activeRed: {
-        backgroundColor: google.base08,
-        '&:hover': {
-            backgroundColor: google.base08
-        }
-    },
-    activeText: {
-        color: theme.accent,
-        '&:hover': {
-            color: theme.accent
-        }
-    }
-}));
+        ...(!variant && {
+            backgroundColor: theme.icon.normal,
+            '&:hover': {
+                backgroundColor: theme.icon.hover
+            }
+        }),
+        ...(variant === 'active' && {
+            backgroundColor: theme.accent,
+            '&:hover': {
+                backgroundColor: theme.accent
+            }
+        }),
+        ...(variant === 'red' && {
+            backgroundColor: google.base08,
+            '&:hover': {
+                backgroundColor: google.base08
+            }
+        })
+    })
+);
 
 export type IconButtonProps = {
     className?: string;
@@ -51,6 +55,7 @@ export type IconButtonProps = {
     onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     title: string;
     active?: boolean;
+    children?: React.ReactNode;
 };
 
 export const IconButton: FC<IconButtonProps> = ({
@@ -61,24 +66,22 @@ export const IconButton: FC<IconButtonProps> = ({
     active,
     children
 }) => {
-    const styles = useStyles({ icon: icon });
+    console.log('icon button');
+    let variant: '' | 'active' | 'red' = '';
+    if (active && icon !== ICONS.debugOn) {
+        variant = 'active';
+    } else if (icon === ICONS.debugOn) {
+        variant = 'red';
+    }
     return (
-        <button
-            className={cn(styles.button, className, {
-                [styles.activeText]: active
-            })}
+        <Button
+            activeText={!!active}
+            className={className}
             onClick={onClick}
             title={title}>
-            {icon ? (
-                <div
-                    className={cn(styles.icon, {
-                        [styles.active]: active && icon !== ICONS.debugOn,
-                        [styles.activeRed]: icon === ICONS.debugOn
-                    })}
-                />
-            ) : null}
+            {icon ? <Icon variant={variant} icon={icon} /> : null}
             {children}
-        </button>
+        </Button>
     );
 };
 

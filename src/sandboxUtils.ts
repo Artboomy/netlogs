@@ -65,7 +65,10 @@ export async function wrapSandbox(): Promise<void> {
                             ) => {
                                 if (
                                     areaName === 'local' &&
-                                    changes.hasOwnProperty('settings') &&
+                                    Object.prototype.hasOwnProperty.call(
+                                        changes,
+                                        'settings'
+                                    ) &&
                                     changes.settings.newValue
                                 ) {
                                     postSandbox(
@@ -136,19 +139,19 @@ export async function wrapSandbox(): Promise<void> {
                         });
                         break;
                     case 'debugger.attach':
-                        portToBackground.postMessage({
+                        portToBackground?.postMessage({
                             type: 'debugger.attach'
                         });
                         analytics.fireEvent('debugger.attach');
                         break;
                     case 'debugger.detach':
-                        portToBackground.postMessage({
+                        portToBackground?.postMessage({
                             type: 'debugger.detach'
                         });
                         analytics.fireEvent('debugger.detach');
                         break;
                     case 'debugger.getStatus':
-                        portToBackground.postMessage({
+                        portToBackground?.postMessage({
                             type: 'debugger.getStatus'
                         });
                         break;
@@ -237,6 +240,9 @@ function analyticsError(data: string) {
 }
 
 async function analyticsInit(id: string, type: EventName) {
+    if (!isExtension()) {
+        return;
+    }
     // determine if settings matcher is equal to default settings matcher
     const settings = await chrome.storage.local
         .get({

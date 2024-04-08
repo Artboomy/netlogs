@@ -6,13 +6,13 @@ import { Entry } from 'har-format';
 import {
     IContentItem,
     IItemNetworkCfg,
-    ItemType,
     NetworkRequest,
     SearchConfig
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { isVisible } from 'react-inspector';
 import { isMimeType } from '../components/InspectorWrapper';
+import { ItemType } from 'models/enums';
 
 function injectMimeType<T>(obj: T, mimeType: string): void {
     Object.defineProperty(obj, '__mimeType', {
@@ -24,7 +24,8 @@ function injectMimeType<T>(obj: T, mimeType: string): void {
 
 type TContent = Record<string, unknown>;
 export default class NetworkItem
-    implements TransactionItemAbstract, IContentItem<TContent> {
+    implements TransactionItemAbstract, IContentItem<TContent>
+{
     public id = '';
     private readonly _request: NetworkRequest;
     public readonly type: ItemType = ItemType.Transaction;

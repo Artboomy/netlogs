@@ -1,31 +1,28 @@
 import React, { FC, memo, useCallback, useMemo, useState } from 'react';
-import { createUseStyles } from 'react-jss';
 import { useListStore } from 'controllers/network';
 import { MultiSelect } from 'react-multi-select-component';
 import isEqual from 'lodash.isequal';
 import settings from '../controllers/settings';
 import { callParentVoid } from 'utils';
-import { Theme } from 'theme/types';
 import { useSettings } from 'hooks/useSettings';
 import { i18n } from 'translations/i18n';
+import styled from '@emotion/styled';
 
-const useStyles = createUseStyles<Theme>((theme) => ({
-    root: {
-        marginLeft: 'auto',
-        '--rmsc-h': '24px!important',
-        fontSize: '10px',
-        '--rmsc-p': '4px',
-        width: '160px',
-        '& .item-renderer': {
-            alignItems: 'center!important',
-            lineHeight: '10px'
-        },
-        '--rmsc-bg': theme.mainBg,
-        '--rmsc-main': theme.mainFont,
-        '--rmsc-border': theme.borderColor,
-        '--rmsc-selected': theme.oddRowBg,
-        '--rmsc-hover': theme.icon.hover
-    }
+const MultiSelectStyled = styled(MultiSelect)(({ theme }) => ({
+    marginLeft: 'auto',
+    '--rmsc-h': '24px!important',
+    fontSize: '10px',
+    '--rmsc-p': '4px',
+    width: '160px',
+    '& .item-renderer': {
+        alignItems: 'center!important',
+        lineHeight: '10px'
+    },
+    '--rmsc-bg': theme.mainBg,
+    '--rmsc-main': theme.mainFont,
+    '--rmsc-border': theme.borderColor,
+    '--rmsc-selected': theme.oddRowBg,
+    '--rmsc-hover': theme.icon.hover
 }));
 
 const useHiddenMimeTypes = () => {
@@ -33,7 +30,7 @@ const useHiddenMimeTypes = () => {
         () => new Set(settings.get().hiddenMimeTypes)
     );
 
-    const setHiddenToStore = useCallback(async (newArray) => {
+    const setHiddenToStore = useCallback(async (newArray: string[]) => {
         settings.set({ ...settings.get(), hiddenMimeTypes: newArray });
         setHidden(new Set(newArray));
     }, []);
@@ -41,7 +38,6 @@ const useHiddenMimeTypes = () => {
 };
 
 export const MimetypeSelect: FC = memo(() => {
-    const styles = useStyles();
     const [{ language }] = useSettings();
     const mimeTypes = useListStore((state) => state.mimeTypes, isEqual);
     const sortedMimeTypes = Array.from(mimeTypes).sort();
@@ -78,8 +74,7 @@ export const MimetypeSelect: FC = memo(() => {
         callParentVoid('analytics.mimeFilterChange');
     };
     return (
-        <MultiSelect
-            className={styles.root}
+        <MultiSelectStyled
             options={options}
             value={selectedTypes}
             labelledBy='Mimetype'
