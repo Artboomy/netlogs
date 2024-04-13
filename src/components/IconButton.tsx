@@ -66,7 +66,6 @@ export const IconButton: FC<IconButtonProps> = ({
     active,
     children
 }) => {
-    console.log('icon button');
     let variant: '' | 'active' | 'red' = '';
     if (active && icon !== ICONS.debugOn) {
         variant = 'active';

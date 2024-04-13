@@ -29,7 +29,8 @@ const Key = styled.span(({ theme }) => ({
 const Value = styled.span<{ type: 'number' | 'string' | '' }>(
     ({ theme, type }) => ({
         ...(type === 'number' && { color: theme.valueNumber }),
-        ...(type === 'string' && { color: theme.valueString })
+        ...(type === 'string' && { color: theme.valueString }),
+        whiteSpace: 'pre-wrap'
     })
 );
 

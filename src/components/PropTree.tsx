@@ -2,6 +2,7 @@ import React, { FC, useEffect, useRef } from 'react';
 import { Section, TSection } from './Section';
 import { callParentVoid } from 'utils';
 import styled from '@emotion/styled';
+import ErrorBoundary from 'components/ErrorBoundary';
 
 export type PropTreeProps = {
     data: {
@@ -27,9 +28,11 @@ export const PropTree: FC<PropTreeProps> = ({ data }) => {
     }, []);
     return (
         <Container>
-            {Object.entries(data).map(([key, sectionData]) => (
-                <Section key={key} {...sectionData} />
-            ))}
+            <ErrorBoundary>
+                {Object.entries(data).map(([key, sectionData]) => (
+                    <Section key={key} {...sectionData} />
+                ))}
+            </ErrorBoundary>
         </Container>
     );
 };

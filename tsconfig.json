@@ -4,6 +4,7 @@
         "target": "es6",
         "module": "es2022",
         "jsx": "react-jsx",
+        "lib": ["es2022", "dom"],
         "jsxImportSource": "@emotion/react",
         "strict": true,
         "incremental": true,

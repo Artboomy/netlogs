@@ -46,7 +46,7 @@ export interface IItemWebSocketCfg {
             title: 'Response';
             items: Array<{ name: string; value: string }>;
         };
-    };
+    } | null;
     params: string;
     result: string;
 }
