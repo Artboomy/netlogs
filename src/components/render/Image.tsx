@@ -20,7 +20,7 @@ const ImagePreview = styled.img({
     height: '24px',
     overflow: 'hidden',
     position: 'absolute',
-    top: '4px',
+    top: '2px',
     border: '2px dotted #ccc',
     boxSizing: 'border-box',
     cursor: 'pointer'

@@ -57,7 +57,7 @@ export const phoenixLiveViewProfile: IProfileWebSocket = {
         },
         getTag(_request, name?: string): string {
             if (name === 'phoenix.heartbeat') {
-                return 'LV♥';
+                return 'LV ♥';
             }
             return 'LV';
         },
