@@ -3,10 +3,10 @@ import { useListStore } from 'controllers/network';
 import { Tag } from './Tag';
 import { google } from 'base16';
 import { useSettings } from 'hooks/useSettings';
-import shallow from 'zustand/shallow';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
 import { ItemType } from 'models/enums';
+import { useShallow } from 'zustand/react/shallow';
 
 const Container = styled.div({
     display: 'flex',
@@ -21,7 +21,7 @@ const Button = styled.button({
 });
 
 export const TagList: FC = () => {
-    const list = useListStore((state) => state.list, shallow);
+    const list = useListStore(useShallow((state) => state.list));
     const [settings, setSettings] = useSettings();
     const hiddenTags = { ...settings.hiddenTags };
     const tags: Record<

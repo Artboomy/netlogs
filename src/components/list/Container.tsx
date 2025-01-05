@@ -10,12 +10,12 @@ import { useListStore } from 'controllers/network';
 import { List } from '../List';
 import { SearchContext, useSearchParams } from 'react-inspector';
 import { FilterContext } from 'context/FilterContext';
-import shallow from 'zustand/shallow';
 import { useSettings } from 'hooks/useSettings';
+import { useShallow } from 'zustand/react/shallow';
 
 export const ListContainer: FC = () => {
     const [settings] = useSettings();
-    const list = useListStore((state) => state.list, shallow);
+    const list = useListStore(useShallow((state) => state.list));
     const [visibleList, setVisibleList] = useState(list);
     const { value: searchValue } = useContext(SearchContext);
     const filterValue = useContext(FilterContext);

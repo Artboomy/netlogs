@@ -1,6 +1,6 @@
 {
     "name": "netlogs",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "Web extension for custom network logs representation",
     "main": "index.js",
     "author": "artboomy",
@@ -32,7 +32,7 @@
         "jszip": "^3.10.1",
         "lodash.clonedeep": "4.5.0",
         "lodash.isequal": "4.5.0",
-        "nanoid": "5.0.6",
+        "nanoid": "5.0.9",
         "react": "^18.2.0",
         "react-dnd": "^16.0.1",
         "react-dnd-html5-backend": "^16.0.1",

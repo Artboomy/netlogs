@@ -2,7 +2,7 @@ import React, { FC, useRef, useState } from 'react';
 import { useListStore } from 'controllers/network';
 import runtime from '../api/runtime';
 import { Har } from 'har-format';
-import { callParent, isExtension } from 'utils';
+import { callParent, isExtension, isMacOs } from 'utils';
 import { IconButton, ICONS } from './IconButton';
 import { useHotkey } from 'hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
@@ -115,13 +115,14 @@ export const Header: FC<IProps> = ({
             isUnpack: !prev.isUnpack
         }));
     };
+    const modifierKey = isMacOs() ? '⌘' : 'Ctrl';
     return (
         <Root className={className}>
             <Row>
                 <IconButton
                     icon={ICONS.clear}
                     onClick={clear}
-                    title={`${i18n.t('clear')} [Ctrl+L]`}
+                    title={`${i18n.t('clear')} [${modifierKey}+L]`}
                 />
                 {isExtension() && <DebuggerButton />}
                 <IconButton
@@ -147,7 +148,7 @@ export const Header: FC<IProps> = ({
                     type='search'
                     placeholder={i18n.t('searchHelp')}
                     value={searchValue}
-                    title={`${i18n.t('search')} [Ctrl+F]`}
+                    title={`${i18n.t('search')} [${modifierKey}+F]`}
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
                 {searchValue && (
@@ -158,7 +159,7 @@ export const Header: FC<IProps> = ({
                             onChange={(e) =>
                                 onHideUnrelatedChange(e.target.checked)
                             }
-                            title={`${i18n.t('toggleUnrelated')} [Ctrl+U]`}
+                            title={`${i18n.t('toggleUnrelated')} [${modifierKey}+U]`}
                         />
                         Hide unrelated
                     </HideUnrelated>

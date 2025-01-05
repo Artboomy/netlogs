@@ -27,7 +27,7 @@ export default class WebSocketItem
     private _isError: boolean;
     private _params: IItemTransactionCfg['params'] = {};
     private _tag = '';
-    private readonly _meta: IItemWebSocketCfg['meta'];
+    private _meta: IItemWebSocketCfg['meta'];
     private readonly _duration: number = 0;
 
     constructor(cfg: IItemWebSocketCfg) {
@@ -54,6 +54,9 @@ export default class WebSocketItem
                 this._request.result
             );
             this._isError = phoenixLiveViewProfile.functions.isError(
+                this._request
+            );
+            this._meta = phoenixLiveViewProfile.functions.getMeta(
                 this._request
             );
         } else {
@@ -101,6 +104,16 @@ export default class WebSocketItem
                     this._result = { raw: this._request.result };
                 }
             }
+            this._meta = {
+                request: {
+                    title: 'Request',
+                    items: [{ name: 'RAW', value: this._request.params }]
+                },
+                response: {
+                    title: 'Response',
+                    items: [{ name: 'RAW', value: this._request.result }]
+                }
+            };
         }
     }
 

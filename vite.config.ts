@@ -7,12 +7,11 @@ import { resolve } from 'node:url';
 
 const plugins = [circleDependency(), tsconfigPaths(), react()];
 if (process.env.ANALYZE) {
-    console.log('visualizer', visualizer);
     plugins.push(
         visualizer({
             template: process.env
                 .ANALYZE as PluginVisualizerOptions['template'],
-            filename: `stats-${process.env.ANALYZE}.html`
+            filename: `stats/${process.env.ANALYZE}.html`
         })
     );
 }
