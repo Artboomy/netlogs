@@ -7,7 +7,7 @@ import Inspector, {
 import { Image } from './render/Image';
 import { useListStore } from 'controllers/network';
 import { Webm } from './render/Webm';
-import { isSerializedObject } from 'utils';
+import { isSerializedFormData, isSerializedObject } from 'utils';
 import { AudioPreview } from './render/AudioPreview';
 import { useSettings } from 'hooks/useSettings';
 
@@ -93,15 +93,52 @@ export interface InspectorWrapperProps {
     tagName?: string;
 }
 
+function parseRawFormData(rawData: string): Record<string, string> {
+    const result: Record<string, string> = {};
+
+    // Split the raw data into parts using the boundary
+    const firstLine = rawData.split('\n')[0];
+    const boundary = firstLine.trim();
+    const parts = rawData
+        .split(boundary)
+        .filter((part) => part.trim().length > 0);
+
+    parts.forEach((part) => {
+        if (part.includes('--\r\n') || part === '--') {
+            return;
+        }
+        const [headersRaw, ...contentParts] = part.split('\r\n\r\n');
+        if (!headersRaw || contentParts.length === 0) {
+            return;
+        }
+        const nameMatch = headersRaw.match(/name="([^"]+)"/);
+        if (!nameMatch) {
+            return;
+        }
+
+        const name = nameMatch[1];
+        result[name] = contentParts.join('\r\n\r\n').replace(/\r\n$/, '');
+    });
+
+    return result;
+}
+
 function recursiveTextToObject<T extends RawType>(
     data: T | unknown
 ): T | unknown {
     // If data is a string and is a serialized object, parse and return it
-    if (typeof data === 'string' && isSerializedObject(data)) {
+    if (
+        typeof data === 'string' &&
+        (isSerializedObject(data) || isSerializedFormData(data))
+    ) {
         try {
-            return JSON.parse(data);
+            if (isSerializedFormData('WebKitFormBoundary')) {
+                return parseRawFormData(data);
+            } else {
+                return JSON.parse(data);
+            }
         } catch (_e) {
-            // console.log('Error parsing JSON', e, data);
+            // console.log('Error parsing JSON', _e, data);
             return data;
         }
     }

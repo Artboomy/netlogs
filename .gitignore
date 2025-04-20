@@ -9,3 +9,4 @@ src/secrets.json
 stats-*.html
 .cache
 stats
+img/noncommit

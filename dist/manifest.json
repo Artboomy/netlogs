@@ -1,6 +1,6 @@
 {
     "name": "Net logs",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "default_locale": "en",
     "manifest_version": 3,
     "minimum_chrome_version": "88",
@@ -18,8 +18,8 @@
         "debugger"
     ],
     "background": {
-      "service_worker": "js/background.mjs",
-      "type": "module"
+        "service_worker": "js/background.mjs",
+        "type": "module"
     },
     "sandbox": {
         "pages": [
@@ -28,26 +28,29 @@
         ]
     },
     "options_ui": {
-      "page": "options.html",
-      "open_in_tab": true
+        "page": "options.html",
+        "open_in_tab": true
     },
     "homepage_url": "https://github.com/Artboomy/netlogs",
     "content_scripts": [
         {
-            "matches": ["<all_urls>"],
-            "js": ["js/content.mjs"],
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/content.mjs"
+            ],
             "run_at": "document_idle"
         }
     ],
     "web_accessible_resources": [
         {
-          "resources": [
-            "js/inject.mjs"
-          ],
-          "matches": [
-            "*://*/*"
-          ]
+            "resources": [
+                "js/inject.mjs"
+            ],
+            "matches": [
+                "*://*/*"
+            ]
         }
     ]
 }
-  

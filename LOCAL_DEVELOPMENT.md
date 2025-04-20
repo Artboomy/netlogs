@@ -2,7 +2,7 @@
 
 ## 🏗️ Building
 
-1. Install node v16.20.2. Newer versions crash the building process.
+1. Install Node.js.
 2. Clone `git clone git@github.com:Artboomy/netlogs.git`
 
 3. Install dependencies `cd netlogs && yarn`
