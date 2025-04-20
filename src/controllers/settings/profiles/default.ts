@@ -1,6 +1,7 @@
 import { IProfile } from '../types';
-import { NetworkRequest } from '../../../models/types';
-import { PropTreeProps } from '../../../components/PropTree';
+import { NetworkRequest } from 'models/types';
+import { PropTreeProps } from 'components/PropTree';
+import { isSerializedFormData } from 'utils';
 
 export const defaultProfile: IProfile = {
     functions: {
@@ -28,8 +29,11 @@ export const defaultProfile: IProfile = {
                     try {
                         params = JSON.parse(postData.text);
                     } catch (_e) {
+                        const key = isSerializedFormData(postData.text)
+                            ? 'FormData'
+                            : 'text';
                         params = {
-                            text: postData.text
+                            [key]: postData.text
                         };
                     }
                 } else {

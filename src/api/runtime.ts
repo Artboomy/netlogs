@@ -5,7 +5,7 @@ class SandboxRuntime {
         return {
             manifest_version: 3,
             name: 'Net logs',
-            version: '2.1.0'
+            version: '2.2.0'
         };
     }
 
@@ -21,7 +21,7 @@ class LocalRuntime {
         return {
             manifest_version: 2,
             name: 'Net logs',
-            version: '0.0.1'
+            version: '2.2.0'
         };
     }
 

@@ -155,3 +155,7 @@ export const isSerializedObject = (input: string): boolean => {
         (input.startsWith('[') && input.endsWith(']'))
     );
 };
+
+export const isSerializedFormData = (input: string): boolean => {
+    return input.includes('WebKitFormBoundary');
+};
