@@ -1,4 +1,32 @@
 // NOTE: no non-type imports in this file or build will FAIL!
+import { ISettings } from 'controllers/settings/types';
+import { NetworkRequest } from 'models/types';
+// same as src/controllers/settings/base.ts
+const defaultSettings: ISettings = {
+    theme: 'light',
+    language: 'en-US',
+    newFeatureFlags: {
+        language: false
+    },
+    matcher: (_request: NetworkRequest) => {
+        return 'default';
+    },
+    profiles: {
+        /*default: defaultProfile,
+        jsonRpc: jsonRpcProfile*/
+    },
+    nextjsIntegration: true,
+    nuxtjsIntegraction: true,
+    debuggerEnabled: false,
+    sendAnalytics: true,
+    jsonRpcIntegration: true,
+    graphqlIntegration: true,
+    hiddenTags: {
+        OPTIONS: 'OPTIONS'
+    },
+    hiddenMimeTypes: [],
+    tagsToolbarVisible: true
+};
 
 function injectScript(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -17,7 +45,13 @@ function injectScript(path: string): Promise<void> {
 
 injectScript('js/inject.mjs').then(() => {
     chrome.storage.local.get('settings', (data) => {
-        window.postMessage({ type: 'settings', value: data.settings }, '*');
+        window.postMessage(
+            {
+                type: 'settings',
+                value: data.settings || JSON.stringify(defaultSettings)
+            },
+            '*'
+        );
     });
 });
 

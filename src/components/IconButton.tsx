@@ -24,8 +24,8 @@ const Button = styled.button<{ activeText: boolean }>(
 
 const Icon = styled.div<{ icon: string; variant: '' | 'active' | 'red' }>(
     ({ theme, icon, variant }) => ({
-        '-webkit-mask-position': icon,
-        '-webkit-mask-image': `url(js/${largeIcons})`,
+        WebkitMaskPosition: icon,
+        WebkitMaskImage: `url(js/${largeIcons})`,
         width: '21px',
         height: '24px',
         ...(!variant && {
