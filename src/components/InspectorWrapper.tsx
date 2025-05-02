@@ -7,7 +7,11 @@ import Inspector, {
 import { Image } from './render/Image';
 import { useListStore } from 'controllers/network';
 import { Webm } from './render/Webm';
-import { isSerializedFormData, isSerializedObject } from 'utils';
+import {
+    isSerializedFormData,
+    isSerializedMultipartFormData,
+    isSerializedObject
+} from 'utils';
 import { AudioPreview } from './render/AudioPreview';
 import { useSettings } from 'hooks/useSettings';
 
@@ -127,15 +131,14 @@ function recursiveTextToObject<T extends RawType>(
     data: T | unknown
 ): T | unknown {
     // If data is a string and is a serialized object, parse and return it
-    if (
-        typeof data === 'string' &&
-        (isSerializedObject(data) || isSerializedFormData(data))
-    ) {
+    if (typeof data === 'string') {
         try {
-            if (isSerializedFormData('WebKitFormBoundary')) {
-                return parseRawFormData(data);
-            } else {
+            if (isSerializedObject(data)) {
                 return JSON.parse(data);
+            } else if (isSerializedFormData(data)) {
+                return Object.fromEntries([...new URLSearchParams(data)]);
+            } else if (isSerializedMultipartFormData(data)) {
+                return parseRawFormData(data);
             }
         } catch (_e) {
             // console.log('Error parsing JSON', _e, data);
@@ -162,6 +165,12 @@ function recursiveTextToObject<T extends RawType>(
         return result;
     }
     return data;
+}
+
+function isObjectWithFormData(data: unknown): data is { FormData: string } {
+    return Boolean(
+        data && typeof data === 'object' && Object.hasOwn(data, 'FormData')
+    );
 }
 
 export const InspectorWrapper: FC<InspectorWrapperProps> = ({
@@ -212,11 +221,28 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
         );
         return <DOMInspector data={renderData} theme={customTheme} />;
     }
-    const name = tagName || (isMimeType(data) && data.__mimeType) || 'result';
+    let name = tagName || (isMimeType(data) && data.__mimeType) || 'result';
     const unwrappedData = isMimeType(data) ? data.__getRaw() : data;
-    const unwrappedDataWithTextConverted = isUnpack
-        ? recursiveTextToObject(unwrappedData)
-        : unwrappedData;
+    let unwrappedDataWithTextConverted = unwrappedData;
+    if (isUnpack) {
+        if (isObjectWithFormData(unwrappedData)) {
+            const payload = unwrappedData.FormData;
+            if (isSerializedFormData(payload)) {
+                unwrappedDataWithTextConverted = recursiveTextToObject(
+                    Object.fromEntries([
+                        ...new URLSearchParams(payload).entries()
+                    ])
+                );
+                name = 'FormData';
+            } else if (isSerializedMultipartFormData(payload)) {
+                unwrappedDataWithTextConverted = parseRawFormData(payload);
+                name = 'FormData';
+            }
+        } else {
+            unwrappedDataWithTextConverted =
+                recursiveTextToObject(unwrappedData);
+        }
+    }
     return (
         <Inspector
             name={name}

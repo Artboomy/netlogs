@@ -1,7 +1,7 @@
 import { IProfile } from '../types';
 import { NetworkRequest } from 'models/types';
 import { PropTreeProps } from 'components/PropTree';
-import { isSerializedFormData } from 'utils';
+import { isSerializedFormData, isSerializedMultipartFormData } from 'utils';
 
 export const defaultProfile: IProfile = {
     functions: {
@@ -29,9 +29,11 @@ export const defaultProfile: IProfile = {
                     try {
                         params = JSON.parse(postData.text);
                     } catch (_e) {
-                        const key = isSerializedFormData(postData.text)
-                            ? 'FormData'
-                            : 'text';
+                        const key =
+                            isSerializedMultipartFormData(postData.text) ||
+                            isSerializedFormData(postData.text)
+                                ? 'FormData'
+                                : 'text';
                         params = {
                             [key]: postData.text
                         };

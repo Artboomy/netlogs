@@ -44,8 +44,8 @@ const Icon = styled.div(({ theme }) => ({
     height: '24px',
     scale: 3,
     transform: 'translateY(-4px)',
-    '-webkit-mask-position': ICONS.drop as `${number}px ${number}px`,
-    '-webkit-mask-image': `url(js/${largeIcons})`
+    WebkitMaskPosition: ICONS.drop as `${number}px ${number}px`,
+    WebkitMaskImage: `url(js/${largeIcons})`
 }));
 
 export const DropContainer: FC<{ children?: React.ReactNode }> = ({

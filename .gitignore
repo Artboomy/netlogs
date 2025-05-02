@@ -10,3 +10,4 @@ stats-*.html
 .cache
 stats
 img/noncommit
+test_build

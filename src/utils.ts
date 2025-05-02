@@ -156,6 +156,33 @@ export const isSerializedObject = (input: string): boolean => {
     );
 };
 
-export const isSerializedFormData = (input: string): boolean => {
+export const isSerializedMultipartFormData = (input: string): boolean => {
     return input.includes('WebKitFormBoundary');
+};
+
+export const isSerializedFormData = (input: unknown): boolean => {
+    if (typeof input !== 'string') {
+        return false;
+    }
+
+    try {
+        // Check if the string has the correct content type format
+        if (!input.includes('=')) {
+            return false;
+        }
+
+        const params = new URLSearchParams(input);
+
+        // Check if all parts are valid key-value pairs
+        const parts = input.split('&');
+        return (
+            parts.every((part) => {
+                // Each part must have exactly one '=' character
+                const pair = part.split('=');
+                return pair.length === 2;
+            }) && params.size > 0
+        );
+    } catch (_e) {
+        return false;
+    }
 };

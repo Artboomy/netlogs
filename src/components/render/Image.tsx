@@ -5,6 +5,8 @@ import { theme as themeLight } from 'theme/light';
 import { theme as themeDark } from 'theme/dark';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
+import { css } from '@emotion/css';
+import { SVGIcon } from 'components/render/SVGIcon';
 
 const TagText = styled.span(({ theme }) => ({
     color:
@@ -16,7 +18,7 @@ const TagText = styled.span(({ theme }) => ({
     fontSize: '12px'
 }));
 
-const ImagePreview = styled.img({
+const ImagePreview = css({
     height: '24px',
     overflow: 'hidden',
     position: 'absolute',
@@ -26,11 +28,21 @@ const ImagePreview = styled.img({
     cursor: 'pointer'
 });
 
-const ImageFull = styled.img({
+const ImageFull = css({
     border: '2px dotted #ccc',
     objectFit: 'none',
     cursor: 'pointer'
 });
+
+const RawData = styled.details({
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-all',
+    padding: '8px'
+});
+
+const isSvg = (input: string): boolean => {
+    return input.startsWith('<svg') && input.endsWith('svg>');
+};
 
 export const Image: FC<{
     base64: string;
@@ -49,23 +61,43 @@ export const Image: FC<{
     };
     const handleClick = () => {
         setValue(
-            <div onClick={handleClickDiv}>
-                <ImageFull
-                    src={`data:${mimeType};base64,${base64}`}
-                    alt='Image'
-                    title={i18n.t('clickImage')}
-                />
+            <div>
+                <div onClick={handleClickDiv}>
+                    {isSvg(base64) ? (
+                        <SVGIcon svgContent={base64} className={ImageFull} />
+                    ) : (
+                        <img
+                            className={ImageFull}
+                            src={`data:${mimeType};base64,${base64}`}
+                            alt='Image'
+                            title={i18n.t('clickImage')}
+                        />
+                    )}
+                </div>
+                <RawData>
+                    <summary>Raw</summary>
+                    {base64}
+                </RawData>
             </div>
         );
     };
     return (
         <>
             <TagText>{mimeType}: </TagText>
-            <ImagePreview
-                src={`data:${mimeType};base64,${base64}`}
-                alt='Image'
-                onClick={handleClick}
-            />
+            {isSvg(base64) ? (
+                <SVGIcon
+                    svgContent={base64}
+                    className={ImagePreview}
+                    onClick={handleClick}
+                />
+            ) : (
+                <img
+                    className={ImagePreview}
+                    src={`data:${mimeType};base64,${base64}`}
+                    alt='Image'
+                    onClick={handleClick}
+                />
+            )}
         </>
     );
 };

@@ -1,11 +1,33 @@
-import { defineConfig } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { PluginVisualizerOptions, visualizer } from 'rollup-plugin-visualizer';
 import circleDependency from 'vite-plugin-circular-dependency';
-import { resolve } from 'node:url';
+import { fileURLToPath, resolve } from 'node:url';
+import { existsSync, rmSync } from 'node:fs';
 
-const plugins = [circleDependency(), tsconfigPaths(), react()];
+const plugins = [
+    // for some reason cleanOutDir does not work properly
+    // @see https://github.com/vitejs/vite/issues/10696
+    {
+        name: 'clean-dist-js',
+        enforce: 'pre',
+        buildStart() {
+            // Get the correct directory path
+            const currentDir = fileURLToPath(new URL('.', import.meta.url));
+            const distJsPath = resolve(currentDir, 'dist/js');
+            console.log('distJsPath', currentDir, distJsPath);
+            if (existsSync(distJsPath)) {
+                rmSync(distJsPath, { recursive: true, force: true });
+                console.log('✨ Cleaned dist/js directory');
+            }
+        }
+    } as Plugin,
+
+    circleDependency(),
+    tsconfigPaths(),
+    react()
+];
 if (process.env.ANALYZE) {
     plugins.push(
         visualizer({
@@ -16,6 +38,7 @@ if (process.env.ANALYZE) {
     );
 }
 
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 export default defineConfig({
     plugins,
     resolve: {
