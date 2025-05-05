@@ -11,7 +11,7 @@ import useDebounce from 'react-use/lib/useDebounce';
 import { Footer } from './Footer';
 import { FilterContext } from 'context/FilterContext';
 import { useHotkey } from 'hooks/useHotkey';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { callParent, callParentVoid, subscribeParent } from 'utils';
 import { Theme } from 'theme/types';
@@ -91,16 +91,7 @@ export const PanelMain: React.FC = () => {
     ]);
     const globalStyles = useMemo(() => getGlobalStyles(theme), [theme]);
     useEffect(() => {
-        callParent('analytics.init').then((isDefault) => {
-            if (isDefault !== 'true') {
-                toast.warning(
-                    'Custom profiles support is DEPRECATED and will be REMOVED in the next version',
-                    {
-                        autoClose: false
-                    }
-                );
-            }
-        });
+        callParent('analytics.init');
     }, []);
 
     useEffect(() => {

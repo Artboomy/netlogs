@@ -12,6 +12,7 @@ import runtime from './api/runtime';
 import JSZip from 'jszip';
 import analytics from './api/analytics';
 import { EventName } from 'types';
+import { ISettings } from 'controllers/settings/types';
 import AreaName = chrome.storage.AreaName;
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
@@ -244,7 +245,7 @@ async function analyticsInit(id: string, type: EventName) {
         return;
     }
     // determine if settings matcher is equal to default settings matcher
-    const settings = await chrome.storage.local
+    const settings: ISettings = await chrome.storage.local
         .get({
             settings: serialize(defaultSettings)
         })
@@ -256,7 +257,7 @@ async function analyticsInit(id: string, type: EventName) {
     // fire event with payload flag
     const isDefaultProfile = Object.keys(settings.profiles).length === 3;
     if (isDefaultProfile) {
-        analytics.fireEvent('matcherTypeDefault', {});
+        analytics.fireEvent('matcherTypeDefault', { lang: settings.language });
     } else {
         analytics.fireEvent(Object.keys(settings.profiles).join('-'));
     }
