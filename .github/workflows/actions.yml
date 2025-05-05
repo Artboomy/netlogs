@@ -1,6 +1,8 @@
 name: Lint
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [ push ]
+permissions:
+  contents: read
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
