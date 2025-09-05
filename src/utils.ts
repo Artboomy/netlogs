@@ -179,7 +179,9 @@ export const isSerializedFormData = (input: unknown): boolean => {
             parts.every((part) => {
                 // Each part must have exactly one '=' character
                 const pair = part.split('=');
-                return pair.length === 2;
+                // sanity check against ico files in octet stream which have = at the end
+                const veryLongKey = pair[0].length > 200;
+                return pair.length === 2 && !veryLongKey;
             }) && params.size > 0
         );
     } catch (_e) {
