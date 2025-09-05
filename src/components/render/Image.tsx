@@ -45,10 +45,13 @@ const isSvg = (input: string): boolean => {
 };
 
 export const Image: FC<{
-    base64: string;
+    base64: string | undefined;
     mimeType: `image/${string}`;
 }> = ({ base64, mimeType }) => {
     const { setValue } = useContext(ModalContext);
+    if (!base64) {
+        return null;
+    }
     const handleClickDiv = (
         event: React.MouseEvent<HTMLDivElement, MouseEvent>
     ) => {
