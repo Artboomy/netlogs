@@ -15,7 +15,8 @@ export const defaultSettings: ISettings = {
         jsonRpc: jsonRpcProfile*/
     },
     nextjsIntegration: true,
-    nuxtjsIntegraction: true,
+    nuxtjsIntegration: true,
+    methodChecks: {},
     debuggerEnabled: false,
     sendAnalytics: true,
     jsonRpcIntegration: true,
@@ -24,5 +25,6 @@ export const defaultSettings: ISettings = {
         OPTIONS: 'OPTIONS'
     },
     hiddenMimeTypes: [],
-    tagsToolbarVisible: true
+    tagsToolbarVisible: true,
+    methodsSidebarVisible: false
 };

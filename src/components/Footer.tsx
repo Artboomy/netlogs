@@ -43,6 +43,24 @@ const ThemeButton = styled.button(({ theme }) => ({
     flexWrap: 'wrap'
 }));
 
+const setTagListVisible = (newValue: boolean) => {
+    useSettings.getState().patchSettings({
+        tagsToolbarVisible: newValue
+    });
+};
+const handleThemeChange = () => {
+    useSettings.getState().patchSettings({
+        theme:
+            useSettings.getState().settings.theme === 'light' ? 'dark' : 'light'
+    });
+};
+const handleSidebarVisibleChange = () => {
+    useSettings.getState().patchSettings({
+        methodsSidebarVisible:
+            !useSettings.getState().settings.methodsSidebarVisible
+    });
+};
+
 export const Footer: FC<{
     value: string;
     onValueChange: (newValue: string) => void;
@@ -51,20 +69,13 @@ export const Footer: FC<{
     const isPreserve = useListStore((state) => state.isPreserve);
     const visibleCount = useListStore((state) => state.visibleCount);
     const totalCount = useListStore((state) => state.totalCount);
-    const [settings, setSettings] = useSettings();
-    const { tagsToolbarVisible } = settings;
-    const setTagListVisible = (newValue: boolean) => {
-        setSettings({
-            ...settings,
-            tagsToolbarVisible: newValue
-        });
-    };
-    const handleThemeChange = () => {
-        setSettings({
-            ...settings,
-            theme: settings.theme === 'light' ? 'dark' : 'light'
-        });
-    };
+    const tagsToolbarVisible = useSettings(
+        (state) => state.settings.tagsToolbarVisible
+    );
+    const methodsSidebarVisible = useSettings(
+        (state) => state.settings.methodsSidebarVisible
+    );
+    const theme = useSettings((state) => state.settings.theme);
     return (
         <Container>
             {tagsToolbarVisible && (
@@ -92,12 +103,18 @@ export const Footer: FC<{
                 <ThemeButton
                     onClick={handleThemeChange}
                     title={i18n.t('changeTheme')}>
-                    {settings.theme === 'light' ? '🌞' : '🌑'}
+                    {theme === 'light' ? '🌞' : '🌑'}
                 </ThemeButton>
                 <Version>v.{version}</Version>
                 <Link
                     text='Github'
                     href='https://github.com/Artboomy/netlogs'
+                />
+                <IconButton
+                    icon={ICONS.panelLeft}
+                    onClick={handleSidebarVisibleChange}
+                    title={i18n.t('methodsSidebar')}
+                    active={methodsSidebarVisible}
                 />
             </Row>
         </Container>

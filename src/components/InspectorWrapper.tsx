@@ -7,11 +7,7 @@ import Inspector, {
 import { Image } from './render/Image';
 import { useListStore } from 'controllers/network';
 import { Webm } from './render/Webm';
-import {
-    isSerializedFormData,
-    isSerializedMultipartFormData,
-    isSerializedObject
-} from 'utils';
+import { isSerializedFormData, isSerializedMultipartFormData, isSerializedObject } from 'utils';
 import { AudioPreview } from './render/AudioPreview';
 import { useSettings } from 'hooks/useSettings';
 
@@ -177,7 +173,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     data,
     tagName
 }) => {
-    const [{ theme }] = useSettings();
+    const theme = useSettings((state) => state.settings.theme);
     const customTheme = useMemo(
         () => ({
             ...(theme === 'light' ? chromeLight : chromeDark),

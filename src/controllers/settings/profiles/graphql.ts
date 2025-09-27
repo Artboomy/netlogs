@@ -100,6 +100,9 @@ function isGraphqlParams(
         params.query.match('query|mutation');
     // instagram uses query_hash
     const hasHash = 'query_hash' in params;
+    // TODO: need to support array of gql calls everywhere
+    /*const isArrayOfCalls =
+        Array.isArray(params) && params.every(isGraphqlParams);*/
     return Boolean(hasQuery || hasHash);
 }
 

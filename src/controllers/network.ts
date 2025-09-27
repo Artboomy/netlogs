@@ -6,12 +6,14 @@ import network from '../api/network';
 import TransactionItem from '../models/TransactionItem';
 import { NetworkRequest } from 'models/types';
 import { insertSorted } from 'utils';
-import Settings from './settings';
 import WebSocketItem from '../models/WebSocketItem';
 
-export type ItemList = Array<
-    NetworkItem | TransactionItem | ContentOnlyItem | WebSocketItem
->;
+export type AnyItem =
+    | NetworkItem
+    | TransactionItem
+    | ContentOnlyItem
+    | WebSocketItem;
+export type ItemList = AnyItem[];
 
 type TStore = {
     list: ItemList;
@@ -24,6 +26,12 @@ type TStore = {
 
     totalCount: number;
     visibleCount: number;
+};
+
+export const toggleUnpack = () => {
+    useListStore.setState((prev) => ({
+        isUnpack: !prev.isUnpack
+    }));
 };
 
 export const useListStore = create<TStore>((set, get) => ({
@@ -56,12 +64,15 @@ export const useListStore = create<TStore>((set, get) => ({
 
 class Network {
     constructor() {
-        Settings.addListener(() => {
+        // NOTE: looks like this isn't needed anymore
+        /*Settings.addListener(function recomputeFieldsOnSettingsChangeNetwork()  {
             const { list, setList } = useListStore.getState();
             list.forEach((i) => i.setComputedFields());
             setList([...list]);
-        });
-        network.onRequestFinished.addListener((request: NetworkRequest) => {
+        });*/
+        network.onRequestFinished.addListener(function networkOnRequestFinished(
+            request: NetworkRequest
+        ) {
             const { list, isDynamic, mimeTypes } = useListStore.getState();
             if (isDynamic) {
                 const newState: Pick<TStore, 'mimeTypes' | 'list'> = {
@@ -78,7 +89,7 @@ class Network {
                 useListStore.setState(newState);
             }
         });
-        network.onNavigated.addListener((url) => {
+        network.onNavigated.addListener(function networkOnNavigated(url) {
             const { list, isPreserve } = useListStore.getState();
             useListStore.setState({
                 isDynamic: true,

@@ -1,5 +1,5 @@
-import { IItemWebSocketCfg, NetworkRequest } from '../../models/types';
-import { PropTreeProps } from '../../components/PropTree';
+import { IItemWebSocketCfg, NetworkRequest } from 'models/types';
+import { PropTreeProps } from 'components/PropTree';
 
 export type ProfileName = string;
 
@@ -13,7 +13,7 @@ export interface IProfile {
             content: string | undefined
         ) => Record<string, unknown> | unknown;
         getMeta: (request: NetworkRequest) => PropTreeProps['data'] | null;
-        isError: (requst: NetworkRequest) => boolean;
+        isError: (request: NetworkRequest) => boolean;
         shouldShow: (request: NetworkRequest) => boolean;
     };
 }
@@ -27,7 +27,7 @@ export interface IProfileWebSocket {
         getMeta: (
             request: IItemWebSocketCfg
         ) => IItemWebSocketCfg['meta'] | null;
-        isError: (requst: IItemWebSocketCfg) => boolean;
+        isError: (request: IItemWebSocketCfg) => boolean;
         shouldShow: (request: IItemWebSocketCfg) => boolean;
     };
     isMatch: (request: IItemWebSocketCfg) => boolean;
@@ -36,6 +36,9 @@ export interface IProfileWebSocket {
 export type IProfileSerialized = Omit<IProfile, 'functions'> & {
     functions: Record<keyof IProfile['functions'], string>;
 };
+
+export type Host = string;
+export type FilteredMethod = string;
 
 export interface ISettings {
     theme: 'light' | 'dark';
@@ -47,11 +50,15 @@ export interface ISettings {
     sendAnalytics: boolean;
     profiles: Record<ProfileName, IProfile>;
     nextjsIntegration: boolean;
-    nuxtjsIntegraction: boolean;
+    nuxtjsIntegration: boolean;
+    methodChecks: {
+        [key: Host]: Record<FilteredMethod, boolean | undefined> | undefined;
+    };
     debuggerEnabled: boolean;
     jsonRpcIntegration: boolean;
     graphqlIntegration: boolean;
     tagsToolbarVisible: boolean;
+    methodsSidebarVisible: boolean;
     hiddenTags: Record<string, string>;
     hiddenMimeTypes: string[];
 }

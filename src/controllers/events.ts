@@ -13,7 +13,7 @@ function isWebsocketItem(cfg: unknown) {
     );
 }
 
-function isContentOnlyItem(cfg: unknown) {
+function isContentOnlyItemCfg(cfg: unknown) {
     return cfg && typeof cfg === 'object' && 'content' in cfg;
 }
 
@@ -29,7 +29,7 @@ class EventsController {
                     | typeof WebSocketItem = TransactionItem;
                 if (isWebsocketItem(cfg)) {
                     Constructor = WebSocketItem;
-                } else if (isContentOnlyItem(cfg)) {
+                } else if (isContentOnlyItemCfg(cfg)) {
                     Constructor = ContentOnlyItem;
                 }
                 const item = new Constructor(cfg);

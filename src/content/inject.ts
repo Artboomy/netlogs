@@ -107,7 +107,7 @@ function injectAfterSettings(settings: Partial<ISettings>) {
             content: window.__NEXT_DATA__
         });
     }
-    if ('__NUXT__' in window && settings.nuxtjsIntegraction) {
+    if ('__NUXT__' in window && settings.nuxtjsIntegration) {
         netlogs({
             timestamp: new Date().getTime(),
             tag: 'NUXT',
