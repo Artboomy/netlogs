@@ -18,6 +18,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 portToContent.onMessage.removeListener(messageHandler);
             });
             portToContent.onMessage.addListener(messageHandler);
+
+            chrome.runtime.onConnect.addListener((port) => {
+                if (port.name === 'panel') {
+                    port.onMessage.addListener((message) => {
+                        if (message.type === 'cachedRequests') {
+                            postSandbox(
+                                createEventPayload(
+                                    'cachedNetworkRequests',
+                                    JSON.stringify(message.data)
+                                )
+                            );
+                        }
+                    });
+                }
+            });
             chrome.devtools.inspectedWindow.eval(
                 'window.location.host',
                 (result, exceptionInfo) => {

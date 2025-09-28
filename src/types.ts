@@ -23,7 +23,12 @@ type NetworkEventName =
 
 type DevtoolsEventName = 'devtools.inspectedWindow.reload';
 
-type CustomEventName = 'newItem' | 'download' | 'searchOnPage' | 'setHost';
+type CustomEventName =
+    | 'newItem'
+    | 'download'
+    | 'searchOnPage'
+    | 'setHost'
+    | 'cachedNetworkRequests';
 
 type TabEventName = 'chrome.tabs.create';
 

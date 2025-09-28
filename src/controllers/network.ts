@@ -5,7 +5,7 @@ import ContentOnlyItem from '../models/ContentOnlyItem';
 import network from '../api/network';
 import TransactionItem from '../models/TransactionItem';
 import { NetworkRequest } from 'models/types';
-import { insertSorted } from 'utils';
+import { insertSorted, subscribeParent } from 'utils';
 import WebSocketItem from '../models/WebSocketItem';
 
 export type AnyItem =
@@ -103,6 +103,22 @@ class Network {
                 ]
             });
         });
+        subscribeParent(
+            'cachedNetworkRequests',
+            function cachedNetworkRequests(data) {
+                const array: NetworkRequest[] = JSON.parse(data);
+                const newState: Pick<TStore, 'mimeTypes' | 'list'> = {
+                    list: array.map((request) => new NetworkItem({ request })),
+                    mimeTypes: new Set(
+                        array.map(
+                            (request) => request.response.content.mimeType
+                        )
+                    )
+                };
+                useListStore.setState(newState);
+                console.log('cachedNetworkRequests restored');
+            }
+        );
     }
 }
 
