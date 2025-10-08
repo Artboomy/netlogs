@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC } from 'react';
 import { Section, TSection } from './Section';
-import { callParentVoid } from 'utils';
+import { useAnalyticsDuration } from 'utils';
 import styled from '@emotion/styled';
 import ErrorBoundary from 'components/ErrorBoundary';
 
@@ -17,15 +17,7 @@ const Container = styled.section({
 });
 
 export const PropTree: FC<PropTreeProps> = ({ data }) => {
-    const openedRef = useRef(Date.now());
-    useEffect(() => {
-        return () => {
-            callParentVoid(
-                'analytics.propTreeViewed',
-                String(Date.now() - openedRef.current)
-            );
-        };
-    }, []);
+    useAnalyticsDuration('analytics.propTreeViewed');
     return (
         <Container>
             <ErrorBoundary>

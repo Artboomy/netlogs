@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, {
+    ChangeEventHandler,
+    useCallback,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import { useSettings } from 'hooks/useSettings';
 import styled from '@emotion/styled';
 import { useListStore } from 'controllers/network';
@@ -8,6 +14,13 @@ import { useDragDropManager } from 'react-dnd';
 import { useShallow } from 'zustand/react/shallow';
 import ContentOnlyItem from 'models/ContentOnlyItem';
 import HostController from 'controllers/host';
+import ErrorBoundary from 'components/ErrorBoundary';
+import { partialHighlight } from 'react-inspector';
+import { useAnalyticsDuration } from 'utils';
+
+const StyledTree = styled(Tree)({
+    paddingTop: '4px'
+}) as typeof Tree;
 
 const Root = styled.div(({ theme }) => ({
     position: 'absolute',
@@ -41,7 +54,7 @@ type TreeMap = {
     name: TreeName;
     value: boolean;
     children?: Record<string, TreeMap>;
-    parent?: TreeMap;
+    // parent?: TreeMap;
 };
 
 function buildMap(list: import('controllers/network').ItemList): TreeMap {
@@ -71,8 +84,8 @@ function buildMap(list: import('controllers/network').ItemList): TreeMap {
                         [method]: {
                             id: name,
                             name: method,
-                            value: true,
-                            parent: map.children[namespace]
+                            value: true
+                            // parent: map.children[namespace]
                         }
                     };
                 }
@@ -110,8 +123,8 @@ function buildMap(list: import('controllers/network').ItemList): TreeMap {
                         root.children[currentPart] = {
                             id: path,
                             name: currentPart,
-                            value: true,
-                            parent: root
+                            value: true
+                            // parent: root
                         };
                     }
                     if (idx !== nameParts.length - 1) {
@@ -182,7 +195,7 @@ const Row = (props: NodeRendererProps<TreeMap>) => {
     const renderName = node.data.name.startsWith('/')
         ? node.data.name.slice(1)
         : node.data.name;
-
+    const searchTerm = props.tree.props.searchTerm;
     return (
         <div
             style={{ ...style, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -201,15 +214,21 @@ const Row = (props: NodeRendererProps<TreeMap>) => {
                 onChange={onToggle}
                 title={indeterminate ? 'Partially selected' : ''}
             />
-            <RenderName onClick={() => node.toggle()}>{renderName}</RenderName>
+            <RenderName onClick={() => node.toggle()}>
+                {searchTerm
+                    ? partialHighlight(renderName, searchTerm, { style: null })
+                    : renderName}
+            </RenderName>
         </div>
     );
 };
 
 export const MethodsSidebar = () => {
+    useAnalyticsDuration('analytics.methodsSidebarViewed');
     const methodsSidebarVisible = useSettings(
         (state) => state.settings.methodsSidebarVisible
     );
+    const [searchTerm, setSearchTerm] = useState('');
 
     // build the raw list excluding ContentOnlyItem
     const rawList = useListStore(
@@ -239,24 +258,41 @@ export const MethodsSidebar = () => {
 
     const dndManager = useDragDropManager();
 
+    const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+        setSearchTerm(e.target.value);
+    };
     if (!methodsSidebarVisible) {
         return null;
     }
     return (
         <Root>
-            <Tree<TreeMap>
-                data={data}
-                width={300}
-                height={Math.max(100, window.innerHeight - 58)}
-                openByDefault
-                rowHeight={22}
-                indent={14}
-                dndManager={dndManager}
-                childrenAccessor={(d) =>
-                    d.children ? Object.values(d.children) : []
-                }>
-                {Row}
-            </Tree>
+            <ErrorBoundary>
+                <input
+                    style={{ paddingBottom: '4px' }}
+                    id='methodSearch'
+                    type='text'
+                    placeholder='Search'
+                    value={searchTerm}
+                    onChange={handleChange}
+                />
+                <StyledTree<TreeMap>
+                    searchTerm={searchTerm}
+                    data={data}
+                    width={300 - 8}
+                    height={Math.max(
+                        100,
+                        window.innerHeight - 31 - 28 - 24 - 8 - 4
+                    )}
+                    openByDefault
+                    rowHeight={22}
+                    indent={14}
+                    dndManager={dndManager}
+                    childrenAccessor={(d) =>
+                        d.children ? Object.values(d.children) : []
+                    }>
+                    {Row}
+                </StyledTree>
+            </ErrorBoundary>
         </Root>
     );
 };

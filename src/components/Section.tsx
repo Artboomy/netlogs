@@ -1,5 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import styled from '@emotion/styled';
+import copy from 'copy-to-clipboard';
+import { Flip, toast } from 'react-toastify';
 
 export type TItem = {
     name: string;
@@ -30,7 +32,8 @@ const Value = styled.span<{ type: 'number' | 'string' | '' }>(
     ({ theme, type }) => ({
         ...(type === 'number' && { color: theme.valueNumber }),
         ...(type === 'string' && { color: theme.valueString }),
-        whiteSpace: 'pre-wrap'
+        whiteSpace: 'pre-wrap',
+        cursor: 'pointer'
     })
 );
 
@@ -47,6 +50,17 @@ export const Section: FC<TSection> = ({ title, items }) => {
         }
         return '';
     };
+    const handleClick = (value: ReactNode) => {
+        if (window.getSelection()?.toString().trim() !== '') {
+            return;
+        }
+        copy(String(value));
+        toast('Value copied', {
+            hideProgressBar: true,
+            autoClose: 300,
+            transition: Flip
+        });
+    };
     return (
         <Container open>
             <summary>
@@ -56,7 +70,11 @@ export const Section: FC<TSection> = ({ title, items }) => {
                 return (
                     <Item key={`${name}${index}`}>
                         <Key>{name}</Key>:{' '}
-                        <Value type={getValueType(value)}>{value}</Value>
+                        <Value
+                            type={getValueType(value)}
+                            onClick={() => handleClick(value)}>
+                            {value}
+                        </Value>
                     </Item>
                 );
             })}

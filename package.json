@@ -34,6 +34,7 @@
         "@emotion/styled": "^11.11.5",
         "base16": "1.0.0",
         "classnames": "2.2.6",
+        "copy-to-clipboard": "^3.3.3",
         "dompurify": "^3.2.5",
         "i18n-js": "^4.4.3",
         "jszip": "^3.10.1",

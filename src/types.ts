@@ -32,14 +32,17 @@ type CustomEventName =
 
 type TabEventName = 'chrome.tabs.create';
 
+export type AnalyticsDurationEventName =
+    | 'analytics.propTreeViewed'
+    | 'analytics.methodsSidebarViewed';
 type AnalyticsEventName =
     | 'analytics.init'
     | 'analytics.mimeFilterChange'
-    | 'analytics.propTreeViewed'
     | 'analytics.hotkey'
     | 'analytics.fileOpen'
     | 'analytics.error'
-    | 'analytics.searchOnPage';
+    | 'analytics.searchOnPage'
+    | AnalyticsDurationEventName;
 
 type DebuggerEventName =
     | 'debugger.attach'
