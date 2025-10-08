@@ -65,7 +65,7 @@ const messageHandler = (
             } catch (_e) {
                 // pass
             }
-        } else if (type === 'connectionTest ') {
+        } else if (type === 'connectionTest') {
             console.log('message', type, e.data);
             postSandbox(createEventPayload('setHost', e.data));
         }
