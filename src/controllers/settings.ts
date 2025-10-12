@@ -13,6 +13,8 @@ import { isJsonRpc, jsonRpcProfile } from './settings/profiles/jsonRpc';
 import { graphqlProfile, isGraphql } from './settings/profiles/graphql';
 import { i18n } from 'translations/i18n';
 
+// TODO: should probably remove storing functions in serialized mode and all related logic
+
 function deserializeFunctionRaw<T>(strFunction: string): T {
     return isSandbox() ? new Function(`return ${strFunction}`)() : strFunction;
 }
@@ -92,7 +94,7 @@ export function serialize(
     );
 }
 
-type Listener = (newSettings: ISettings) => void;
+export type SettingsListener = (newSettings: ISettings) => void;
 
 function injectStaticProfiles(settings: ISettings): void {
     settings.profiles.default = defaultProfile;
@@ -106,7 +108,7 @@ function setLanguage(language: string) {
 
 class Settings {
     private settings: ISettings = defaultSettings;
-    private listeners: Listener[] = [];
+    private listeners: SettingsListener[] = [];
 
     constructor() {
         this.settings = defaultSettings;
@@ -132,8 +134,11 @@ class Settings {
         );
     }
 
-    addListener(listener: Listener) {
+    addListener(listener: SettingsListener) {
         this.listeners.push(listener);
+    }
+    removeListener(listener: SettingsListener) {
+        this.listeners = this.listeners.filter((l) => l !== listener);
     }
 
     refresh() {
@@ -152,6 +157,9 @@ class Settings {
                     }
                     injectStaticProfiles(this.settings);
                     resolve(this.settings);
+                    this.listeners.forEach((listener) => {
+                        this.settings && listener(this.settings);
+                    });
                 }
             );
         });
@@ -187,19 +195,12 @@ class Settings {
         };
     }
 
-    getProfile(request: NetworkRequest): IProfile {
-        return {
-            ...defaultProfile,
-            ...this.settings.profiles[this.getMather()(request)]
-        };
-    }
-
     getFunctions(request: NetworkRequest): IProfile['functions'] {
         return this.settings.profiles[this.getMather()(request)]?.functions;
     }
 
     set(newSettings: ISettings | ISettingsSerialized) {
-        storage.local.set({ settings: serialize(newSettings) });
+        return storage.local.set({ settings: serialize(newSettings) });
     }
 
     reset() {

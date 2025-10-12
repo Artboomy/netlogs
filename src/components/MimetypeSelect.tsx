@@ -1,12 +1,12 @@
-import React, { FC, memo, useCallback, useMemo, useState } from 'react';
+import React, { FC, memo, useMemo } from 'react';
 import { useListStore } from 'controllers/network';
 import { MultiSelect } from 'react-multi-select-component';
 import isEqual from 'lodash.isequal';
-import settings from '../controllers/settings';
 import { callParentVoid } from 'utils';
 import { useSettings } from 'hooks/useSettings';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
+import { useShallow } from 'zustand/react/shallow';
 
 const MultiSelectStyled = styled(MultiSelect)(({ theme }) => ({
     marginLeft: 'auto',
@@ -25,23 +25,14 @@ const MultiSelectStyled = styled(MultiSelect)(({ theme }) => ({
     '--rmsc-hover': theme.icon.hover
 }));
 
-const useHiddenMimeTypes = () => {
-    const [hidden, setHidden] = useState(
-        () => new Set(settings.get().hiddenMimeTypes)
-    );
-
-    const setHiddenToStore = useCallback(async (newArray: string[]) => {
-        settings.set({ ...settings.get(), hiddenMimeTypes: newArray });
-        setHidden(new Set(newArray));
-    }, []);
-    return [hidden, setHiddenToStore] as const;
-};
-
 export const MimetypeSelect: FC = memo(() => {
-    const [{ language }] = useSettings();
+    const language = useSettings((state) => state.settings.language);
     const mimeTypes = useListStore((state) => state.mimeTypes, isEqual);
     const sortedMimeTypes = Array.from(mimeTypes).sort();
-    const [hiddenMimeTypes, setHiddenMimeTypes] = useHiddenMimeTypes();
+    const hiddenMimeTypesArray = useSettings(
+        useShallow((state) => state.settings.hiddenMimeTypes)
+    );
+    const hiddenMimeTypes = new Set(hiddenMimeTypesArray);
     const selectedTypes = sortedMimeTypes
         .filter((type) => !hiddenMimeTypes.has(type))
         .map((i) => ({ label: i, value: i }));
@@ -70,7 +61,9 @@ export const MimetypeSelect: FC = memo(() => {
         const newHiddenMimeTypes = sortedMimeTypes.filter(
             (mimeType) => !selectedMimeTypes.has(mimeType)
         );
-        setHiddenMimeTypes(newHiddenMimeTypes);
+        useSettings
+            .getState()
+            .patchSettings({ hiddenMimeTypes: newHiddenMimeTypes });
         callParentVoid('analytics.mimeFilterChange');
     };
     return (

@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom';
 import { callParent, callParentVoid, isMacOs } from '../utils';
 
 import EventsController from 'controllers/events';
+import HostController from 'controllers/host';
 import { PanelApp } from '../components/PanelApp';
 
 EventsController.subscribe();
+HostController.subscribe();
 
 callParent('onIframeReady').then(() => {
     ReactDOM.render(<PanelApp />, document.getElementById('root'));

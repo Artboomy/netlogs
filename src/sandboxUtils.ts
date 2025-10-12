@@ -167,8 +167,15 @@ export async function wrapSandbox(): Promise<void> {
                             engagement_time_msec: parseInt(data)
                         });
                         break;
+                    case 'analytics.methodsSidebarViewed':
+                        analytics.fireEvent('methodsSidebarViewed', {
+                            engagement_time_msec: parseInt(data)
+                        });
+                        break;
                     case 'analytics.hotkey':
-                        analytics.fireEvent(`hotkey-${data}`);
+                        analytics.fireEvent(`hotkey`, {
+                            hotkey: data
+                        });
                         break;
                     case 'analytics.fileOpen':
                         analytics.fireEvent('fileOpen', {

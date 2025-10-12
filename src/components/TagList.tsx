@@ -22,8 +22,9 @@ const Button = styled.button({
 
 export const TagList: FC = () => {
     const list = useListStore(useShallow((state) => state.list));
-    const [settings, setSettings] = useSettings();
-    const hiddenTags = { ...settings.hiddenTags };
+    const hiddenTags = useSettings(
+        useShallow((state) => state.settings.hiddenTags)
+    );
     const tags: Record<
         string,
         {
@@ -43,14 +44,15 @@ export const TagList: FC = () => {
         }
     });
     const handleClick = (tag: string) => {
-        if (hiddenTags[tag]) {
-            delete hiddenTags[tag];
+        const clonedTags: Record<string, string> = structuredClone(hiddenTags);
+        if (clonedTags[tag]) {
+            delete clonedTags[tag];
         } else {
-            hiddenTags[tag] = tag;
+            clonedTags[tag] = tag;
         }
-        setSettings({
-            ...settings,
-            ...{ hiddenTags }
+        useSettings.getState().setSettings({
+            ...useSettings.getState().settings,
+            ...{ hiddenTags: clonedTags }
         });
     };
     const values = Object.values(tags);

@@ -16,7 +16,8 @@ const defaultSettings: ISettings = {
         jsonRpc: jsonRpcProfile*/
     },
     nextjsIntegration: true,
-    nuxtjsIntegraction: true,
+    nuxtjsIntegration: true,
+    methodChecks: {},
     debuggerEnabled: false,
     sendAnalytics: true,
     jsonRpcIntegration: true,
@@ -25,7 +26,8 @@ const defaultSettings: ISettings = {
         OPTIONS: 'OPTIONS'
     },
     hiddenMimeTypes: [],
-    tagsToolbarVisible: true
+    tagsToolbarVisible: true,
+    methodsSidebarVisible: false
 };
 
 function injectScript(path: string): Promise<void> {
@@ -64,7 +66,10 @@ const portFromContent = window.chrome.runtime.connect({
 let portToSend: chrome.runtime.Port;
 
 // initiate a connection
-portFromContent.postMessage({ type: 'connectionTest' });
+portFromContent.postMessage({
+    type: 'connectionTest',
+    data: { host: window.location.host }
+});
 const lastError = window.chrome.runtime.lastError;
 if (lastError) {
     console.error('lastError', lastError);

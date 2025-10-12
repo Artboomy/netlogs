@@ -18,6 +18,7 @@ import { Theme } from 'theme/types';
 import { useSettings } from 'hooks/useSettings';
 import styled from '@emotion/styled';
 import { Global, useTheme } from '@emotion/react';
+import { MethodsSidebar } from 'components/MethodsSidebar';
 
 const Container = styled.div({
     height: '100%',
@@ -76,7 +77,7 @@ const getGlobalStyles = (theme: Theme) =>
     }) as const;
 
 export const PanelMain: React.FC = () => {
-    const [{ language }] = useSettings();
+    const language = useSettings((state) => state.settings.language);
     const theme = useTheme();
     const [searchValue, setSearchValue] = useState('');
     const [hideUnrelated, setHideUnrelated] = useState(true);
@@ -125,6 +126,7 @@ export const PanelMain: React.FC = () => {
                                     <ListContainer />
                                 </DropContainer>
                             </ErrorBoundary>
+                            <MethodsSidebar />
                             <Footer
                                 value={filterValue}
                                 onValueChange={setFilterValue}

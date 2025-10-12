@@ -1,5 +1,5 @@
 import React, { FC, useRef, useState } from 'react';
-import { useListStore } from 'controllers/network';
+import { toggleUnpack, useListStore } from 'controllers/network';
 import runtime from '../api/runtime';
 import { Har } from 'har-format';
 import { callParent, isExtension, isMacOs } from 'utils';
@@ -20,6 +20,8 @@ const Row = styled.div(({ theme }) => ({
     display: 'flex',
     backgroundColor: theme.panelColor,
     padding: '2px 4px',
+    boxSizing: 'border-box',
+    height: '30px',
     alignItems: 'center',
     gap: '8px'
 }));
@@ -110,11 +112,6 @@ export const Header: FC<IProps> = ({
             })),
         []
     );
-    const handleToggleUnpack = () => {
-        useListStore.setState((prev) => ({
-            isUnpack: !prev.isUnpack
-        }));
-    };
     const modifierKey = isMacOs() ? '⌘' : 'Ctrl';
     return (
         <Root className={className}>
@@ -140,7 +137,7 @@ export const Header: FC<IProps> = ({
                 <IconButton
                     active={isUnpack}
                     icon={ICONS.brackets}
-                    onClick={handleToggleUnpack}
+                    onClick={toggleUnpack}
                     title={i18n.t('decodeJSON')}
                 />
                 <input

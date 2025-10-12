@@ -11,7 +11,7 @@ const themeMap = {
 export const ThemeContainer: FC<{ children?: React.ReactNode }> = ({
     children
 }) => {
-    const [{ theme: themeKey }] = useSettings();
+    const themeKey = useSettings((state) => state.settings.theme);
     const theme = useMemo(() => themeMap[themeKey], [themeKey]);
     return (
         <EmotionThemeProvider theme={theme}>{children}</EmotionThemeProvider>

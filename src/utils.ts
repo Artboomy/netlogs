@@ -1,6 +1,7 @@
-import { EventName, IframeEvent } from './types';
+import { AnalyticsDurationEventName, EventName, IframeEvent } from './types';
 import { nanoid } from 'nanoid';
 import { ItemList } from 'controllers/network';
+import { useEffect, useRef } from 'react';
 
 export const mediaQuerySmallOnly = '@media (max-width: 700px)';
 
@@ -187,4 +188,13 @@ export const isSerializedFormData = (input: unknown): boolean => {
     } catch (_e) {
         return false;
     }
+};
+
+export const useAnalyticsDuration = (name: AnalyticsDurationEventName) => {
+    const openedRef = useRef(Date.now());
+    useEffect(() => {
+        return () => {
+            callParentVoid(name, String(Date.now() - openedRef.current));
+        };
+    }, []);
 };

@@ -1,10 +1,10 @@
 import React, { FC, useEffect } from 'react';
 import { useSettings } from 'hooks/useSettings';
 import { HiddenTagList } from './options/HiddenTagList';
-import { Link } from './Link';
 import { i18n } from 'translations/i18n';
 import { Global } from '@emotion/react';
 import styled from '@emotion/styled';
+import Inspector from 'react-inspector';
 
 const Block = styled.section`
     padding: 0 8px;
@@ -21,6 +21,10 @@ const TitleRow = styled.section(({ theme }) => ({
 
 const CheckboxRow = styled.div`
     padding: 4px 0;
+`;
+
+const Link = styled.a`
+    margin-right: 4px;
 `;
 
 const globalStyles = {
@@ -44,7 +48,7 @@ const globalStyles = {
 };
 
 export const Options: FC = () => {
-    const [settings, setSettings] = useSettings();
+    const { settings, setSettings } = useSettings();
 
     useEffect(() => {
         i18n.locale = settings.language;
@@ -59,15 +63,22 @@ export const Options: FC = () => {
                     {i18n.t('links')}:{' '}
                     <Link
                         href='https://github.com/Artboomy/netlogs'
-                        text='Github'
-                    />{' '}
+                        target={'_blank'}
+                        rel={'noreferrer noopener'}>
+                        Github
+                    </Link>
                     <Link
                         href='https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf'
-                        text={i18n.t('chromeStore')}
-                    />{' '}
+                        target={'_blank'}>
+                        {i18n.t('chromeStore')}
+                    </Link>
                 </div>
             </TitleRow>
-
+            <Block>
+                <button onClick={() => useSettings.getState().resetSettings()}>
+                    Reset
+                </button>
+            </Block>
             <Block>
                 <h2>{i18n.t('language')}</h2>
                 <select
@@ -143,9 +154,11 @@ export const Options: FC = () => {
                         />
                         {i18n.t('Unwrap')}{' '}
                         <Link
-                            text='JSON-RPC'
                             href='https://www.jsonrpc.org/specification'
-                        />{' '}
+                            target={'_blank'}
+                            rel={'noreferrer noopener'}>
+                            JSON-RPC
+                        </Link>
                         {i18n.t('requests')}
                     </label>
                 </CheckboxRow>
@@ -195,7 +208,12 @@ export const Options: FC = () => {
                             }
                         />
                         {i18n.t('Unwrap')}{' '}
-                        <Link text='GraphQL' href='https://graphql.org/' />{' '}
+                        <Link
+                            href='https://graphql.org/'
+                            target={'_blank'}
+                            rel={'noreferrer noopener'}>
+                            GraphQL
+                        </Link>
                         {i18n.t('requests')}
                     </label>
                 </CheckboxRow>
@@ -204,11 +222,11 @@ export const Options: FC = () => {
                         <input
                             type='checkbox'
                             name='nuxtjsIntegraction'
-                            checked={settings.nuxtjsIntegraction}
+                            checked={settings.nuxtjsIntegration}
                             onChange={(e) =>
                                 setSettings({
                                     ...settings,
-                                    nuxtjsIntegraction: e.target.checked
+                                    nuxtjsIntegration: e.target.checked
                                 })
                             }
                         />
@@ -225,6 +243,10 @@ export const Options: FC = () => {
             <Block>
                 <h2>{i18n.t('hiddenTags')}</h2>
                 <HiddenTagList />
+            </Block>
+            <Block>
+                <h2>DEV ZONE</h2>
+                <Inspector name={'methodChecks'} data={settings.methodChecks} />
             </Block>
         </div>
     );

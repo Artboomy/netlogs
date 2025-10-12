@@ -18,6 +18,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 portToContent.onMessage.removeListener(messageHandler);
             });
             portToContent.onMessage.addListener(messageHandler);
+
+            chrome.runtime.onConnect.addListener((port) => {
+                if (port.name === 'panel') {
+                    port.onMessage.addListener((message) => {
+                        if (message.type === 'cachedRequests') {
+                            postSandbox(
+                                createEventPayload(
+                                    'cachedNetworkRequests',
+                                    JSON.stringify(message.data)
+                                )
+                            );
+                        }
+                    });
+                }
+            });
+            chrome.devtools.inspectedWindow.eval(
+                'window.location.host',
+                (result, exceptionInfo) => {
+                    if (exceptionInfo) {
+                        console.error('eval error', exceptionInfo);
+                    } else {
+                        if (typeof result === 'string') {
+                            postSandbox(createEventPayload('setHost', result));
+                        }
+                    }
+                }
+            );
         }
     });
 });
@@ -38,6 +65,9 @@ const messageHandler = (
             } catch (_e) {
                 // pass
             }
+        } else if (type === 'connectionTest') {
+            console.log('message', type, e.data);
+            postSandbox(createEventPayload('setHost', e.data));
         }
     }
 };
