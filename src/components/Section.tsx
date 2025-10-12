@@ -2,6 +2,7 @@ import React, { FC, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import copy from 'copy-to-clipboard';
 import { Flip, toast } from 'react-toastify';
+import { i18n } from 'translations/i18n';
 
 export type TItem = {
     name: string;
@@ -55,7 +56,7 @@ export const Section: FC<TSection> = ({ title, items }) => {
             return;
         }
         copy(String(value));
-        toast('Value copied', {
+        toast(i18n.t('copied') as string, {
             hideProgressBar: true,
             autoClose: 300,
             transition: Flip

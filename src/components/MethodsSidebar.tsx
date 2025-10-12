@@ -17,6 +17,7 @@ import HostController from 'controllers/host';
 import ErrorBoundary from 'components/ErrorBoundary';
 import { partialHighlight } from 'react-inspector';
 import { useAnalyticsDuration } from 'utils';
+import { i18n } from 'translations/i18n';
 
 const StyledTree = styled(Tree)({
     paddingTop: '4px'
@@ -271,7 +272,7 @@ export const MethodsSidebar = () => {
                     style={{ paddingBottom: '4px' }}
                     id='methodSearch'
                     type='text'
-                    placeholder='Search'
+                    placeholder={i18n.t('search')}
                     value={searchTerm}
                     onChange={handleChange}
                 />

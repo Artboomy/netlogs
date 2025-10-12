@@ -1,5 +1,6 @@
 {
     "en-US": {
+        "copied": "Value copied",
         "drop": "Drop file",
         "changeLanguage": "You can change language in the settings",
         "onlyJSONSupported": "Only json files are supported",
@@ -70,6 +71,7 @@
         "clickToListen": "Click to listen WebSockets"
     },
     "ru-RU": {
+        "copied": "Значение скопировано",
         "drop": "Отпустите файл",
         "changeLanguage": "Вы можете изменить язык в настройках",
         "onlyJSONSupported": "Поддерживаются только json файлы",
@@ -140,6 +142,7 @@
         "clickToListen": "Нажмите, чтобы прослушать вебсокеты"
     },
     "es-ES": {
+        "copied": "Valor copiado",
         "drop": "Suelta el archivo",
         "changeLanguage": "Puedes cambiar el idioma en la configuración",
         "onlyJSONSupported": "Solo se admiten archivos json",
@@ -210,6 +213,7 @@
         "clickToListen": "Haz clic para escuchar WebSockets"
     },
     "zh-CN": {
+        "copied": "值已复制",
         "drop": "放置文件",
         "changeLanguage": "您可以在设置中更改语言",
         "onlyJSONSupported": "仅支持json文件",
@@ -280,6 +284,7 @@
         "clickToListen": "点击监听WebSockets"
     },
     "hi": {
+        "copied": "मान कॉपी किया गया",
         "drop": "फ़ाइल छोड़ें",
         "changeLanguage": "आप सेटिंग्स में भाषा बदल सकते हैं",
         "onlyJSONSupported": "केवल json फ़ाइलें समर्थित हैं",
@@ -350,6 +355,7 @@
         "clickToListen": "WebSockets सुनने के लिए क्लिक करें"
     },
     "de-DE": {
+        "copied": "Wert kopiert",
         "drop": "Datei ablegen",
         "changeLanguage": "Sie können die Sprache in den Einstellungen ändern",
         "onlyJSONSupported": "Nur JSON-Dateien werden unterstützt",
@@ -420,6 +426,7 @@
         "clickToListen": "Klicken, um WebSockets zu hören"
     },
     "ja-JP": {
+        "copied": "値をコピーしました",
         "drop": "ファイルをドロップ",
         "changeLanguage": "設定で言語を変更できます",
         "onlyJSONSupported": "jsonファイルのみがサポートされています",
