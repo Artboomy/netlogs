@@ -1,6 +1,6 @@
 {
     "name": "Net logs",
-    "version": "2.5.0",
+    "version": "2.6.0",
     "default_locale": "en",
     "manifest_version": 3,
     "minimum_chrome_version": "88",

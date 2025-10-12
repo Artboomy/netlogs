@@ -13,6 +13,7 @@ import { FilterContext } from 'context/FilterContext';
 import { useHotkey } from 'hooks/useHotkey';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import 'rc-tooltip/assets/bootstrap_white.css';
 import { callParent, callParentVoid, subscribeParent } from 'utils';
 import { Theme } from 'theme/types';
 import { useSettings } from 'hooks/useSettings';

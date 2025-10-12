@@ -87,6 +87,8 @@ export default defineConfig({
                     return '[name].[ext]';
                 },
                 manualChunks(id) {
+                    // NOTE: pack all libs into one chunk so css packs into react-verndors.css
+                    // only it is imported in the html
                     if (
                         id.includes('react') ||
                         id.includes('react-dom') ||
@@ -94,7 +96,8 @@ export default defineConfig({
                         id.includes('react-dnd') ||
                         id.includes('react-dnd-html5-backend') ||
                         id.includes('classnames') ||
-                        id.includes('base16')
+                        id.includes('base16') ||
+                        id.includes('rc-tooltip')
                     ) {
                         return 'react-vendors';
                     }

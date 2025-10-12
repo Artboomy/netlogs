@@ -1,8 +1,9 @@
-import React, { FC, useContext } from 'react';
+import React, { FC, memo, useContext } from 'react';
 import { partialHighlight } from 'react-inspector';
 import { FilterContext } from 'context/FilterContext';
 import { useListStore } from 'controllers/network';
 import { useTheme } from '@emotion/react';
+import { Tooltip } from 'components/Tooltip';
 
 const guidRegex =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -19,7 +20,7 @@ function isImg(input: string): string {
     return match ? match[0] : '';
 }
 
-export const Name: FC<{ value: string }> = ({ value }) => {
+const _Name: FC<{ value: string }> = ({ value }) => {
     const filterValue = useContext(FilterContext);
     const { name, icon } = useTheme();
     const isUnpack = useListStore((state) => state.isUnpack);
@@ -43,15 +44,19 @@ export const Name: FC<{ value: string }> = ({ value }) => {
     }
     if (renderValue != value) {
         return (
-            <span
-                style={{
-                    textDecoration: 'underline',
-                    textDecorationColor:
-                        name === 'dark' ? icon.normal : 'lightgrey'
-                }}>
-                {renderValue}
-            </span>
+            <Tooltip placement='right' overlay={value}>
+                <span
+                    style={{
+                        textDecoration: 'underline',
+                        textDecorationColor:
+                            name === 'dark' ? icon.normal : 'lightgrey'
+                    }}>
+                    {renderValue}
+                </span>
+            </Tooltip>
         );
     }
     return <>{renderValue}</>;
 };
+export const Name = memo(_Name);
+Name.displayName = 'Name';

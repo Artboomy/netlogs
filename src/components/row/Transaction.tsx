@@ -65,7 +65,7 @@ export const Transaction: FC<ITransactionProps> = ({
     return (
         <>
             {date}
-            <NameContainer className={className} title={name}>
+            <NameContainer className={className}>
                 {tag}
                 <Name value={name} />
             </NameContainer>

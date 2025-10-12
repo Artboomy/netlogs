@@ -18,7 +18,7 @@ import ErrorBoundary from 'components/ErrorBoundary';
 import { partialHighlight } from 'react-inspector';
 import { useAnalyticsDuration } from 'utils';
 import { i18n } from 'translations/i18n';
-
+import { Tooltip } from 'components/Tooltip';
 const StyledTree = styled(Tree)({
     paddingTop: '4px'
 }) as typeof Tree;
@@ -215,11 +215,15 @@ const Row = (props: NodeRendererProps<TreeMap>) => {
                 onChange={onToggle}
                 title={indeterminate ? 'Partially selected' : ''}
             />
-            <RenderName onClick={() => node.toggle()}>
-                {searchTerm
-                    ? partialHighlight(renderName, searchTerm, { style: null })
-                    : renderName}
-            </RenderName>
+            <Tooltip overlay={renderName} placement='bottom'>
+                <RenderName onClick={() => node.toggle()}>
+                    {searchTerm
+                        ? partialHighlight(renderName, searchTerm, {
+                              style: null
+                          })
+                        : renderName}
+                </RenderName>
+            </Tooltip>
         </div>
     );
 };
