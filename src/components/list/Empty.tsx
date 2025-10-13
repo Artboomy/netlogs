@@ -74,7 +74,7 @@ const ThemeLine = styled.p(({ theme }) => ({
     '&::after': {
         ...fixedLinePointer(theme, 'top'),
         bottom: '-8px',
-        right: '82px'
+        right: '102px'
     }
 }));
 

@@ -1,21 +1,15 @@
-import React, {
-    memo,
-    MouseEventHandler,
-    useContext,
-    useEffect,
-    useRef
-} from 'react';
+import React, { memo, MouseEventHandler } from 'react';
 import ContentOnlyItem from '../models/ContentOnlyItem';
 import { TransactionItemAbstract } from 'models/TransactionItem';
 import { google } from 'base16';
 import { Tag } from './Tag';
-import { PropTree } from './PropTree';
-import { ModalContext } from './modal/Context';
 import { ContentOnly } from './row/ContentOnly';
 import { Transaction } from './row/Transaction';
 import { mediaQuerySmallOnly } from 'utils';
 import styled from '@emotion/styled';
 import { useTheme } from '@emotion/react';
+import { base16Darcula } from 'theme/dark';
+import { useRowClickPanel } from 'components/row/useRowClickPanel';
 
 const Date = styled.div<{
     clickable: boolean;
@@ -23,12 +17,15 @@ const Date = styled.div<{
     oddRow: boolean;
 }>(({ theme, clickable, contentOnly, oddRow }) => ({
     color: theme.dateColor,
+    position: 'relative',
     fontSize: '12px',
     padding: '4px 4px 4px 8px',
     whiteSpace: 'nowrap',
     ...(clickable && {
         cursor: 'pointer',
-        textDecoration: 'underline'
+        '&:hover': {
+            backgroundColor: theme.rowHover
+        }
     }),
     ...(contentOnly && {
         [mediaQuerySmallOnly]: {
@@ -37,7 +34,20 @@ const Date = styled.div<{
     }),
     ...(oddRow && {
         backgroundColor: theme.oddRowBg
-    })
+    }),
+    '&:after': {
+        content: '" ms"',
+        fontSize: '0.8em',
+        color: theme.icon.normal
+    }
+}));
+
+const DateUnderlay = styled.div<{ color: string }>(({ color }) => ({
+    position: 'absolute',
+    left: 0,
+    height: '3px',
+    bottom: 0,
+    backgroundColor: color
 }));
 
 interface IRowProps {
@@ -54,27 +64,20 @@ interface IRowProps {
 }*/
 
 export const Row: React.FC<IRowProps> = memo(({ item, idx }) => {
-    const { setValue } = useContext(ModalContext);
     const theme = useTheme();
     const tag = item.getTag();
     const meta = item.getMeta();
-    const shouldClean = useRef(false);
-    const handleClick: MouseEventHandler = (e) => {
-        if (e.target === e.currentTarget) {
-            if (meta) {
-                setValue(<PropTree data={meta} />);
-                shouldClean.current = true;
-            }
-        }
-    };
-    useEffect(() => {
-        return () => {
-            if (shouldClean.current) {
-                setValue(null);
-                shouldClean.current = false;
-            }
-        };
-    }, []);
+    const handleClick: MouseEventHandler = useRowClickPanel(item);
+    let dateColor = google.base0B;
+    const duration = item.getDuration();
+    if (duration > 1000) {
+        dateColor = base16Darcula.base0F;
+    } else if (duration > 500) {
+        dateColor = base16Darcula.base0E;
+    } else if (duration > 300) {
+        dateColor = google.base0A;
+    }
+    const durationWidth = Math.round(Math.min(duration / 1000, 1) * 100);
     const commonProps = {
         css: idx % 2 ? { backgroundColor: theme.oddRowBg } : {},
         date: (
@@ -83,7 +86,11 @@ export const Row: React.FC<IRowProps> = memo(({ item, idx }) => {
                 contentOnly={item instanceof ContentOnlyItem}
                 oddRow={Boolean(idx % 2)}
                 onClick={handleClick}>
-                {item.getDuration().toFixed(2)} ms
+                {duration.toFixed(2)}
+                <DateUnderlay
+                    color={dateColor}
+                    style={{ right: `${100 - durationWidth}%` }}
+                />
             </Date>
         ),
         tag: tag ? (
