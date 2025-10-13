@@ -37,6 +37,7 @@ export const theme: Theme = {
         key: base16Darcula.base03
     },
     accent: base16Darcula.base08,
+    rowHover: '#1a73e81a',
     graphql: '#e535ab',
     phoenixLiveView: '#ee765d',
     oddRowBg: base16Darcula.base01,

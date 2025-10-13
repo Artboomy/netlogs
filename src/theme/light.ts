@@ -16,6 +16,7 @@ export const theme: Theme = {
         key: 'rgb(33% 33% 33%)'
     },
     accent: 'rgb(26, 115, 232)',
+    rowHover: '#1a73e81a',
     graphql: '#e535ab',
     phoenixLiveView: '#ee765d', // '#634872',
     oddRowBg: 'rgba(245, 245, 245)',

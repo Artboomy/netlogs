@@ -1,10 +1,11 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC, MouseEventHandler, ReactNode } from 'react';
 import { TransactionItemAbstract } from 'models/TransactionItem';
 import { mediaQuerySmallOnly, nameTrimmer } from 'utils';
 import { Response } from '../Response';
 import { InspectorWrapper } from '../InspectorWrapper';
 import { Name } from './Name';
 import styled from '@emotion/styled';
+import { useRowClickPanel } from 'components/row/useRowClickPanel';
 
 interface ITransactionProps {
     className?: string;
@@ -13,18 +14,26 @@ interface ITransactionProps {
     tag: ReactNode;
 }
 
-const NameContainer = styled.div({
-    // marginRight: 'auto',
-    fontSize: '13px',
-    // maxWidth: '30ch',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    padding: '4px 8px',
-    [mediaQuerySmallOnly]: {
-        maxWidth: '100%'
-    }
-});
+const NameContainer = styled.div<{ clickable: boolean }>(
+    ({ theme, clickable }) => ({
+        // marginRight: 'auto',
+        fontSize: '13px',
+        // maxWidth: '30ch',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        padding: '4px 8px',
+        [mediaQuerySmallOnly]: {
+            maxWidth: '100%'
+        },
+        ...(clickable && {
+            cursor: 'pointer',
+            '&:hover': {
+                backgroundColor: theme.rowHover
+            }
+        })
+    })
+);
 
 const ParamsContainer = styled.div({
     // marginRight: 'auto',
@@ -62,10 +71,14 @@ export const Transaction: FC<ITransactionProps> = ({
     tag
 }) => {
     const name = nameTrimmer(item.getName());
+    const handleClick: MouseEventHandler = useRowClickPanel(item);
     return (
         <>
             {date}
-            <NameContainer className={className}>
+            <NameContainer
+                className={className}
+                onClick={handleClick}
+                clickable={!!item.getMeta()}>
                 {tag}
                 <Name value={name} />
             </NameContainer>

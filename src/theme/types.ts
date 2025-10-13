@@ -13,6 +13,7 @@ export type Theme = {
     panelColor: string;
     borderColor: string;
     accent: string;
+    rowHover: string;
     graphql: string;
     phoenixLiveView: string;
     oddRowBg: string;
