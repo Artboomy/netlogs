@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
             chrome.runtime.onConnect.addListener((port) => {
                 if (port.name === 'panel') {
                     port.onMessage.addListener((message) => {
-                        if (message.type === 'cachedRequests') {
+                        if (message.type === 'cachedRequest') {
                             postSandbox(
                                 createEventPayload(
-                                    'cachedNetworkRequests',
+                                    'cachedNetworkRequest',
                                     JSON.stringify(message.data)
                                 )
                             );

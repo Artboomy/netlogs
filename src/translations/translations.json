@@ -1,5 +1,6 @@
 {
     "en-US": {
+        "restoringRequests": "Restoring requests",
         "copied": "Value copied",
         "drop": "Drop file",
         "changeLanguage": "You can change language in the settings",
@@ -71,6 +72,7 @@
         "clickToListen": "Click to listen WebSockets"
     },
     "ru-RU": {
+        "restoringRequests": "Восстановление запросов",
         "copied": "Значение скопировано",
         "drop": "Отпустите файл",
         "changeLanguage": "Вы можете изменить язык в настройках",
@@ -142,6 +144,7 @@
         "clickToListen": "Нажмите, чтобы прослушать вебсокеты"
     },
     "es-ES": {
+        "restoringRequests": "Restaurando solicitudes",
         "copied": "Valor copiado",
         "drop": "Suelta el archivo",
         "changeLanguage": "Puedes cambiar el idioma en la configuración",
@@ -213,6 +216,7 @@
         "clickToListen": "Haz clic para escuchar WebSockets"
     },
     "zh-CN": {
+        "restoringRequests": "正在恢复请求",
         "copied": "值已复制",
         "drop": "放置文件",
         "changeLanguage": "您可以在设置中更改语言",
@@ -284,6 +288,7 @@
         "clickToListen": "点击监听WebSockets"
     },
     "hi": {
+        "restoringRequests": "अनुरोध पुनर्स्थापित किए जा रहे हैं",
         "copied": "मान कॉपी किया गया",
         "drop": "फ़ाइल छोड़ें",
         "changeLanguage": "आप सेटिंग्स में भाषा बदल सकते हैं",
@@ -355,6 +360,7 @@
         "clickToListen": "WebSockets सुनने के लिए क्लिक करें"
     },
     "de-DE": {
+        "restoringRequests": "Anfragen werden wiederhergestellt",
         "copied": "Wert kopiert",
         "drop": "Datei ablegen",
         "changeLanguage": "Sie können die Sprache in den Einstellungen ändern",
@@ -426,6 +432,7 @@
         "clickToListen": "Klicken, um WebSockets zu hören"
     },
     "ja-JP": {
+        "restoringRequests": "リクエストを復元しています",
         "copied": "値をコピーしました",
         "drop": "ファイルをドロップ",
         "changeLanguage": "設定で言語を変更できます",

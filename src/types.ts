@@ -28,7 +28,7 @@ type CustomEventName =
     | 'download'
     | 'searchOnPage'
     | 'setHost'
-    | 'cachedNetworkRequests';
+    | 'cachedNetworkRequest';
 
 type TabEventName = 'chrome.tabs.create';
 

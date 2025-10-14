@@ -7,6 +7,7 @@ import TransactionItem from '../models/TransactionItem';
 import { NetworkRequest } from 'models/types';
 import { insertSorted, subscribeParent } from 'utils';
 import WebSocketItem from '../models/WebSocketItem';
+import { Id, toast } from 'react-toastify';
 
 export type AnyItem =
     | NetworkItem
@@ -63,6 +64,9 @@ export const useListStore = create<TStore>((set, get) => ({
 }));
 
 class Network {
+    cachedTimer: number | null = null;
+    cachedData: NetworkRequest[] = [];
+    toastId: Id = '';
     constructor() {
         // NOTE: looks like this isn't needed anymore
         /*Settings.addListener(function recomputeFieldsOnSettingsChangeNetwork()  {
@@ -103,22 +107,37 @@ class Network {
                 ]
             });
         });
-        subscribeParent(
-            'cachedNetworkRequests',
-            function cachedNetworkRequests(data) {
-                const array: NetworkRequest[] = JSON.parse(data);
+        subscribeParent('cachedNetworkRequest', (data) => {
+            const { request, idx, total } = JSON.parse(data);
+            this.cachedData.push(request);
+            if (this.cachedTimer) {
+                window.clearTimeout(this.cachedTimer);
+            }
+            const progress = idx + 1 / total;
+            if (this.toastId) {
+                toast.update(this.toastId, { progress });
+            } else {
+                this.toastId = toast('⌛', {
+                    progress
+                });
+            }
+            this.cachedTimer = window.setTimeout(() => {
                 const newState: Pick<TStore, 'mimeTypes' | 'list'> = {
-                    list: array.map((request) => new NetworkItem({ request })),
+                    list: this.cachedData.map(
+                        (request) => new NetworkItem({ request })
+                    ),
                     mimeTypes: new Set(
-                        array.map(
+                        this.cachedData.map(
                             (request) => request.response.content.mimeType
                         )
                     )
                 };
                 useListStore.setState(newState);
-                console.log('cachedNetworkRequests restored');
-            }
-        );
+                toast.done(this.toastId);
+                this.toastId = '';
+                this.cachedTimer = null;
+            }, 500);
+        });
     }
 }
 
