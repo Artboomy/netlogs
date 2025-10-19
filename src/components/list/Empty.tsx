@@ -137,6 +137,7 @@ export const Empty: FC = () => {
                         {i18n.t('togglePreserve')}: <kbd>{modifierKey}</kbd>+
                         <kbd>P</kbd>
                     </p>
+                    <p>{i18n.t('nodeCopyToClipboard')}</p>
                 </Column>
                 <Column>
                     <Line>

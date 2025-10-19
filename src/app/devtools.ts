@@ -25,11 +25,15 @@ chrome.devtools.panels.create(
 );
 
 let cache: chrome.devtools.network.Request[] = [];
+let cacheId = 1;
 function networkOnRequestFinished(request: chrome.devtools.network.Request) {
     if ('getContent' in request) {
+        const id = cacheId;
         request.getContent((content) => {
-            request.response.content.text = content;
-            cache.push(request);
+            if (cacheId === id) {
+                request.response.content.text = content;
+                cache.push(request);
+            }
         });
     } else {
         cache.push(request);
@@ -38,6 +42,7 @@ function networkOnRequestFinished(request: chrome.devtools.network.Request) {
 
 function networkOnNavigated() {
     cache = [];
+    cacheId += 1;
 }
 
 chrome.devtools.network.onRequestFinished.addListener(networkOnRequestFinished);
@@ -59,9 +64,15 @@ function connectToPanel() {
 // Send all cached requests to the panel
 function sendCachedRequests() {
     if (panelConnection && cache.length > 0) {
-        panelConnection.postMessage({
-            type: 'cachedRequests',
-            data: cache
+        cache.forEach((request, idx) => {
+            panelConnection?.postMessage({
+                type: 'cachedRequest',
+                data: {
+                    request,
+                    idx,
+                    total: cache.length
+                }
+            });
         });
     }
 }

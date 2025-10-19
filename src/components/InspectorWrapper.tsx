@@ -1,15 +1,23 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import Inspector, {
     chromeDark,
     chromeLight,
-    DOMInspector
+    DOMInspector,
+    InspectorAsTreeProps
 } from 'react-inspector';
 import { Image } from './render/Image';
 import { useListStore } from 'controllers/network';
 import { Webm } from './render/Webm';
-import { isSerializedFormData, isSerializedMultipartFormData, isSerializedObject } from 'utils';
+import {
+    isSerializedFormData,
+    isSerializedMultipartFormData,
+    isSerializedObject
+} from 'utils';
 import { AudioPreview } from './render/AudioPreview';
 import { useSettings } from 'hooks/useSettings';
+import copy from 'copy-to-clipboard';
+import { Flip, toast } from 'react-toastify';
+import { i18n } from 'translations/i18n';
 
 type TDomData = {
     __mimeType: 'text/html';
@@ -239,11 +247,34 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
                 recursiveTextToObject(unwrappedData);
         }
     }
+    const handleMouseDown: InspectorAsTreeProps['onMouseDown'] = useCallback(
+        (event, data) => {
+            if (event.button === 1 || event.buttons === 4) {
+                try {
+                    if (data !== undefined && data !== null) {
+                        copy(JSON.stringify(data, null, 4));
+                        event.stopPropagation();
+                        event.preventDefault();
+                        toast(i18n.t<string>('copied'), {
+                            hideProgressBar: true,
+                            autoClose: 300,
+                            transition: Flip
+                        });
+                    }
+                } catch (e) {
+                    toast(i18n.t<string>('errorOccurred'));
+                    console.error('Error while copying to clipboard', e);
+                }
+            }
+        },
+        []
+    );
     return (
         <Inspector
             name={name}
             data={unwrappedDataWithTextConverted}
             theme={customTheme}
+            onMouseDown={handleMouseDown}
         />
     );
 };

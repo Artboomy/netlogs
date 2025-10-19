@@ -1,5 +1,7 @@
 {
     "en-US": {
+        "nodeCopyToClipboard": "Copy object to clipboard: 🖱️ middle click on object",
+        "restoringRequests": "Restoring requests",
         "copied": "Value copied",
         "drop": "Drop file",
         "changeLanguage": "You can change language in the settings",
@@ -71,6 +73,8 @@
         "clickToListen": "Click to listen WebSockets"
     },
     "ru-RU": {
+        "nodeCopyToClipboard": "Скопировать объект в буфер обмена: 🖱️ клик средней кнопкой по объекту",
+        "restoringRequests": "Восстановление запросов",
         "copied": "Значение скопировано",
         "drop": "Отпустите файл",
         "changeLanguage": "Вы можете изменить язык в настройках",
@@ -142,6 +146,8 @@
         "clickToListen": "Нажмите, чтобы прослушать вебсокеты"
     },
     "es-ES": {
+        "nodeCopyToClipboard": "Copiar objeto al portapapeles: 🖱️ clic con el botón central en el objeto",
+        "restoringRequests": "Restaurando solicitudes",
         "copied": "Valor copiado",
         "drop": "Suelta el archivo",
         "changeLanguage": "Puedes cambiar el idioma en la configuración",
@@ -213,6 +219,8 @@
         "clickToListen": "Haz clic para escuchar WebSockets"
     },
     "zh-CN": {
+        "nodeCopyToClipboard": "复制对象到剪贴板：🖱️ 中键单击对象",
+        "restoringRequests": "正在恢复请求",
         "copied": "值已复制",
         "drop": "放置文件",
         "changeLanguage": "您可以在设置中更改语言",
@@ -284,6 +292,9 @@
         "clickToListen": "点击监听WebSockets"
     },
     "hi": {
+        "nodeCopyToClipboard": "ऑब्जेक्ट को क्लिपबोर्ड पर कॉपी करें: 🖱️ ऑब्जेक्ट पर मिडिल-क्लिक करें",
+
+        "restoringRequests": "अनुरोध पुनर्स्थापित किए जा रहे हैं",
         "copied": "मान कॉपी किया गया",
         "drop": "फ़ाइल छोड़ें",
         "changeLanguage": "आप सेटिंग्स में भाषा बदल सकते हैं",
@@ -355,6 +366,9 @@
         "clickToListen": "WebSockets सुनने के लिए क्लिक करें"
     },
     "de-DE": {
+        "nodeCopyToClipboard": "Objekt in die Zwischenablage kopieren: 🖱️ mit der mittleren Maustaste auf das Objekt klicken",
+
+        "restoringRequests": "Anfragen werden wiederhergestellt",
         "copied": "Wert kopiert",
         "drop": "Datei ablegen",
         "changeLanguage": "Sie können die Sprache in den Einstellungen ändern",
@@ -426,6 +440,9 @@
         "clickToListen": "Klicken, um WebSockets zu hören"
     },
     "ja-JP": {
+        "nodeCopyToClipboard": "オブジェクトをクリップボードにコピー：🖱️ オブジェクトを中クリック",
+
+        "restoringRequests": "リクエストを復元しています",
         "copied": "値をコピーしました",
         "drop": "ファイルをドロップ",
         "changeLanguage": "設定で言語を変更できます",
