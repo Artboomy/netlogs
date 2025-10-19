@@ -48,7 +48,7 @@ const DateUnderlay = styled.div<{ color: string }>(({ color }) => ({
     height: '3px',
     bottom: 0,
     backgroundColor: color,
-    willChange: 'tranform'
+    willChange: 'transform'
 }));
 
 interface IRowProps {

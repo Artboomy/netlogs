@@ -56,7 +56,7 @@ export const Section: FC<TSection> = ({ title, items }) => {
             return;
         }
         copy(String(value));
-        toast(i18n.t('copied') as string, {
+        toast(i18n.t<string>('copied'), {
             hideProgressBar: true,
             autoClose: 300,
             transition: Flip

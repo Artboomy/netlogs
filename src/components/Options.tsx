@@ -246,7 +246,11 @@ export const Options: FC = () => {
             </Block>
             <Block>
                 <h2>DEV ZONE</h2>
-                <Inspector name={'methodChecks'} data={settings.methodChecks} />
+                <Inspector
+                    name={'methodChecks'}
+                    data={settings.methodChecks}
+                    onMouseDown={() => null}
+                />
             </Block>
         </div>
     );
