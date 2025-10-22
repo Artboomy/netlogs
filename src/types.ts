@@ -42,6 +42,7 @@ type AnalyticsEventName =
     | 'analytics.fileOpen'
     | 'analytics.error'
     | 'analytics.searchOnPage'
+    | 'analytics.copyObject'
     | AnalyticsDurationEventName;
 
 type DebuggerEventName =
