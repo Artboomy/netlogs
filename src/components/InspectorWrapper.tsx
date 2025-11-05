@@ -9,6 +9,7 @@ import { Image } from './render/Image';
 import { useListStore } from 'controllers/network';
 import { Webm } from './render/Webm';
 import {
+    callParentVoid,
     isSerializedFormData,
     isSerializedMultipartFormData,
     isSerializedObject
@@ -252,7 +253,12 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
             if (event.button === 1 || event.buttons === 4) {
                 try {
                     if (data !== undefined && data !== null) {
-                        copy(JSON.stringify(data, null, 4));
+                        copy(
+                            typeof data === 'string'
+                                ? data
+                                : // strings to JSON adds extra quotes
+                                  JSON.stringify(data, null, 4)
+                        );
                         event.stopPropagation();
                         event.preventDefault();
                         toast(i18n.t<string>('copied'), {
@@ -260,6 +266,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
                             autoClose: 300,
                             transition: Flip
                         });
+                        callParentVoid('analytics.copyObject');
                     }
                 } catch (e) {
                     toast(i18n.t<string>('errorOccurred'));

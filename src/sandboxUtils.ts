@@ -185,6 +185,9 @@ export async function wrapSandbox(): Promise<void> {
                     case 'analytics.error':
                         analyticsError(data);
                         break;
+                    case 'analytics.copyObject':
+                        analytics.fireEvent('copyObject');
+                        break;
                     case 'analytics.searchOnPage':
                         analytics.fireEvent('searchOnPage');
                         break;
@@ -262,16 +265,14 @@ async function analyticsInit(id: string, type: EventName) {
         analytics.noSend = true;
     }
     // fire event with payload flag
-    const isDefaultProfile = Object.keys(settings.profiles).length === 3;
-    if (isDefaultProfile) {
-        analytics.fireEvent('matcherTypeDefault', { lang: settings.language });
-    } else {
-        analytics.fireEvent(Object.keys(settings.profiles).join('-'));
-    }
+    analytics.fireEvent('matcherTypeDefault', {
+        lang: settings.language,
+        browserLang: navigator?.languages?.join(',') || 'unknown'
+    });
     postSandbox({
         id,
         type,
-        data: String(isDefaultProfile)
+        data: String(true)
     });
 }
 
