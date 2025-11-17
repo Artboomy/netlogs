@@ -248,8 +248,8 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
                 recursiveTextToObject(unwrappedData);
         }
     }
-    const handleMouseDown: InspectorAsTreeProps['onMouseDown'] = useCallback(
-        (event, data) => {
+    const handleMouseDown: NonNullable<InspectorAsTreeProps['onMouseDown']> =
+        useCallback((event, data) => {
             if (event.button === 1 || event.buttons === 4) {
                 try {
                     if (data !== undefined && data !== null) {
@@ -273,9 +273,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
                     console.error('Error while copying to clipboard', e);
                 }
             }
-        },
-        []
-    );
+        }, []);
     return (
         <Inspector
             name={name}

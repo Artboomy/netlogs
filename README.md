@@ -166,7 +166,10 @@ The list may extend in the future.
 
 Please see the [dedicated documentation](LOCAL_DEVELOPMENT.md).
 
-## 🚧 Disclaimer
+## 🤝 Attributions
 
-This is software in its early stages of development, which is developed in the free time. You can report a bug or
-suggestion in the [Issues tab](https://github.com/Artboomy/netlogs/issues). I may or may not fix it 😉.
+[Left mouse click icon](https://www.flaticon.com/free-icon/left-click_3645819)
+
+[Middle mouse click icon](https://www.flaticon.com/free-icon/click_3646205)
+
+[Right mouse click icon](https://www.flaticon.com/free-icon/right-click_3645851)

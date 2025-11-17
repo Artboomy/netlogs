@@ -5,6 +5,8 @@ import { Theme } from 'theme/types';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import leftClick from 'icons/left-click.png?inline';
+import middleClick from 'icons/click.png';
 
 const fixedLine = (theme: Theme) =>
     ({
@@ -63,6 +65,17 @@ const NoItemsLine = styled.p({
     fontSize: '1.4em'
 });
 
+const KbdLine = styled.p({
+    display: 'flex',
+    gap: '4px'
+});
+
+const MouseImg = styled.img(({ theme }) => ({
+    width: '19px',
+    height: '19px',
+    ...(theme.name === 'dark' && { filter: 'invert(1)' })
+}));
+
 const Line = styled.p({
     margin: '0.5em 0'
 });
@@ -101,7 +114,7 @@ const WebsocketLine = styled.p(({ theme }) => ({
 }));
 
 // <NewBlock>New</NewBlock>
-const _NewBlock = styled.span(({ theme }) => ({
+const NewBlock = styled.span(({ theme }) => ({
     color: theme.mainBg,
     backgroundColor: 'orange',
     content: 'close-quote',
@@ -121,23 +134,31 @@ export const Empty: FC = () => {
             <NoItemsLine>👀 {i18n.t('noItems')} 👀</NoItemsLine>
             <Columns>
                 <Column css={hotkeysStyle}>
-                    <p>
+                    <KbdLine>
                         {i18n.t('focusSearch')}: <kbd>{modifierKey}</kbd>+
                         <kbd>F</kbd>
-                    </p>
-                    <p>
+                    </KbdLine>
+                    <KbdLine>
                         {i18n.t('clearLog')}: <kbd>{modifierKey}</kbd>+
                         <kbd>L</kbd>
-                    </p>
-                    <p>
+                    </KbdLine>
+                    <KbdLine>
                         {i18n.t('toggleUnrelated')}: <kbd>{modifierKey}</kbd>+
                         <kbd>Shift</kbd>+<kbd>U</kbd>
-                    </p>
-                    <p>
+                    </KbdLine>
+                    <KbdLine>
                         {i18n.t('togglePreserve')}: <kbd>{modifierKey}</kbd>+
                         <kbd>P</kbd>
-                    </p>
-                    <p>{i18n.t('nodeCopyToClipboard')}</p>
+                    </KbdLine>
+                    <KbdLine>
+                        <NewBlock>New</NewBlock>
+                        {i18n.t('recursiveToggle')}: <kbd>{modifierKey}</kbd>+
+                        <MouseImg src={leftClick} alt='Left click' />
+                    </KbdLine>
+                    <KbdLine>
+                        {i18n.t('nodeCopyToClipboard')}:{' '}
+                        <MouseImg src={middleClick} alt='Middle click' />
+                    </KbdLine>
                 </Column>
                 <Column>
                     <Line>
