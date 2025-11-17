@@ -1,6 +1,6 @@
 {
     "en-US": {
-        "nodeCopyToClipboard": "Copy object to clipboard: 🖱️ middle click on object",
+        "nodeCopyToClipboard": "Copy object to clipboard",
         "restoringRequests": "Restoring requests",
         "copied": "Value copied",
         "drop": "Drop file",
@@ -70,10 +70,11 @@
         "noTags": "No tags",
         "archiveNoHar": "Archive does not contain har file",
         "websocketsActive": "WebSockets are listened",
-        "clickToListen": "Click to listen WebSockets"
+        "clickToListen": "Click to listen WebSockets",
+        "recursiveToggle": "Recursively expand/collapse"
     },
     "ru-RU": {
-        "nodeCopyToClipboard": "Скопировать объект в буфер обмена: 🖱️ клик средней кнопкой по объекту",
+        "nodeCopyToClipboard": "Скопировать объект в буфер обмена",
         "restoringRequests": "Восстановление запросов",
         "copied": "Значение скопировано",
         "drop": "Отпустите файл",
@@ -143,10 +144,11 @@
         "noTags": "Нет тегов",
         "archiveNoHar": "Архив не содержит HAR файл",
         "websocketsActive": "Вебсокеты прослушиваются",
-        "clickToListen": "Нажмите, чтобы прослушать вебсокеты"
+        "clickToListen": "Нажмите, чтобы прослушать вебсокеты",
+        "recursiveToggle": "Рекурсивно раскрыть/скрыть"
     },
     "es-ES": {
-        "nodeCopyToClipboard": "Copiar objeto al portapapeles: 🖱️ clic con el botón central en el objeto",
+        "nodeCopyToClipboard": "Copiar objeto al portapapeles",
         "restoringRequests": "Restaurando solicitudes",
         "copied": "Valor copiado",
         "drop": "Suelta el archivo",
@@ -216,10 +218,11 @@
         "noTags": "Sin etiquetas",
         "archiveNoHar": "El archivo no contiene archivo har",
         "websocketsActive": "Los WebSockets están siendo escuchados",
-        "clickToListen": "Haz clic para escuchar WebSockets"
+        "clickToListen": "Haz clic para escuchar WebSockets",
+        "recursiveToggle": "Expandir/contraer recursivamente"
     },
     "zh-CN": {
-        "nodeCopyToClipboard": "复制对象到剪贴板：🖱️ 中键单击对象",
+        "nodeCopyToClipboard": "复制对象到剪贴板",
         "restoringRequests": "正在恢复请求",
         "copied": "值已复制",
         "drop": "放置文件",
@@ -289,11 +292,11 @@
         "noTags": "无标签",
         "archiveNoHar": "存档不包含har文件",
         "websocketsActive": "正在监听WebSockets",
-        "clickToListen": "点击监听WebSockets"
+        "clickToListen": "点击监听WebSockets",
+        "recursiveToggle": "递归展开/折叠"
     },
     "hi": {
-        "nodeCopyToClipboard": "ऑब्जेक्ट को क्लिपबोर्ड पर कॉपी करें: 🖱️ ऑब्जेक्ट पर मिडिल-क्लिक करें",
-
+        "nodeCopyToClipboard": "ऑब्जेक्ट को क्लिपबोर्ड पर कॉपी करें",
         "restoringRequests": "अनुरोध पुनर्स्थापित किए जा रहे हैं",
         "copied": "मान कॉपी किया गया",
         "drop": "फ़ाइल छोड़ें",
@@ -363,11 +366,11 @@
         "noTags": "कोई टैग नहीं",
         "archiveNoHar": "आर्काइव में har फ़ाइल नहीं है",
         "websocketsActive": "WebSockets सुने जा रहे हैं",
-        "clickToListen": "WebSockets सुनने के लिए क्लिक करें"
+        "clickToListen": "WebSockets सुनने के लिए क्लिक करें",
+        "recursiveToggle": "पुनरावर्ती रूप से विस्तार/संक्षेप"
     },
     "de-DE": {
-        "nodeCopyToClipboard": "Objekt in die Zwischenablage kopieren: 🖱️ mit der mittleren Maustaste auf das Objekt klicken",
-
+        "nodeCopyToClipboard": "Objekt in die Zwischenablage kopieren",
         "restoringRequests": "Anfragen werden wiederhergestellt",
         "copied": "Wert kopiert",
         "drop": "Datei ablegen",
@@ -437,11 +440,11 @@
         "noTags": "Keine Tags",
         "archiveNoHar": "Archiv enthält keine HAR-Datei",
         "websocketsActive": "WebSockets werden überwacht",
-        "clickToListen": "Klicken, um WebSockets zu hören"
+        "clickToListen": "Klicken, um WebSockets zu hören",
+        "recursiveToggle": "Rekursiv auf-/zuklappen"
     },
     "ja-JP": {
-        "nodeCopyToClipboard": "オブジェクトをクリップボードにコピー：🖱️ オブジェクトを中クリック",
-
+        "nodeCopyToClipboard": "オブジェクトをクリップボードにコピー",
         "restoringRequests": "リクエストを復元しています",
         "copied": "値をコピーしました",
         "drop": "ファイルをドロップ",
@@ -511,6 +514,7 @@
         "noTags": "タグなし",
         "archiveNoHar": "アーカイブにharファイルが含まれていません",
         "websocketsActive": "WebSocketsがリスニングされています",
-        "clickToListen": "WebSocketsをリスニングするにはクリック"
+        "clickToListen": "WebSocketsをリスニングするにはクリック",
+        "recursiveToggle": "再帰的に展開/折りたたむ"
     }
 }

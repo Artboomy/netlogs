@@ -111,7 +111,7 @@ export default defineConfig({
                 }
             }
         },
-        assetsInlineLimit: 10 // Inline assets smaller than 4KB
+        assetsInlineLimit: 8192 // Inline assets smaller than 4KB
     },
     css: {
         // Configuration for CSS
