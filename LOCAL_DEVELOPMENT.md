@@ -23,6 +23,9 @@ Run `yarn run package`. This will generate .zip archive, which can be unpacked a
 
 Alternatively, run `yarn run bild:prod` and archive `dist` folder manually.
 
+To build a Firefox-friendly bundle with an adjusted manifest, use `yarn run build:firefox`.
+To create an archive ready for Firefox installation, run `yarn run package:firefox`. The output will be in `dist-firefox` and `netlogs-firefox.zip`.
+
 ## 🗜️ Zip installation
 
 1. Grab the latest release from [Github](https://github.com/Artboomy/netlogs/releases). Download `netlogs.zip`.

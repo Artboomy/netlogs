@@ -1,8 +1,10 @@
 dist/js/*
+dist-firefox/
 node_modules/
 .idea
 .husky
 *.zip
+netlogs-firefox.zip
 roadmap.md
 yarn-error.log
 src/secrets.json
