@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useCallback, useRef, useState } from 'react';
 import { toggleUnpack, useListStore } from 'controllers/network';
 import runtime from '../api/runtime';
 import { Har } from 'har-format';
@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { DebuggerButton } from './DebuggerButton';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
+import { useTempSettings } from 'hooks/useTempSettings';
 
 const Root = styled.header(({ theme }) => ({
     borderBottom: `1px solid ${theme.borderColor}`,
@@ -94,6 +95,13 @@ export const Header: FC<IProps> = ({
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         useListStore.setState({ isPreserve: e.target.checked });
     };
+    const isVerticalView = useTempSettings((state) => state.isVerticalView);
+
+    const handleToggleForceVertical = useCallback(() => {
+        useTempSettings.setState(({ isVerticalView }) => ({
+            isVerticalView: !isVerticalView
+        }));
+    }, []);
     const ref = useRef<HTMLInputElement>(null);
     useHotkey(
         'focusSearch',
@@ -162,6 +170,12 @@ export const Header: FC<IProps> = ({
                     </HideUnrelated>
                 )}
                 <MimetypeSelect />
+                <IconButton
+                    onClick={handleToggleForceVertical}
+                    title={i18n.t('switchToVerticalMode')}
+                    active={isVerticalView}
+                    icon={ICONS.rotateView}
+                />
                 {isExtension() && (
                     <IconButton
                         icon={ICONS.settings}

@@ -11,23 +11,29 @@ interface IContentOnlyProp {
     tag: ReactNode;
 }
 
-const Container = styled.div({
+const containerVerticalFragment = {
+    gridColumn: '1/3',
+    flexDirection: 'column'
+} as const;
+
+const Container = styled.div(({ theme: { isVerticalView } }) => ({
     display: 'flex',
     alignItems: 'baseline',
     gridColumn: '2/5',
     padding: '4px 8px',
-    [mediaQuerySmallOnly]: {
-        gridColumn: '1/3',
-        flexDirection: 'column'
-    }
-});
+    ...(isVerticalView && containerVerticalFragment),
+    [mediaQuerySmallOnly]: containerVerticalFragment
+}));
 
-const ResponseStyled = styled(Response)({
+const responseVerticalFragment = {
+    paddingTop: '4px'
+};
+
+const ResponseStyled = styled(Response)(({ theme: { isVerticalView } }) => ({
     minHeight: '20px',
-    [mediaQuerySmallOnly]: {
-        paddingTop: '4px'
-    }
-});
+    ...(isVerticalView && responseVerticalFragment),
+    [mediaQuerySmallOnly]: responseVerticalFragment
+}));
 
 export const ContentOnly: FC<IContentOnlyProp> = ({
     className,

@@ -11,11 +11,15 @@ import { useTheme } from '@emotion/react';
 import { base16Darcula } from 'theme/dark';
 import { useRowClickPanel } from 'components/row/useRowClickPanel';
 
+const dateVerticalFragment = {
+    gridColumn: '1/3'
+};
+
 const Date = styled.div<{
     clickable: boolean;
     contentOnly: boolean;
     oddRow: boolean;
-}>(({ theme, clickable, contentOnly, oddRow }) => ({
+}>(({ theme: { isVerticalView, ...theme }, clickable, contentOnly, oddRow }) => ({
     color: theme.dateColor,
     position: 'relative',
     fontSize: '12px',
@@ -27,11 +31,8 @@ const Date = styled.div<{
             backgroundColor: theme.rowHover
         }
     }),
-    ...(contentOnly && {
-        [mediaQuerySmallOnly]: {
-            gridColumn: '1/3'
-        }
-    }),
+    ...(contentOnly && isVerticalView && dateVerticalFragment),
+    ...(contentOnly && { [mediaQuerySmallOnly]: dateVerticalFragment }),
     ...(oddRow && {
         backgroundColor: theme.oddRowBg
     }),

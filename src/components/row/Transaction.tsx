@@ -14,6 +14,10 @@ interface ITransactionProps {
     tag: ReactNode;
 }
 
+const nameVerticalFragment = {
+    maxWidth: '100%'
+};
+
 const NameContainer = styled.div<{ clickable: boolean }>(
     ({ theme, clickable }) => ({
         // marginRight: 'auto',
@@ -23,9 +27,8 @@ const NameContainer = styled.div<{ clickable: boolean }>(
         overflow: 'hidden',
         whiteSpace: 'nowrap',
         padding: '4px 8px',
-        [mediaQuerySmallOnly]: {
-            maxWidth: '100%'
-        },
+        ...(theme.isVerticalView && nameVerticalFragment),
+        [mediaQuerySmallOnly]: nameVerticalFragment,
         ...(clickable && {
             cursor: 'pointer',
             '&:hover': {
@@ -35,34 +38,40 @@ const NameContainer = styled.div<{ clickable: boolean }>(
     })
 );
 
-const ParamsContainer = styled.div({
+const paramsVerticalFragment = {
+    gridColumn: '1/3',
+    paddingLeft: '8px',
+    paddingBottom: '4px'
+};
+
+const ParamsContainer = styled.div(({ theme }) => ({
     // marginRight: 'auto',
     fontSize: '13px',
     wordBreak: 'break-all',
     minHeight: '20px',
     paddingTop: '4px',
     paddingRight: '8px',
-    [mediaQuerySmallOnly]: {
-        gridColumn: '1/3',
-        paddingLeft: '8px',
-        paddingBottom: '4px'
-    }
-});
+    ...(theme.isVerticalView && paramsVerticalFragment),
+    [mediaQuerySmallOnly]: paramsVerticalFragment
+}));
 
-const ResponseStyled = styled(Response)({
+const responseVerticalFragment = {
+    paddingBottom: '4px',
+    paddingLeft: '8px',
+    marginBottom: '4px',
+    gridColumn: '1/3'
+};
+
+const ResponseStyled = styled(Response)(({ theme }) => ({
     // marginRight: 'auto',
     paddingTop: '4px',
     position: 'relative',
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',
     overflow: 'hidden',
-    [mediaQuerySmallOnly]: {
-        paddingBottom: '4px',
-        paddingLeft: '8px',
-        marginBottom: '4px',
-        gridColumn: '1/3'
-    }
-});
+    ...(theme.isVerticalView && responseVerticalFragment),
+    [mediaQuerySmallOnly]: responseVerticalFragment
+}));
 
 export const Transaction: FC<ITransactionProps> = ({
     className,

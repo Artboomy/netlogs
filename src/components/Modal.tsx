@@ -4,7 +4,11 @@ import { IconButton, ICONS } from './IconButton';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
 
-const Container = styled.div(({ theme }) => ({
+const verticalFragment = {
+    left: '60px'
+};
+
+const Container = styled.div(({ theme: { isVerticalView, ...theme } }) => ({
     display: 'flex',
     flexDirection: 'column',
     position: 'fixed',
@@ -17,9 +21,8 @@ const Container = styled.div(({ theme }) => ({
     backgroundColor: theme.mainBg,
     paddingLeft: '8px',
     borderLeft: `1px solid ${theme.borderColor}`,
-    [mediaQuerySmallOnly]: {
-        left: '60px'
-    }
+    ...(isVerticalView && verticalFragment),
+    [mediaQuerySmallOnly]: verticalFragment
 }));
 
 const Header = styled.div(({ theme }) => ({

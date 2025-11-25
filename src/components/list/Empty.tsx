@@ -5,7 +5,7 @@ import { Theme } from 'theme/types';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import leftClick from 'icons/left-click.png?inline';
+import leftClick from 'icons/left-click.png';
 import middleClick from 'icons/click.png';
 
 const fixedLine = (theme: Theme) =>
@@ -36,14 +36,17 @@ const Section = styled.section({
     marginTop: '36px'
 });
 
-const Columns = styled.div({
+const columnsVerticalFragment = {
+    gridTemplateColumns: '1fr'
+};
+
+const Columns = styled.div(({ theme: { isVerticalView } }) => ({
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     padding: '0 16px',
-    [mediaQuerySmallOnly]: {
-        gridTemplateColumns: '1fr'
-    }
-});
+    ...(isVerticalView && columnsVerticalFragment),
+    [mediaQuerySmallOnly]: columnsVerticalFragment
+}));
 
 const Column = styled.div({
     display: 'flex',
@@ -55,6 +58,11 @@ const Column = styled.div({
 const hotkeysStyle = css`
     align-items: center;
 `;
+
+const HelpColumn = styled(Column)(({ theme: { isVerticalView } }) => ({
+    [mediaQuerySmallOnly]: hotkeysStyle,
+    ...(isVerticalView && hotkeysStyle)
+}));
 
 const NoItemsLine = styled.p({
     margin: '0.5em 0',
@@ -122,7 +130,10 @@ const NewBlock = styled.span(({ theme }) => ({
     borderRadius: '4px',
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    fontSize: '9px'
+    fontSize: '9px',
+    display: 'flex',
+    alignItems: 'center',
+    boxShadow: `2px 2px 6px 0px rgba(${theme.name === 'light' ? '34, 60, 80' : '255, 255, 255'}, 0.2)`
 }));
 
 const url =
@@ -160,7 +171,7 @@ export const Empty: FC = () => {
                         <MouseImg src={middleClick} alt='Middle click' />
                     </KbdLine>
                 </Column>
-                <Column>
+                <HelpColumn>
                     <Line>
                         ⛰️ <Link href='https://nextjs.org/' text='Next' />
                         /
@@ -183,7 +194,7 @@ export const Empty: FC = () => {
                         <Link href={url} text={i18n.t('share')} />{' '}
                         {i18n.t('shareHelper2')}
                     </Line>
-                </Column>
+                </HelpColumn>
             </Columns>
             {isExtension() && (
                 <LanguageLine>🌎 {i18n.t('changeLanguage')}</LanguageLine>

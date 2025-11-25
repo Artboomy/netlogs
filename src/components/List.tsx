@@ -5,17 +5,20 @@ import { ItemList } from 'controllers/network';
 import { Row } from './Row';
 import styled from '@emotion/styled';
 
-const Content = styled.div({
+const verticalFragment = {
+    gridTemplateColumns: 'min-content auto',
+    rowGap: 0
+};
+
+const Content = styled.div(({ theme: { isVerticalView } }) => ({
     display: 'grid',
     rowGap: '4px',
     // 45% leaves gap on the right on ultra-wide monitor
     gridTemplateColumns: 'min-content 30ch minmax(auto, 46%) minmax(auto, 46%)',
     whiteSpace: 'pre-wrap',
-    [mediaQuerySmallOnly]: {
-        gridTemplateColumns: 'min-content auto',
-        rowGap: 0
-    }
-});
+    ...(isVerticalView && verticalFragment),
+    [mediaQuerySmallOnly]: verticalFragment
+}));
 
 export const List: FC<{ items: ItemList }> = ({ items }) => {
     if (!items.length) {
