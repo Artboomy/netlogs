@@ -30,7 +30,7 @@ export const theme: Theme = {
     borderColor: 'rgb(71, 71, 71)',
     // TODO
     icon: {
-        normal: '#6e6e6e',
+        normal: '#838383',
         hover: '#5a5a5a'
     },
     section: {
@@ -46,5 +46,6 @@ export const theme: Theme = {
     linkVisitedColor: base16Darcula.base09,
     valueNumber: base16Darcula.base08,
     valueString: base16Darcula.base0F,
-    kbdBg: base16Darcula.base00
+    kbdBg: base16Darcula.base00,
+    isVerticalView: false
 };

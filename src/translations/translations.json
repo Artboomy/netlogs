@@ -71,7 +71,8 @@
         "archiveNoHar": "Archive does not contain har file",
         "websocketsActive": "WebSockets are listened",
         "clickToListen": "Click to listen WebSockets",
-        "recursiveToggle": "Recursively expand/collapse"
+        "recursiveToggle": "Recursively expand/collapse",
+        "switchToVerticalMode": "Switch to vertical view mode"
     },
     "ru-RU": {
         "nodeCopyToClipboard": "Скопировать объект в буфер обмена",
@@ -145,7 +146,8 @@
         "archiveNoHar": "Архив не содержит HAR файл",
         "websocketsActive": "Вебсокеты прослушиваются",
         "clickToListen": "Нажмите, чтобы прослушать вебсокеты",
-        "recursiveToggle": "Рекурсивно раскрыть/скрыть"
+        "recursiveToggle": "Рекурсивно раскрыть/скрыть",
+        "switchToVerticalMode": "Переключиться в вертикальный режим просмотра"
     },
     "es-ES": {
         "nodeCopyToClipboard": "Copiar objeto al portapapeles",
@@ -219,7 +221,8 @@
         "archiveNoHar": "El archivo no contiene archivo har",
         "websocketsActive": "Los WebSockets están siendo escuchados",
         "clickToListen": "Haz clic para escuchar WebSockets",
-        "recursiveToggle": "Expandir/contraer recursivamente"
+        "recursiveToggle": "Expandir/contraer recursivamente",
+        "switchToVerticalMode": "Cambiar al modo de vista vertical"
     },
     "zh-CN": {
         "nodeCopyToClipboard": "复制对象到剪贴板",
@@ -293,7 +296,8 @@
         "archiveNoHar": "存档不包含har文件",
         "websocketsActive": "正在监听WebSockets",
         "clickToListen": "点击监听WebSockets",
-        "recursiveToggle": "递归展开/折叠"
+        "recursiveToggle": "递归展开/折叠",
+        "switchToVerticalMode": "切换到垂直视图模式"
     },
     "hi": {
         "nodeCopyToClipboard": "ऑब्जेक्ट को क्लिपबोर्ड पर कॉपी करें",
@@ -367,7 +371,8 @@
         "archiveNoHar": "आर्काइव में har फ़ाइल नहीं है",
         "websocketsActive": "WebSockets सुने जा रहे हैं",
         "clickToListen": "WebSockets सुनने के लिए क्लिक करें",
-        "recursiveToggle": "पुनरावर्ती रूप से विस्तार/संक्षेप"
+        "recursiveToggle": "पुनरावर्ती रूप से विस्तार/संक्षेप",
+        "switchToVerticalMode": "ऊर्ध्वाधर दृश्य मोड पर स्विच करें"
     },
     "de-DE": {
         "nodeCopyToClipboard": "Objekt in die Zwischenablage kopieren",
@@ -441,7 +446,8 @@
         "archiveNoHar": "Archiv enthält keine HAR-Datei",
         "websocketsActive": "WebSockets werden überwacht",
         "clickToListen": "Klicken, um WebSockets zu hören",
-        "recursiveToggle": "Rekursiv auf-/zuklappen"
+        "recursiveToggle": "Rekursiv auf-/zuklappen",
+        "switchToVerticalMode": "In den vertikalen Ansichtsmodus wechseln"
     },
     "ja-JP": {
         "nodeCopyToClipboard": "オブジェクトをクリップボードにコピー",
@@ -515,6 +521,7 @@
         "archiveNoHar": "アーカイブにharファイルが含まれていません",
         "websocketsActive": "WebSocketsがリスニングされています",
         "clickToListen": "WebSocketsをリスニングするにはクリック",
-        "recursiveToggle": "再帰的に展開/折りたたむ"
+        "recursiveToggle": "再帰的に展開/折りたたむ",
+        "switchToVerticalMode": "縦向き表示モードに切り替える"
     }
 }

@@ -23,4 +23,5 @@ export type Theme = {
     valueNumber: string;
     valueString: string;
     kbdBg: string;
+    isVerticalView: boolean;
 };

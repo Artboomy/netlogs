@@ -25,5 +25,6 @@ export const theme: Theme = {
     linkVisitedColor: '',
     valueNumber: 'rgb(28, 0, 207)',
     valueString: 'rgb(196, 26, 22)',
-    kbdBg: '#eee'
+    kbdBg: '#eee',
+    isVerticalView: false
 };
