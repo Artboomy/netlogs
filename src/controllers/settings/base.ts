@@ -26,5 +26,16 @@ export const defaultSettings: ISettings = {
     },
     hiddenMimeTypes: [],
     tagsToolbarVisible: true,
-    methodsSidebarVisible: false
+    methodsSidebarVisible: false,
+    jira: {
+        baseUrl: '',
+        user: '',
+        apiToken: '',
+        projectKey: '',
+        issueType: 'Task',
+        apiVersion: '2',
+        attachScreenshot: true,
+        openTicketInNewTab: true,
+        template: ''
+    }
 };

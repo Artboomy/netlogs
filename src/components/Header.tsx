@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useRef, useState } from 'react';
+import React, { FC, useCallback, useContext, useRef, useState } from 'react';
 import { toggleUnpack, useListStore } from 'controllers/network';
 import runtime from '../api/runtime';
 import { Har } from 'har-format';
@@ -11,6 +11,8 @@ import { DebuggerButton } from './DebuggerButton';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
 import { useTempSettings } from 'hooks/useTempSettings';
+import { JiraTicketModal } from './JiraTicketModal';
+import { ModalContext } from './modal/Context';
 
 const Root = styled.header(({ theme }) => ({
     borderBottom: `1px solid ${theme.borderColor}`,
@@ -41,18 +43,18 @@ interface IProps {
     onCaseSensitiveChange: (value: boolean) => void;
 }
 
-function getFileName(): string {
+export function getFileName(): string {
     const now = new Date();
     return now.toISOString().replace(/:/g, '-');
 }
 
-const doExport = () => {
+export const getHarData = (): Har => {
     const { version, name } = runtime.getManifest();
     const { list } = useListStore.getState();
     const entries = list
         .filter((i) => i.shouldShow())
         .map((item) => item.toJSON());
-    const fileData: Har = {
+    return {
         log: {
             version: '1.2',
             creator: {
@@ -63,6 +65,10 @@ const doExport = () => {
             comment: 'Format: http://www.softwareishard.com/blog/har-12-spec/'
         }
     };
+};
+
+const doExport = () => {
+    const fileData = getHarData();
     toast.promise(
         callParent(
             'download',
@@ -92,6 +98,7 @@ export const Header: FC<IProps> = ({
     const isPreserve = useListStore((state) => state.isPreserve);
     const isUnpack = useListStore((state) => state.isUnpack);
     const [secondRowVisible, setSecondRowVisible] = useState(false);
+    const { setValue } = useContext(ModalContext);
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         useListStore.setState({ isPreserve: e.target.checked });
     };
@@ -183,6 +190,11 @@ export const Header: FC<IProps> = ({
                         title={i18n.t('options')}
                     />
                 )}
+                <IconButton
+                    onClick={() => setValue(<JiraTicketModal />)}
+                    title='Create Jira issue'>
+                    Jira
+                </IconButton>
                 <IconButton
                     icon={ICONS.export}
                     onClick={doExport}

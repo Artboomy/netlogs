@@ -1,6 +1,6 @@
 {
     "name": "netlogs",
-    "version": "2.9.0",
+    "version": "2.10.0",
     "description": "Web extension for custom network logs representation",
     "main": "index.js",
     "author": "artboomy",
@@ -9,7 +9,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "lint": "npx tsc --noEmit && npx eslint -c eslint.config.js --max-warnings=0 ./src",
+        "lint": "node scripts/lint-translations.cjs && npx tsc --noEmit && npx eslint -c eslint.config.js --max-warnings=0 ./src",
         "lint:ci": "echo '{\"api_secret\": \"mockData\", \"measurement_id\": \"mockData\"}' > src/secrets.json && yarn run lint",
         "build": "cross-env NODE_ENV=development vite build --mode development",
         "build:prod": "yarn run lint && vite build --mode production",
