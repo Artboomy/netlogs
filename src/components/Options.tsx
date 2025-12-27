@@ -1,23 +1,21 @@
 import React, { FC, useEffect } from 'react';
 import { useSettings } from 'hooks/useSettings';
 import { HiddenTagList } from './options/HiddenTagList';
+import { JiraOptions } from './options/JiraOptions';
 import { i18n } from 'translations/i18n';
 import { Global } from '@emotion/react';
 import styled from '@emotion/styled';
 import Inspector from 'react-inspector';
+import { Block } from 'components/options/Block';
 
-const Block = styled.section`
-    padding: 0 8px;
-`;
-
-const TitleRow = styled.section(({ theme }) => ({
-    padding: '0 8px',
+const TitleRow = styled.section({
+    padding: '0 8px 8px 24px',
     display: 'flex',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    backgroundColor: theme.panelColor,
-    borderBottom: `1px solid ${theme.borderColor}`
-}));
+    backgroundColor: 'rgb(243, 243, 243)',
+    borderBottom: `1px solid #dadce0`
+});
 
 const CheckboxRow = styled.div`
     padding: 4px 0;
@@ -28,22 +26,23 @@ const Link = styled.a`
 `;
 
 const globalStyles = {
-    '@global': {
-        html: {
-            height: '100%',
-            minWidth: '1024px'
-        },
-        body: {
-            height: '100%',
-            margin: 0,
-            fontSize: '100%'
-        },
-        '#root': {
-            height: '100%'
-        },
-        ':target': {
-            backgroundColor: '#ffa'
-        }
+    html: {
+        height: '100%',
+        minWidth: '1024px'
+    },
+    body: {
+        height: '100%',
+        margin: 0,
+        fontSize: '16px !important'
+    },
+    h2: {
+        margin: '8px 0'
+    },
+    '#root': {
+        height: '100%'
+    },
+    ':target': {
+        backgroundColor: '#ffa'
     }
 };
 
@@ -76,7 +75,7 @@ export const Options: FC = () => {
             </TitleRow>
             <Block>
                 <button onClick={() => useSettings.getState().resetSettings()}>
-                    Reset
+                    {i18n.t('reset')}
                 </button>
             </Block>
             <Block>
@@ -244,6 +243,7 @@ export const Options: FC = () => {
                 <h2>{i18n.t('hiddenTags')}</h2>
                 <HiddenTagList />
             </Block>
+            <JiraOptions />
             <Block>
                 <h2>DEV ZONE</h2>
                 <Inspector

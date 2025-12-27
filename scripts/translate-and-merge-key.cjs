@@ -20,74 +20,119 @@
  - If TARGET_KEY already exists, it will be updated and also moved to the end.
 */
 
+/* eslint-disable */
 const fs = require('fs');
 const path = require('path');
 
-const translationsPath = path.resolve(__dirname, '..', 'src', 'translations', 'translations.json');
+const translationsDir = path.resolve(__dirname, '..', 'src', 'translations');
 
-// LLM: set the key you want to merge into translations
-const TARGET_KEY = '';
+function getSupportedLanguages() {
+    return fs
+        .readdirSync(translationsDir)
+        .filter((f) => f.endsWith('.json') && f !== 'translations.json')
+        .map((f) => path.basename(f, '.json'));
+}
 
-/**
- * LLM: Provide translations for TARGET_KEY per language code, e.g.
- * {
- *   'en-US': 'English text',
- *   'ru-RU': 'Русский текст',
- *   ...
- * }
- */
-const newValues = {
-  // LLM: place new translations here
-};
+function printHelp() {
+    const langs = getSupportedLanguages();
+    console.log(`
+Usage:
+  node scripts/translate-and-merge-key.cjs <TARGET_KEY> '<newValuesJSON>'
+
+Arguments:
+  TARGET_KEY      The key to add or update in translations
+  newValuesJSON   A JSON string mapping language codes to values
+
+Supported languages:
+  ${langs.join(', ')}
+
+Example:
+  node scripts/translate-and-merge-key.cjs myNewKey '{"en-US": "Hello", "ru-RU": "Привет"}'
+`);
+}
 
 function readJson(file) {
-  const raw = fs.readFileSync(file, 'utf8');
-  return JSON.parse(raw);
+    const raw = fs.readFileSync(file, 'utf8');
+    return JSON.parse(raw);
 }
 
 function writeJson(file, data) {
-  const content = JSON.stringify(data, null, 4) + '\n';
-  fs.writeFileSync(file, content, 'utf8');
+    const content = JSON.stringify(data, null, 4) + '\n';
+    fs.writeFileSync(file, content, 'utf8');
 }
 
 function appendAtEnd(obj, key, value) {
-  // Rebuild object to ensure key order and append the target key at the end
-  const rebuilt = {};
-  for (const k of Object.keys(obj)) {
-    if (k === key) continue; // skip existing to re-append later
-    rebuilt[k] = obj[k];
-  }
-  rebuilt[key] = value;
-  return rebuilt;
+    // Rebuild object to ensure key order and append the target key at the end
+    const rebuilt = {};
+    for (const k of Object.keys(obj)) {
+        if (k === key) continue; // skip existing to re-append later
+        rebuilt[k] = obj[k];
+    }
+    rebuilt[key] = value;
+    return rebuilt;
 }
 
 function run() {
-  if (!fs.existsSync(translationsPath)) {
-    console.error('translations.json not found at', translationsPath);
-    process.exit(1);
-  }
+    const args = process.argv.slice(2);
 
-  const original = readJson(translationsPath);
+    if (args.includes('--help') || args.includes('-h') || args.length < 2) {
+        printHelp();
+        process.exit(
+            args.length < 2 && !args.includes('--help') && !args.includes('-h')
+                ? 1
+                : 0
+        );
+    }
 
-  const out = {};
-  for (const lang of Object.keys(original)) {
-    const langObj = original[lang] || {};
-    const fallbackValue = Object.prototype.hasOwnProperty.call(newValues, 'en-US')
-      ? newValues['en-US']
-      : Object.values(newValues)[0]; // fallback to the first provided translation if English is absent
+    const TARGET_KEY = args[0];
+    let newValues;
 
-    const value = Object.prototype.hasOwnProperty.call(newValues, lang)
-      ? newValues[lang]
-      : fallbackValue; // fallback value may be undefined if newValues is empty (ok for template)
+    try {
+        newValues = JSON.parse(args[1]);
+    } catch (e) {
+        console.error('Error: newValuesJSON must be a valid JSON string.');
+        console.error(e.message);
+        process.exit(1);
+    }
 
-    const updated = appendAtEnd(langObj, TARGET_KEY, value);
-    out[lang] = updated;
-  }
+    const langFiles = fs
+        .readdirSync(translationsDir)
+        .filter((f) => f.endsWith('.json') && f !== 'translations.json');
 
-  writeJson(translationsPath, out);
+    if (langFiles.length === 0) {
+        console.error('No language files found in', translationsDir);
+        process.exit(1);
+    }
 
-  console.log(`Merged \`${TARGET_KEY}\` into`, Object.keys(original).length, 'languages.');
-  console.log('Languages:', Object.keys(original).join(', '));
+    for (const file of langFiles) {
+        const lang = path.basename(file, '.json');
+        const filePath = path.join(translationsDir, file);
+        const langObj = readJson(filePath);
+
+        const fallbackValue = Object.prototype.hasOwnProperty.call(
+            newValues,
+            'en-US'
+        )
+            ? newValues['en-US']
+            : Object.values(newValues)[0]; // fallback to the first provided translation if English is absent
+
+        const value = Object.prototype.hasOwnProperty.call(newValues, lang)
+            ? newValues[lang]
+            : fallbackValue; // fallback value may be undefined if newValues is empty (ok for template)
+
+        const updated = appendAtEnd(langObj, TARGET_KEY, value);
+        writeJson(filePath, updated);
+    }
+
+    console.log(
+        `Merged \`${TARGET_KEY}\` into`,
+        langFiles.length,
+        'languages.'
+    );
+    console.log(
+        'Languages:',
+        langFiles.map((f) => path.basename(f, '.json')).join(', ')
+    );
 }
 
 run();

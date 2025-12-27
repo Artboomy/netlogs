@@ -1,0 +1,306 @@
+import React, { FC, useEffect, useMemo, useState } from 'react';
+import { useSettings } from 'hooks/useSettings';
+import { i18n } from 'translations/i18n';
+import styled from '@emotion/styled';
+import { Block } from './Block';
+import Inspector from 'react-inspector';
+import { ISettings } from 'controllers/settings/types';
+import { getDefaultTemplate } from 'utils/getDefaultTemplate';
+
+const Grid = styled.div`
+    display: grid;
+    grid-template-columns: 250px minmax(0, 500px);
+    gap: 8px;
+    align-items: center;
+    justify-items: start;
+
+    textarea,
+    input:not([type='checkbox']) {
+        width: 100%;
+    }
+
+    textarea {
+        min-height: 300px;
+        resize: vertical;
+    }
+`;
+
+const TitleRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+
+    h2 {
+        margin: 0;
+    }
+`;
+
+const ErrorBlock = styled.div(({ theme }) => ({
+    padding: '8px',
+    border: `2px solid ${theme.valueString}`,
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    fontSize: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    marginTop: '16px',
+    gridColumn: '1 / -1',
+    width: '100%',
+    boxSizing: 'border-box'
+}));
+
+const SuccessBlock = styled.div(({ theme }) => ({
+    padding: '8px',
+    border: `2px solid ${theme.name === 'dark' ? theme.dateColor : '#28a745'}`,
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    color: theme.name === 'dark' ? theme.dateColor : '#28a745',
+    fontSize: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    marginTop: '16px',
+    gridColumn: '1 / -1',
+    width: '100%',
+    boxSizing: 'border-box'
+}));
+
+const ErrorTitle = styled.div({
+    fontWeight: 'bold'
+});
+
+const ErrorItem = styled.div({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px'
+});
+
+const ErrorLabel = styled.span({
+    fontWeight: 'bold',
+    marginRight: '4px'
+});
+
+const Checkmark = styled.span(({ theme }) => ({
+    color: theme.name === 'dark' ? theme.dateColor : '#28a745',
+    fontWeight: 'bold',
+    marginLeft: '8px'
+}));
+
+type JiraIssueResponse = {
+    ok: boolean;
+    error?: string;
+    details?: {
+        url: string;
+        project: string;
+        issueType: string;
+        user: string;
+        status?: number;
+        statusText?: string;
+        response?: unknown;
+    };
+};
+
+const placeholders: Partial<Record<keyof ISettings['jira'], string>> = {
+    baseUrl: 'https://myorg.atlassian.net',
+    user: 'john.doe@myorg.com',
+    apiToken: 'your-api-token-here',
+    projectKey: 'MYPROJ'
+};
+
+export const JiraOptions: FC = () => {
+    const { settings, setSettings } = useSettings();
+    const [localJira, setLocalJira] = useState(settings.jira);
+    const [isSaved, setIsSaved] = useState(false);
+    const [isTesting, setIsTesting] = useState(false);
+    const [testResult, setTestResult] = useState<JiraIssueResponse | null>(
+        null
+    );
+
+    useEffect(() => {
+        setLocalJira(settings.jira);
+    }, [settings.jira]);
+
+    const handleSave = () => {
+        setSettings({
+            ...settings,
+            jira: localJira
+        });
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 2000);
+    };
+
+    const handleChange = (
+        key: keyof typeof localJira,
+        value: string | boolean
+    ) => {
+        setLocalJira({
+            ...localJira,
+            [key]: value
+        });
+    };
+
+    const handleTestSettings = async () => {
+        setIsTesting(true);
+        setTestResult(null);
+        try {
+            // first save current local settings to make sure we test what is on the screen
+            setSettings({
+                ...settings,
+                jira: localJira
+            });
+            const response = await new Promise<string>((resolve) => {
+                chrome.runtime.sendMessage(
+                    { type: 'jira.testSettings', requestId: 'options' },
+                    (response) => resolve(response)
+                );
+            });
+            const parsed = JSON.parse(response) as JiraIssueResponse;
+            setTestResult(parsed);
+        } catch (e) {
+            setTestResult({
+                ok: false,
+                error: String(e)
+            });
+        } finally {
+            setIsTesting(false);
+        }
+    };
+
+    const errorDetails = useMemo(() => {
+        if (!testResult?.details) return [];
+        const details = testResult.details;
+        const items = [
+            { label: 'URL', value: details.url },
+            { label: 'Project', value: details.project },
+            { label: 'Issue Type', value: details.issueType },
+            { label: 'User', value: details.user }
+        ];
+
+        if (details.status || details.statusText) {
+            items.push({
+                label: 'Status',
+                value: `${details.status ?? ''} ${details.statusText ?? ''}`
+            });
+        }
+
+        return items;
+    }, [testResult]);
+
+    return (
+        <Block>
+            <TitleRow>
+                <h2>Jira</h2>
+                <button onClick={handleSave}>
+                    {isSaved ? i18n.t('saved') : i18n.t('save')}
+                </button>
+                <button onClick={handleTestSettings} disabled={isTesting}>
+                    {isTesting
+                        ? i18n.t('jira_testing')
+                        : i18n.t('jira_checkSettings')}
+                </button>
+                {testResult?.ok && <Checkmark>✓</Checkmark>}
+            </TitleRow>
+            <Grid>
+                {testResult?.ok && (
+                    <SuccessBlock>
+                        {i18n.t('jira_testSuccess', {
+                            defaultValue: 'Jira settings are correct!'
+                        })}
+                    </SuccessBlock>
+                )}
+                {testResult && !testResult.ok && (
+                    <ErrorBlock>
+                        <ErrorTitle>
+                            {i18n.t(testResult.error || '', {
+                                defaultValue: testResult.error,
+                                project: testResult.details?.project,
+                                issueType: testResult.details?.issueType
+                            })}
+                        </ErrorTitle>
+                        {errorDetails.map((item) => (
+                            <ErrorItem key={item.label}>
+                                <ErrorLabel>
+                                    {i18n.t(
+                                        `jiraTicketModal_errorLabel${item.label.replace(
+                                            ' ',
+                                            ''
+                                        )}`,
+                                        { defaultValue: item.label }
+                                    )}
+                                    :
+                                </ErrorLabel>
+                                {item.value}
+                            </ErrorItem>
+                        ))}
+                        {testResult.details?.response ? (
+                            <ErrorItem>
+                                <ErrorLabel>
+                                    {i18n.t(
+                                        'jiraTicketModal_errorLabelResponse'
+                                    )}
+                                    :
+                                </ErrorLabel>
+                                <Inspector data={testResult.details.response} />
+                            </ErrorItem>
+                        ) : null}
+                    </ErrorBlock>
+                )}
+                {(Object.keys(localJira) as Array<keyof typeof localJira>).map(
+                    (key) => (
+                        <React.Fragment key={key}>
+                            <label htmlFor={`jira-${key}`}>
+                                {i18n.t(`jiraSettings_${key}`)}
+                                {key === 'apiToken' && (
+                                    <a
+                                        href='https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html'
+                                        target='_blank'
+                                        rel='noreferrer'
+                                        style={{ marginLeft: '8px' }}>
+                                        ?
+                                    </a>
+                                )}
+                            </label>
+                            {key === 'template' ? (
+                                <textarea
+                                    id={`jira-${key}`}
+                                    value={
+                                        (localJira[key] as string) ||
+                                        getDefaultTemplate()
+                                    }
+                                    onChange={(e) =>
+                                        handleChange(key, e.target.value)
+                                    }
+                                />
+                            ) : key === 'attachScreenshot' ||
+                              key === 'openTicketInNewTab' ? (
+                                <input
+                                    id={`jira-${key}`}
+                                    type='checkbox'
+                                    checked={localJira[key] as boolean}
+                                    onChange={(e) =>
+                                        handleChange(key, e.target.checked)
+                                    }
+                                />
+                            ) : (
+                                <input
+                                    id={`jira-${key}`}
+                                    type={
+                                        key === 'apiToken' ? 'password' : 'text'
+                                    }
+                                    placeholder={placeholders[key]}
+                                    value={localJira[key] as string}
+                                    onChange={(e) =>
+                                        handleChange(key, e.target.value)
+                                    }
+                                />
+                            )}
+                        </React.Fragment>
+                    )
+                )}
+            </Grid>
+        </Block>
+    );
+};

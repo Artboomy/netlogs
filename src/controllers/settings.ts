@@ -60,7 +60,12 @@ function deserializeProfile(profile: IProfileSerialized): IProfile {
 export function deserialize(strSettings: string): ISettings {
     const deserialized = JSON.parse(strSettings) as ISettingsSerialized;
     return {
+        ...defaultSettings,
         ...deserialized,
+        jira: {
+            ...defaultSettings.jira,
+            ...(deserialized.jira || {})
+        },
         ...{ matcher: deserializeMatcher(deserialized.matcher) },
         ...{
             profiles: Object.assign(
@@ -147,10 +152,7 @@ class Settings {
                 { settings: serialize(defaultSettings) },
                 ({ settings }) => {
                     try {
-                        this.settings = {
-                            ...defaultSettings,
-                            ...deserialize(settings)
-                        };
+                        this.settings = deserialize(settings);
                         setLanguage(this.settings.language);
                     } catch (_e) {
                         this.settings = defaultSettings;

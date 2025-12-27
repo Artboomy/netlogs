@@ -61,6 +61,17 @@ export interface ISettings {
     methodsSidebarVisible: boolean;
     hiddenTags: Record<string, string>;
     hiddenMimeTypes: string[];
+    jira: {
+        baseUrl: string;
+        user: string;
+        apiToken: string;
+        projectKey: string;
+        issueType: string;
+        apiVersion: string;
+        template: string;
+        attachScreenshot: boolean;
+        openTicketInNewTab: boolean;
+    };
 }
 
 export type ISettingsSerialized = Omit<ISettings, 'matcher' | 'profiles'> & {

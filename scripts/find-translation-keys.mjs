@@ -41,14 +41,21 @@ async function extractKeys(filePath) {
 }
 
 async function loadTranslations() {
-    const translationsPath = path.join(
-        __dirname,
-        'src',
-        'translations',
-        'translations.json'
+    const translationsDir = path.join(__dirname, 'src', 'translations');
+    const langFiles = (await fs.readdir(translationsDir)).filter(
+        (f) => f.endsWith('.json') && f !== 'translations.json'
     );
-    const content = await fs.readFile(translationsPath, 'utf-8');
-    return JSON.parse(content);
+
+    const translations = {};
+    for (const file of langFiles) {
+        const lang = path.basename(file, '.json');
+        const content = await fs.readFile(
+            path.join(translationsDir, file),
+            'utf-8'
+        );
+        translations[lang] = JSON.parse(content);
+    }
+    return translations;
 }
 
 async function main() {
@@ -100,20 +107,14 @@ async function main() {
             }
         }
 
-        // Save clean translations to a new file
-        const cleanTranslationsPath = path.join(
-            __dirname,
-            'clean-translations.json'
-        );
-        await fs.writeFile(
-            cleanTranslationsPath,
-            JSON.stringify(cleanTranslations, null, 4)
-        );
+        // Save clean translations to new files
+        const translationsDir = path.join(__dirname, 'src', 'translations');
+        for (const [lang, trans] of Object.entries(cleanTranslations)) {
+            const filePath = path.join(translationsDir, `${lang}.json`);
+            await fs.writeFile(filePath, JSON.stringify(trans, null, 4) + '\n');
+        }
 
-        console.log(
-            '\nClean translations file has been saved to:',
-            cleanTranslationsPath
-        );
+        console.log('\nClean translations files have been saved.');
     } catch (error) {
         console.error('Error:', error);
     }

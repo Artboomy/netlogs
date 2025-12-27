@@ -67,7 +67,13 @@ const messageHandler = (
             }
         } else if (type === 'connectionTest') {
             console.log('message', type, e.data);
-            postSandbox(createEventPayload('setHost', e.data));
+            const data = e.data as unknown as { host: string };
+            postSandbox(
+                createEventPayload(
+                    'setHost',
+                    typeof data === 'object' ? data.host : data
+                )
+            );
         }
     }
 };
