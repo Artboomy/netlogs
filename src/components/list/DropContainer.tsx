@@ -17,10 +17,12 @@ import styled from '@emotion/styled';
 import { ItemType } from 'models/enums';
 
 const DropZone = styled.div({
-    height: '100%',
+    flex: 1,
     width: '100%',
     boxSizing: 'border-box',
-    overflow: 'auto'
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column'
 });
 
 const Overlay = styled.div({
@@ -51,6 +53,20 @@ const Icon = styled.div(({ theme }) => ({
 export const DropContainer: FC<{ children?: React.ReactNode }> = ({
     children
 }) => {
+    React.useEffect(() => {
+        const preventDefault = (e: DragEvent) => {
+            if (e.dataTransfer?.types.includes('Files')) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        };
+        window.addEventListener('dragover', preventDefault);
+        window.addEventListener('drop', preventDefault);
+        return () => {
+            window.removeEventListener('dragover', preventDefault);
+            window.removeEventListener('drop', preventDefault);
+        };
+    }, []);
     const { setList } = useListStore.getState();
     const [{ canDrop, isOver }, dropRef] = useDrop(
         () => ({
