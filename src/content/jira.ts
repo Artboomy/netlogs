@@ -520,6 +520,18 @@ export async function handleJiraTestSettings(
     }
 }
 
+let metadataCache: {
+    projectKey: string;
+    issueType: string;
+    baseUrl: string;
+    fields: {
+        key: string;
+        name: string;
+        type: string | undefined;
+        allowedValues: { id: string; value: string | undefined }[] | undefined;
+    }[];
+} | null = null;
+
 export async function handleJiraGetMetadata(
     message: JiraGetMetadataMessage,
     port: Port
@@ -546,39 +558,96 @@ export async function handleJiraGetMetadata(
         return;
     }
 
+    if (
+        metadataCache &&
+        metadataCache.projectKey === projectKey &&
+        metadataCache.issueType === issueType &&
+        metadataCache.baseUrl === baseUrl
+    ) {
+        respond(JSON.stringify({ ok: true, fields: metadataCache.fields }));
+        return;
+    }
+
     try {
-        const endpoint = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta?projectKeys=${projectKey}&issuetypeNames=${encodeURIComponent(
+        const projectEndpoint = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta?projectKeys=${projectKey}&issuetypeNames=${encodeURIComponent(
             issueType
         )}&expand=projects.issuetypes.fields`;
 
-        const response = await fetch(endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${jiraSettings.apiToken}`
-            }
-        });
+        const systemEndpoint = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta?issuetypeNames=${encodeURIComponent(
+            issueType
+        )}&expand=projects.issuetypes.fields`;
 
-        const responseBody = await response.json().catch(() => ({}));
+        const [projectResponse, systemResponse] = await Promise.all([
+            fetch(projectEndpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jiraSettings.apiToken}`
+                }
+            }),
+            fetch(systemEndpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jiraSettings.apiToken}`
+                }
+            })
+        ]);
 
-        if (!response.ok) {
+        const projectBody = await projectResponse.json().catch(() => ({}));
+        const systemBody = await systemResponse.json().catch(() => ({}));
+
+        if (!projectResponse.ok && !systemResponse.ok) {
             respond(
                 createJiraError(
-                    responseBody?.errorMessages?.join(', ') ||
-                        response.statusText ||
+                    projectBody?.errorMessages?.join(', ') ||
+                        projectResponse.statusText ||
                         'Failed to fetch metadata'
                 )
             );
             return;
         }
 
-        const project = responseBody.projects?.[0];
-        const issuetype = project?.issuetypes?.[0];
-        const fields = issuetype?.fields || {};
+        const fieldsMap: Record<
+            string,
+            {
+                required: boolean;
+                hasDefaultValue?: boolean;
+                name: string;
+                schema?: { type: string };
+                allowedValues?: { id: string; value?: string; name?: string }[];
+            }
+        > = {};
 
-        const requiredFields = Object.keys(fields)
+        const processMeta = (body: unknown) => {
+            const projects =
+                ((body as Record<string, unknown>)?.projects as unknown[]) ||
+                [];
+            projects.forEach((p) => {
+                const issuetypes =
+                    ((p as Record<string, unknown>)?.issuetypes as unknown[]) ||
+                    [];
+                issuetypes.forEach((it) => {
+                    const fields =
+                        ((it as Record<string, unknown>)?.fields as Record<
+                            string,
+                            unknown
+                        >) || {};
+                    Object.keys(fields).forEach((key) => {
+                        fieldsMap[key] = fields[
+                            key
+                        ] as (typeof fieldsMap)[string];
+                    });
+                });
+            });
+        };
+
+        processMeta(projectBody);
+        processMeta(systemBody);
+
+        const requiredFields = Object.keys(fieldsMap)
             .filter((key) => {
-                const field = fields[key];
+                const field = fieldsMap[key];
                 return (
                     field.required &&
                     !field.hasDefaultValue &&
@@ -589,7 +658,7 @@ export async function handleJiraGetMetadata(
                 );
             })
             .map((key) => {
-                const field = fields[key];
+                const field = fieldsMap[key];
                 return {
                     key,
                     name: field.name,
@@ -602,6 +671,13 @@ export async function handleJiraGetMetadata(
                     )
                 };
             });
+
+        metadataCache = {
+            projectKey,
+            issueType,
+            baseUrl,
+            fields: requiredFields
+        };
 
         respond(JSON.stringify({ ok: true, fields: requiredFields }));
     } catch (e) {

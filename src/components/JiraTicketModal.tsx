@@ -34,7 +34,7 @@ const Row = styled.label(({ theme }) => ({
 
 const DescriptionRow = styled(Row)({
     flex: 1,
-    minHeight: '200px'
+    minHeight: '300px'
 });
 
 const TitleRow = styled.div({
@@ -75,7 +75,7 @@ const Select = styled.select(({ theme }) => ({
 
 const TextArea = styled.textarea(({ theme }) => ({
     padding: '6px 8px',
-    minHeight: '120px',
+    minHeight: '280px',
     resize: 'vertical',
     backgroundColor: theme.mainBg,
     color: theme.mainFont,
