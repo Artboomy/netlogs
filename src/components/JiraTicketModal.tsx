@@ -1,4 +1,4 @@
-import React, { FC, useContext, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { callParent } from 'utils';
 import { toast } from 'react-toastify';
@@ -55,7 +55,22 @@ const Input = styled.input(({ theme }) => ({
     '&:focus': {
         borderColor: theme.accent,
         outline: 'none'
-    }
+    },
+    width: '100%',
+    boxSizing: 'border-box'
+}));
+
+const Select = styled.select(({ theme }) => ({
+    padding: '6px 8px',
+    backgroundColor: theme.mainBg,
+    color: theme.mainFont,
+    border: `1px solid ${theme.borderColor}`,
+    '&:focus': {
+        borderColor: theme.accent,
+        outline: 'none'
+    },
+    width: '100%',
+    boxSizing: 'border-box'
 }));
 
 const TextArea = styled.textarea(({ theme }) => ({
@@ -136,6 +151,19 @@ const ErrorLabel = styled.span({
     marginRight: '4px'
 });
 
+type JiraFieldMetadata = {
+    key: string;
+    name: string;
+    type: string;
+    allowedValues?: { id: string; value: string }[];
+};
+
+type JiraMetadataResponse = {
+    ok: boolean;
+    fields?: JiraFieldMetadata[];
+    error?: string;
+};
+
 type JiraIssueResponse = {
     ok: boolean;
     key?: string;
@@ -166,11 +194,38 @@ export const JiraTicketModal: FC = () => {
         const jira = settings.jira;
         return jira.baseUrl && jira.apiToken && jira.projectKey;
     });
+    console.log('isReady', isReady);
     const { setValue } = useContext(ModalContext);
     const [summary, setSummary] = useState('');
     const [description, setDescription] = useState(
         template || getDefaultTemplate()
     );
+    const [dynamicFields, setDynamicFields] = useState<JiraFieldMetadata[]>([]);
+    const [fieldValues, setFieldValues] = useState<Record<string, unknown>>({});
+
+    useEffect(() => {
+        if (isReady) {
+            callParent('jira.getMetadata').then((response) => {
+                const parsed = JSON.parse(response) as JiraMetadataResponse;
+                if (parsed.ok && parsed.fields) {
+                    setDynamicFields(parsed.fields);
+                    // Initialize field values
+                    const initialValues: Record<string, unknown> = {};
+                    parsed.fields.forEach((f) => {
+                        if (f.type === 'option' || f.type === 'select') {
+                            initialValues[f.key] =
+                                f.allowedValues?.[0]?.id || '';
+                        } else if (f.type === 'checkbox') {
+                            initialValues[f.key] = [];
+                        } else {
+                            initialValues[f.key] = '';
+                        }
+                    });
+                    setFieldValues(initialValues);
+                }
+            });
+        }
+    }, [isReady]);
 
     const [lastError, setLastError] = useState<JiraIssueResponse | null>(null);
     const [lastSuccess, setLastSuccess] = useState<JiraIssueResponse | null>(
@@ -207,6 +262,29 @@ export const JiraTicketModal: FC = () => {
             console.error('Failed to generate HAR ZIP', e);
         }
 
+        const fields: Record<string, unknown> = {};
+        dynamicFields.forEach((f) => {
+            const val = fieldValues[f.key];
+            if (f.type === 'option' || f.type === 'select') {
+                if (val) {
+                    fields[f.key] = { id: val };
+                }
+            } else if (f.type === 'array' && val && typeof val === 'string') {
+                // Handle labels (array of strings)
+                fields[f.key] = val
+                    .split(';')
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+            } else if (f.type === 'checkbox') {
+                // Handle checkboxes (usually an array of objects with value or id)
+                if (Array.isArray(val)) {
+                    fields[f.key] = val.map((v) => ({ value: v }));
+                }
+            } else {
+                fields[f.key] = val;
+            }
+        });
+
         const response = await callParent(
             'jira.createIssue',
             JSON.stringify({
@@ -215,7 +293,8 @@ export const JiraTicketModal: FC = () => {
                 template: template || getDefaultTemplate(),
                 harZipData,
                 harFileName: `${getFileName()}.har.zip`,
-                attachScreenshot
+                attachScreenshot,
+                fields
             })
         );
         console.log('createIssue response', response);
@@ -358,11 +437,101 @@ export const JiraTicketModal: FC = () => {
                     onChange={(event) => setSummary(event.target.value)}
                 />
             </Row>
+            {dynamicFields.map((field) => (
+                <Row key={field.key}>
+                    <span>
+                        {field.name}
+                        <Required>*</Required>
+                    </span>
+                    {field.type === 'option' || field.type === 'select' ? (
+                        <Select
+                            value={(fieldValues[field.key] as string) || ''}
+                            onChange={(e) =>
+                                setFieldValues((prev) => ({
+                                    ...prev,
+                                    [field.key]: e.target.value
+                                }))
+                            }>
+                            {field.allowedValues?.map((opt) => (
+                                <option key={opt.id} value={opt.id}>
+                                    {opt.value}
+                                </option>
+                            ))}
+                        </Select>
+                    ) : field.type === 'array' ? (
+                        <Input
+                            type='text'
+                            placeholder='label1;label2'
+                            value={(fieldValues[field.key] as string) || ''}
+                            onChange={(e) =>
+                                setFieldValues((prev) => ({
+                                    ...prev,
+                                    [field.key]: e.target.value
+                                }))
+                            }
+                        />
+                    ) : field.type === 'checkbox' ? (
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '4px'
+                            }}>
+                            {field.allowedValues?.map((opt) => (
+                                <label
+                                    key={opt.id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}>
+                                    <input
+                                        type='checkbox'
+                                        checked={(
+                                            (fieldValues[
+                                                field.key
+                                            ] as string[]) || []
+                                        ).includes(opt.value)}
+                                        onChange={(e) => {
+                                            const current =
+                                                (fieldValues[
+                                                    field.key
+                                                ] as string[]) || [];
+                                            const next = e.target.checked
+                                                ? [...current, opt.value]
+                                                : current.filter(
+                                                      (v) => v !== opt.value
+                                                  );
+                                            setFieldValues((prev) => ({
+                                                ...prev,
+                                                [field.key]: next
+                                            }));
+                                        }}
+                                    />
+                                    {opt.value}
+                                </label>
+                            ))}
+                        </div>
+                    ) : (
+                        <Input
+                            type='text'
+                            value={(fieldValues[field.key] as string) || ''}
+                            onChange={(e) =>
+                                setFieldValues((prev) => ({
+                                    ...prev,
+                                    [field.key]: e.target.value
+                                }))
+                            }
+                        />
+                    )}
+                </Row>
+            ))}
             <DescriptionRow>
                 {i18n.t('jiraTicketModal_description')}
                 <TextArea
                     value={description}
                     onChange={(event) => setDescription(event.target.value)}
+                    rows={Math.min(description.split('\n').length + 3, 10)}
                 />
             </DescriptionRow>
         </Form>

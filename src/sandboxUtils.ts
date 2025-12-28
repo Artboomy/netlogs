@@ -203,6 +203,15 @@ export async function wrapSandbox(): Promise<void> {
                             });
                         });
                         break;
+                    case 'jira.getMetadata':
+                        getJiraMetadata(id).then((response) => {
+                            postSandbox({
+                                id,
+                                type,
+                                data: response
+                            });
+                        });
+                        break;
                     case 'debugger.evaluate':
                         debuggerEvaluate(data, id).then((response) => {
                             postSandbox({
@@ -234,6 +243,7 @@ export async function wrapSandbox(): Promise<void> {
 
 let portToBackground: chrome.runtime.Port;
 const jiraRequests = new Map<string, (data: string) => void>();
+const jiraMetadataRequests = new Map<string, (data: string) => void>();
 const evaluateRequests = new Map<string, (data: string) => void>();
 
 let cache: { type: string; value: string | undefined }[] = [];
@@ -252,9 +262,12 @@ if (isExtension()) {
     portToBackground.onMessage.addListener((message) => {
         if (message.type === 'jira.response') {
             console.log('jira.response', message);
-            const resolver = jiraRequests.get(message.requestId);
+            const resolver =
+                jiraRequests.get(message.requestId) ||
+                jiraMetadataRequests.get(message.requestId);
             if (resolver) {
                 jiraRequests.delete(message.requestId);
+                jiraMetadataRequests.delete(message.requestId);
                 resolver(message.data);
             }
             return;
@@ -324,6 +337,23 @@ async function createJiraIssue(
             type: 'jira.createIssue',
             requestId,
             data: payload
+        });
+    });
+}
+
+async function getJiraMetadata(requestId: string): Promise<string> {
+    if (!portToBackground) {
+        return JSON.stringify({
+            ok: false,
+            error: 'Background connection is not available.'
+        });
+    }
+
+    return new Promise((resolve) => {
+        jiraMetadataRequests.set(requestId, resolve);
+        portToBackground.postMessage({
+            type: 'jira.getMetadata',
+            requestId
         });
     });
 }

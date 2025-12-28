@@ -30,6 +30,7 @@ type CustomEventName =
     | 'setHost'
     | 'cachedNetworkRequest'
     | 'jira.createIssue'
+    | 'jira.getMetadata'
     | 'jira.testSettings'
     | 'chrome.permissions.request';
 

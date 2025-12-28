@@ -7,6 +7,11 @@ export type JiraCreateMessage = {
     data: string;
 };
 
+export type JiraGetMetadataMessage = {
+    type: 'jira.getMetadata';
+    requestId: string;
+};
+
 export type JiraTestMessage = {
     type: 'jira.testSettings';
     requestId: string;
@@ -28,6 +33,7 @@ export type JiraIssuePayload = {
     tabId?: number;
     pageState?: string;
     template?: string;
+    fields?: Record<string, unknown>;
 };
 
 export type JiraIssueResponse = {
@@ -187,7 +193,8 @@ export async function handleJiraCreateIssue(
             project: { key: project },
             summary: payload.summary,
             description: description,
-            issuetype: { name: issueType }
+            issuetype: { name: issueType },
+            ...(payload.fields || {})
         }
     };
     try {
@@ -208,6 +215,17 @@ export async function handleJiraCreateIssue(
                 responseBody?.errors?.summary ||
                 response.statusText ||
                 'Jira request failed';
+
+            if (tabId !== undefined) {
+                const wasAttached = !!debuggerAttachedMap[tabId];
+                if (!wasAttached) {
+                    try {
+                        await chrome.debugger.detach({ tabId });
+                    } catch (_e) {
+                        /* ignore */
+                    }
+                }
+            }
 
             port.postMessage({
                 type: 'jira.response',
@@ -499,5 +517,94 @@ export async function handleJiraTestSettings(
         respond(JSON.stringify({ ok: true }));
     } catch (e) {
         respond(createJiraError(String(e), details));
+    }
+}
+
+export async function handleJiraGetMetadata(
+    message: JiraGetMetadataMessage,
+    port: Port
+) {
+    const jiraSettings = await getJiraSettings();
+
+    const apiVersion = jiraSettings.apiVersion || '2';
+    const baseUrl = jiraSettings.baseUrl
+        ? normalizeBaseUrl(jiraSettings.baseUrl)
+        : '';
+    const projectKey = jiraSettings.projectKey;
+    const issueType = jiraSettings.issueType || 'Task';
+
+    const respond = (data: string) => {
+        port.postMessage({
+            type: 'jira.response',
+            requestId: message.requestId,
+            data
+        } satisfies JiraResponseMessage);
+    };
+
+    if (!baseUrl || !jiraSettings.apiToken || !projectKey) {
+        respond(createJiraError('Missing Jira settings.'));
+        return;
+    }
+
+    try {
+        const endpoint = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta?projectKeys=${projectKey}&issuetypeNames=${encodeURIComponent(
+            issueType
+        )}&expand=projects.issuetypes.fields`;
+
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jiraSettings.apiToken}`
+            }
+        });
+
+        const responseBody = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            respond(
+                createJiraError(
+                    responseBody?.errorMessages?.join(', ') ||
+                        response.statusText ||
+                        'Failed to fetch metadata'
+                )
+            );
+            return;
+        }
+
+        const project = responseBody.projects?.[0];
+        const issuetype = project?.issuetypes?.[0];
+        const fields = issuetype?.fields || {};
+
+        const requiredFields = Object.keys(fields)
+            .filter((key) => {
+                const field = fields[key];
+                return (
+                    field.required &&
+                    !field.hasDefaultValue &&
+                    key !== 'project' &&
+                    key !== 'issuetype' &&
+                    key !== 'summary' &&
+                    key !== 'description'
+                );
+            })
+            .map((key) => {
+                const field = fields[key];
+                return {
+                    key,
+                    name: field.name,
+                    type: field.schema?.type,
+                    allowedValues: field.allowedValues?.map(
+                        (v: { id: string; value?: string; name?: string }) => ({
+                            id: v.id,
+                            value: v.value || v.name
+                        })
+                    )
+                };
+            });
+
+        respond(JSON.stringify({ ok: true, fields: requiredFields }));
+    } catch (e) {
+        respond(createJiraError(String(e)));
     }
 }

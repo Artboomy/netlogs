@@ -9,8 +9,10 @@ import { defaultSettings } from 'controllers/settings/base';
 import Port = chrome.runtime.Port;
 import {
     handleJiraCreateIssue,
+    handleJiraGetMetadata,
     handleJiraTestSettings,
     JiraCreateMessage,
+    JiraGetMetadataMessage,
     JiraTestMessage
 } from './jira';
 
@@ -234,6 +236,9 @@ function portMessageHandler(message: { type: string }, port: Port) {
             debuggerAttachedMap,
             tabId
         );
+    } else if (message.type === 'jira.getMetadata') {
+        console.log('jira.getMetadata');
+        handleJiraGetMetadata(message as JiraGetMetadataMessage, port);
     } else if (message.type === 'jira.testSettings') {
         console.log('jira.testSettings');
         handleJiraTestSettings(message as JiraTestMessage, undefined, port);
