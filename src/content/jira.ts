@@ -569,98 +569,98 @@ export async function handleJiraGetMetadata(
     }
 
     try {
-        const projectEndpoint = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta?projectKeys=${projectKey}&issuetypeNames=${encodeURIComponent(
-            issueType
-        )}&expand=projects.issuetypes.fields`;
+        const authHeader = `Bearer ${jiraSettings.apiToken}`;
 
-        const systemEndpoint = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta?issuetypeNames=${encodeURIComponent(
-            issueType
-        )}&expand=projects.issuetypes.fields`;
-
-        const [projectResponse, systemResponse] = await Promise.all([
-            fetch(projectEndpoint, {
+        // 1. Get Project to find issueTypeId
+        const projectResponse = await fetch(
+            `${baseUrl}/rest/api/${apiVersion}/project/${projectKey}`,
+            {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${jiraSettings.apiToken}`
+                    Authorization: authHeader
                 }
-            }),
-            fetch(systemEndpoint, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${jiraSettings.apiToken}`
-                }
-            })
-        ]);
+            }
+        );
 
-        const projectBody = await projectResponse.json().catch(() => ({}));
-        const systemBody = await systemResponse.json().catch(() => ({}));
-
-        if (!projectResponse.ok && !systemResponse.ok) {
+        if (!projectResponse.ok) {
+            const projectBody = await projectResponse.json().catch(() => ({}));
             respond(
                 createJiraError(
                     projectBody?.errorMessages?.join(', ') ||
                         projectResponse.statusText ||
+                        'Failed to fetch project details'
+                )
+            );
+            return;
+        }
+
+        const projectData = (await projectResponse.json()) as {
+            issueTypes: { id: string; name: string }[];
+        };
+        const targetIssueType = projectData.issueTypes.find(
+            (it) => it.name === issueType
+        );
+
+        if (!targetIssueType) {
+            respond(
+                createJiraError(
+                    `Issue type "${issueType}" not found in project "${projectKey}"`
+                )
+            );
+            return;
+        }
+
+        const issueTypeId = targetIssueType.id;
+
+        // 2. Get Metadata for the specific project and issue type
+        const metaUrl = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta/${projectKey}/issuetypes/${issueTypeId}`;
+        const metaResponse = await fetch(metaUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: authHeader
+            }
+        });
+
+        const metaBody = await metaResponse.json().catch(() => ({}));
+
+        if (!metaResponse.ok) {
+            respond(
+                createJiraError(
+                    metaBody?.errorMessages?.join(', ') ||
+                        metaResponse.statusText ||
                         'Failed to fetch metadata'
                 )
             );
             return;
         }
 
-        const fieldsMap: Record<
-            string,
-            {
-                required: boolean;
-                hasDefaultValue?: boolean;
-                name: string;
-                schema?: { type: string };
-                allowedValues?: { id: string; value?: string; name?: string }[];
-            }
-        > = {};
+        // The response for /rest/api/2/issue/createmeta/{projectKey}/issuetypes/{issueTypeId}
+        // is FieldCreateMetaBeans, which contains a "fields" property.
+        const fields = (metaBody.fields || []) as Array<{
+            required: boolean;
+            hasDefaultValue?: boolean;
+            name: string;
+            key: string;
+            schema?: { type: string };
+            allowedValues?: { id: string; value?: string; name?: string }[];
+        }>;
 
-        const processMeta = (body: unknown) => {
-            const projects =
-                ((body as Record<string, unknown>)?.projects as unknown[]) ||
-                [];
-            projects.forEach((p) => {
-                const issuetypes =
-                    ((p as Record<string, unknown>)?.issuetypes as unknown[]) ||
-                    [];
-                issuetypes.forEach((it) => {
-                    const fields =
-                        ((it as Record<string, unknown>)?.fields as Record<
-                            string,
-                            unknown
-                        >) || {};
-                    Object.keys(fields).forEach((key) => {
-                        fieldsMap[key] = fields[
-                            key
-                        ] as (typeof fieldsMap)[string];
-                    });
-                });
-            });
-        };
-
-        processMeta(projectBody);
-        processMeta(systemBody);
-
-        const requiredFields = Object.keys(fieldsMap)
-            .filter((key) => {
-                const field = fieldsMap[key];
+        const requiredFields = fields
+            .filter((field) => {
                 return (
                     field.required &&
                     !field.hasDefaultValue &&
-                    key !== 'project' &&
-                    key !== 'issuetype' &&
-                    key !== 'summary' &&
-                    key !== 'description'
+                    field.key !== 'project' &&
+                    field.key !== 'issuetype' &&
+                    field.key !== 'summary' &&
+                    field.key !== 'description'
                 );
             })
-            .map((key) => {
-                const field = fieldsMap[key];
+            .map((field) => {
                 return {
-                    key,
+                    key: field.key,
                     name: field.name,
                     type: field.schema?.type,
                     allowedValues: field.allowedValues?.map(
