@@ -161,6 +161,7 @@ type JiraFieldMetadata = {
 type JiraMetadataResponse = {
     ok: boolean;
     fields?: JiraFieldMetadata[];
+    allFields?: JiraFieldMetadata[];
     error?: string;
 };
 
@@ -169,6 +170,7 @@ type JiraIssueResponse = {
     key?: string;
     url?: string;
     error?: string;
+    missingFields?: string[];
     details?: {
         url: string;
         project: string;
@@ -201,7 +203,24 @@ export const JiraTicketModal: FC = () => {
         template || getDefaultTemplate()
     );
     const [dynamicFields, setDynamicFields] = useState<JiraFieldMetadata[]>([]);
+    const [allFields, setAllFields] = useState<JiraFieldMetadata[]>([]);
     const [fieldValues, setFieldValues] = useState<Record<string, unknown>>({});
+
+    const initializeFieldValues = (fields: JiraFieldMetadata[]) => {
+        const initialValues: Record<string, unknown> = {};
+        fields.forEach((f) => {
+            if (f.type === 'option' || f.type === 'select') {
+                initialValues[f.key] = f.allowedValues?.[0]?.id || '';
+            } else if (f.type === 'checkbox') {
+                initialValues[f.key] = [];
+            } else if (f.type === 'array') {
+                initialValues[f.key] = '';
+            } else {
+                initialValues[f.key] = '';
+            }
+        });
+        return initialValues;
+    };
 
     useEffect(() => {
         if (isReady) {
@@ -209,19 +228,13 @@ export const JiraTicketModal: FC = () => {
                 const parsed = JSON.parse(response) as JiraMetadataResponse;
                 if (parsed.ok && parsed.fields) {
                     setDynamicFields(parsed.fields);
+                    if (parsed.allFields) {
+                        setAllFields(parsed.allFields);
+                    }
                     // Initialize field values
-                    const initialValues: Record<string, unknown> = {};
-                    parsed.fields.forEach((f) => {
-                        if (f.type === 'option' || f.type === 'select') {
-                            initialValues[f.key] =
-                                f.allowedValues?.[0]?.id || '';
-                        } else if (f.type === 'checkbox') {
-                            initialValues[f.key] = [];
-                        } else {
-                            initialValues[f.key] = '';
-                        }
-                    });
-                    setFieldValues(initialValues);
+                    setFieldValues(
+                        initializeFieldValues(parsed.allFields || parsed.fields)
+                    );
                 }
             });
         }
@@ -301,6 +314,38 @@ export const JiraTicketModal: FC = () => {
         const parsed = JSON.parse(response) as JiraIssueResponse;
         if (!parsed.ok) {
             setLastError(parsed);
+            if (parsed.missingFields && parsed.missingFields.length > 0) {
+                const missingFieldKeys = parsed.missingFields;
+                const newFields = allFields.filter(
+                    (f) =>
+                        missingFieldKeys.includes(f.key) &&
+                        !dynamicFields.some((df) => df.key === f.key)
+                );
+
+                if (newFields.length > 0) {
+                    setDynamicFields((prev) => [...prev, ...newFields]);
+                    // Initialize missing fields if they don't have values yet
+                    setFieldValues((prev) => {
+                        const next = { ...prev };
+                        newFields.forEach((f) => {
+                            if (next[f.key] === undefined) {
+                                if (
+                                    f.type === 'option' ||
+                                    f.type === 'select'
+                                ) {
+                                    next[f.key] =
+                                        f.allowedValues?.[0]?.id || '';
+                                } else if (f.type === 'checkbox') {
+                                    next[f.key] = [];
+                                } else {
+                                    next[f.key] = '';
+                                }
+                            }
+                        });
+                        return next;
+                    });
+                }
+            }
             throw new Error(parsed.error || 'Jira request failed');
         }
         setLastSuccess(parsed);

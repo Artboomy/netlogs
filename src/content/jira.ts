@@ -41,6 +41,7 @@ export type JiraIssueResponse = {
     key?: string;
     url?: string;
     error?: string;
+    missingFields?: string[];
     details?: {
         url: string;
         project: string;
@@ -50,7 +51,6 @@ export type JiraIssueResponse = {
         response?: unknown;
     };
 };
-
 export function normalizeBaseUrl(baseUrl: string): string {
     return baseUrl.replace(/\/+$/, '');
 }
@@ -216,6 +216,15 @@ export async function handleJiraCreateIssue(
                 response.statusText ||
                 'Jira request failed';
 
+            let missingFields: string[] | undefined;
+            if (
+                response.status === 400 &&
+                responseBody?.errors &&
+                typeof responseBody.errors === 'object'
+            ) {
+                missingFields = Object.keys(responseBody.errors);
+            }
+
             if (tabId !== undefined) {
                 const wasAttached = !!debuggerAttachedMap[tabId];
                 if (!wasAttached) {
@@ -230,12 +239,17 @@ export async function handleJiraCreateIssue(
             port.postMessage({
                 type: 'jira.response',
                 requestId: message.requestId,
-                data: createJiraError(errorMessage, {
-                    ...details,
-                    status: response.status,
-                    statusText: response.statusText,
-                    response: responseBody
-                })
+                data: JSON.stringify({
+                    ok: false,
+                    error: errorMessage,
+                    missingFields,
+                    details: {
+                        ...details,
+                        status: response.status,
+                        statusText: response.statusText,
+                        response: responseBody
+                    }
+                } satisfies JiraIssueResponse)
             } satisfies JiraResponseMessage);
             return;
         }
@@ -528,6 +542,8 @@ let metadataCache: {
         key: string;
         name: string;
         type: string | undefined;
+        required: boolean;
+        hasDefaultValue: boolean | undefined;
         allowedValues: { id: string; value: string | undefined }[] | undefined;
     }[];
 } | null = null;
@@ -564,7 +580,23 @@ export async function handleJiraGetMetadata(
         metadataCache.issueType === issueType &&
         metadataCache.baseUrl === baseUrl
     ) {
-        respond(JSON.stringify({ ok: true, fields: metadataCache.fields }));
+        const initialFields = metadataCache.fields.filter((field) => {
+            return (
+                field.required &&
+                !field.hasDefaultValue &&
+                field.key !== 'project' &&
+                field.key !== 'issuetype' &&
+                field.key !== 'summary' &&
+                field.key !== 'description'
+            );
+        });
+        respond(
+            JSON.stringify({
+                ok: true,
+                fields: initialFields,
+                allFields: metadataCache.fields
+            })
+        );
         return;
     }
 
@@ -638,48 +670,57 @@ export async function handleJiraGetMetadata(
 
         // The response for /rest/api/2/issue/createmeta/{projectKey}/issuetypes/{issueTypeId}
         // is FieldCreateMetaBeans, which contains a "fields" property.
-        const fields = (metaBody.fields || []) as Array<{
+        const fields = (metaBody.fields || metaBody.values || []) as Array<{
             required: boolean;
             hasDefaultValue?: boolean;
             name: string;
             key: string;
+            fieldId: string;
             schema?: { type: string };
             allowedValues?: { id: string; value?: string; name?: string }[];
         }>;
 
-        const requiredFields = fields
-            .filter((field) => {
-                return (
-                    field.required &&
-                    !field.hasDefaultValue &&
-                    field.key !== 'project' &&
-                    field.key !== 'issuetype' &&
-                    field.key !== 'summary' &&
-                    field.key !== 'description'
-                );
-            })
-            .map((field) => {
-                return {
-                    key: field.key,
-                    name: field.name,
-                    type: field.schema?.type,
-                    allowedValues: field.allowedValues?.map(
-                        (v: { id: string; value?: string; name?: string }) => ({
-                            id: v.id,
-                            value: v.value || v.name
-                        })
-                    )
-                };
-            });
+        const mappedFields = fields.map((field) => {
+            return {
+                key: field.key || field.fieldId,
+                name: field.name,
+                type: field.schema?.type,
+                required: field.required,
+                hasDefaultValue: field.hasDefaultValue,
+                allowedValues: field.allowedValues?.map(
+                    (v: { id: string; value?: string; name?: string }) => ({
+                        id: v.id,
+                        value: v.value || v.name
+                    })
+                )
+            };
+        });
 
         metadataCache = {
             projectKey,
             issueType,
             baseUrl,
-            fields: requiredFields
+            fields: mappedFields
         };
 
-        respond(JSON.stringify({ ok: true, fields: requiredFields }));
+        const initialFields = mappedFields.filter((field) => {
+            return (
+                field.required &&
+                !field.hasDefaultValue &&
+                field.key !== 'project' &&
+                field.key !== 'issuetype' &&
+                field.key !== 'summary' &&
+                field.key !== 'description'
+            );
+        });
+
+        respond(
+            JSON.stringify({
+                ok: true,
+                fields: initialFields,
+                allFields: mappedFields
+            })
+        );
     } catch (e) {
         respond(createJiraError(String(e)));
     }
