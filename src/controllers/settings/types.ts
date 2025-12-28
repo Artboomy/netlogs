@@ -63,7 +63,6 @@ export interface ISettings {
     hiddenMimeTypes: string[];
     jira: {
         baseUrl: string;
-        user: string;
         apiToken: string;
         projectKey: string;
         issueType: string;

@@ -30,7 +30,6 @@ const defaultSettings: ISettings = {
     methodsSidebarVisible: false,
     jira: {
         baseUrl: '',
-        user: '',
         apiToken: '',
         projectKey: '',
         issueType: '',

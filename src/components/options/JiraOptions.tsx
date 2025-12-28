@@ -96,7 +96,6 @@ type JiraIssueResponse = {
         url: string;
         project: string;
         issueType: string;
-        user: string;
         status?: number;
         statusText?: string;
         response?: unknown;
@@ -105,7 +104,6 @@ type JiraIssueResponse = {
 
 const placeholders: Partial<Record<keyof ISettings['jira'], string>> = {
     baseUrl: 'https://myorg.atlassian.net',
-    user: 'john.doe@myorg.com',
     apiToken: 'your-api-token-here',
     projectKey: 'MYPROJ'
 };
@@ -175,8 +173,7 @@ export const JiraOptions: FC = () => {
         const items = [
             { label: 'URL', value: details.url },
             { label: 'Project', value: details.project },
-            { label: 'Issue Type', value: details.issueType },
-            { label: 'User', value: details.user }
+            { label: 'Issue Type', value: details.issueType }
         ];
 
         if (details.status || details.statusText) {
@@ -255,7 +252,7 @@ export const JiraOptions: FC = () => {
                                 {i18n.t(`jiraSettings_${key}`)}
                                 {key === 'apiToken' && (
                                     <a
-                                        href='https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html'
+                                        href='https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html#UsingPersonalAccessTokens-CreatingPATsintheapplication'
                                         target='_blank'
                                         rel='noreferrer'
                                         style={{ marginLeft: '8px' }}>

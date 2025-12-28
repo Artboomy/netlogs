@@ -164,7 +164,7 @@ export const JiraTicketModal: FC = () => {
     );
     const isReady = useSettings(({ settings }) => {
         const jira = settings.jira;
-        return jira.baseUrl && jira.user && jira.apiToken && jira.projectKey;
+        return jira.baseUrl && jira.apiToken && jira.projectKey;
     });
     const { setValue } = useContext(ModalContext);
     const [summary, setSummary] = useState('');

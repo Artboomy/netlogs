@@ -39,7 +39,6 @@ export type JiraIssueResponse = {
         url: string;
         project: string;
         issueType: string;
-        user: string;
         status?: number;
         statusText?: string;
         response?: unknown;
@@ -84,22 +83,20 @@ export async function handleJiraCreateIssue(
     const endpoint = `${baseUrl}/rest/api/${apiVersion}/issue`;
     const issueType = payload.issueType || jiraSettings.issueType || 'Task';
     const project = jiraSettings.projectKey;
-    const user = jiraSettings.user;
     const tabId = payload.tabId ?? incomingTabId;
 
     const details: JiraIssueResponse['details'] = {
         url: endpoint,
         project,
-        issueType,
-        user
+        issueType
     };
 
-    if (!baseUrl || !user || !jiraSettings.apiToken || !project) {
+    if (!baseUrl || !jiraSettings.apiToken || !project) {
         port.postMessage({
             type: 'jira.response',
             requestId: message.requestId,
             data: createJiraError(
-                'Missing Jira settings. Check base URL, user, token, and project key.',
+                'Missing Jira settings. Check base URL, token, and project key.',
                 details
             )
         } satisfies JiraResponseMessage);
@@ -165,7 +162,6 @@ export async function handleJiraCreateIssue(
                 .replace(
                     '$service_info$',
                     [
-                        `timestamp: ${timestamp}`,
                         `userAgent: ${stateData.userAgent || ''}`,
                         `title: ${stateData.title || ''}`
                     ].join('\n')
@@ -199,9 +195,7 @@ export async function handleJiraCreateIssue(
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Basic ${btoa(
-                    `${user}:${jiraSettings.apiToken}`
-                )}`
+                Authorization: `Bearer ${jiraSettings.apiToken}`
             },
             body: JSON.stringify(body)
         });
@@ -266,9 +260,7 @@ export async function handleJiraCreateIssue(
                         method: 'POST',
                         headers: {
                             'X-Atlassian-Token': 'no-check',
-                            Authorization: `Basic ${btoa(
-                                `${user}:${jiraSettings.apiToken}`
-                            )}`
+                            Authorization: `Bearer ${jiraSettings.apiToken}`
                         },
                         body: formData
                     }
@@ -310,9 +302,7 @@ export async function handleJiraCreateIssue(
                         method: 'POST',
                         headers: {
                             'X-Atlassian-Token': 'no-check',
-                            Authorization: `Basic ${btoa(
-                                `${user}:${jiraSettings.apiToken}`
-                            )}`
+                            Authorization: `Bearer ${jiraSettings.apiToken}`
                         },
                         body: formData
                     }
@@ -338,9 +328,7 @@ export async function handleJiraCreateIssue(
                         method: 'POST',
                         headers: {
                             'X-Atlassian-Token': 'no-check',
-                            Authorization: `Basic ${btoa(
-                                `${user}:${jiraSettings.apiToken}`
-                            )}`
+                            Authorization: `Bearer ${jiraSettings.apiToken}`
                         },
                         body: formData
                     }
@@ -388,13 +376,11 @@ export async function handleJiraTestSettings(
         ? normalizeBaseUrl(jiraSettings.baseUrl)
         : '';
     const endpoint = `${baseUrl}/rest/api/${apiVersion}/myself`;
-    const user = jiraSettings.user;
 
     const details: JiraIssueResponse['details'] = {
         url: endpoint,
         project: jiraSettings.projectKey,
-        issueType: jiraSettings.issueType || 'Task',
-        user
+        issueType: jiraSettings.issueType || 'Task'
     };
 
     const respond = (data: JiraResponseMessage['data']) => {
@@ -409,10 +395,10 @@ export async function handleJiraTestSettings(
         }
     };
 
-    if (!baseUrl || !user || !jiraSettings.apiToken) {
+    if (!baseUrl || !jiraSettings.apiToken) {
         respond(
             createJiraError(
-                'Missing Jira settings. Check base URL, user, and token.',
+                'Missing Jira settings. Check base URL and token.',
                 details
             )
         );
@@ -420,7 +406,7 @@ export async function handleJiraTestSettings(
     }
 
     try {
-        const authHeader = `Basic ${btoa(`${user}:${jiraSettings.apiToken}`)}`;
+        const authHeader = `Bearer ${jiraSettings.apiToken}`;
 
         // 1. Test Authentication
         const response = await fetch(endpoint, {
