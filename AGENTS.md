@@ -1,5 +1,9 @@
 # AGENTS
 
+## Development Environment
+- Node.js version manager: **fnm** (Fast Node Manager)
+- To run commands call `fnm use 22.12.0 && <your command>`
+
 ## Repo layout (quick map)
 - `src/` main extension code (React + TypeScript)
 - `src/app/`, `src/components/`, `src/controllers/`, `src/models/` core UI/state/data layers
