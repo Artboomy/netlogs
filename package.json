@@ -10,7 +10,7 @@
     "type": "module",
     "scripts": {
         "lint": "node scripts/lint-translations.cjs && npx tsc --noEmit && npx eslint -c eslint.config.js --max-warnings=0 ./src",
-        "lint:ci": "echo '{\"api_secret\": \"mockData\", \"measurement_id\": \"mockData\"}' > src/secrets.json && yarn run lint",
+        "lint:ci": "node -e \"require('fs').writeFileSync('src/secrets.json', JSON.stringify({api_secret: 'mockData', measurement_id: 'mockData'}))\" && yarn run lint",
         "build": "cross-env NODE_ENV=development vite build --mode development",
         "build:prod": "yarn run lint && vite build --mode production",
         "build:analyze:treemap": "cross-env ANALYZE=treemap yarn run build",
@@ -26,7 +26,11 @@
         "site": "vite serve dist",
         "storybook": "yarn ladle serve",
         "build-storybook": "yarn ladle build",
-        "bump": "node update-version.cjs"
+        "bump": "node update-version.cjs",
+        "test": "vitest",
+        "test:coverage": "vitest --coverage",
+        "test:ui": "vitest --ui",
+        "prepare": "husky"
     },
     "dependencies": {
         "@emotion/css": "^11.11.2",
@@ -65,21 +69,24 @@
         "@types/node": "^20.12.5",
         "@types/react": "^18.2.74",
         "@types/react-dom": "^18.2.24",
-        "@typescript-eslint/eslint-plugin": "^7.5.0",
-        "@typescript-eslint/parser": "^7.5.0",
         "@vitejs/plugin-react": "^5.1.2",
+        "@vitest/coverage-v8": "^4.0.16",
+        "@vitest/ui": "^4.0.16",
         "cross-env": "^7.0.3",
-        "eslint": "^8.0.0",
+        "eslint": "^9.0.0",
         "eslint-config-prettier": "10.1.8",
         "eslint-plugin-prettier": "5.5.4",
         "eslint-plugin-react": "^7.34.1",
+        "happy-dom": "^20.0.11",
+        "husky": "^9.1.7",
         "prettier": "^3.2.5",
         "rollup-plugin-visualizer": "^6.0.5",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^7.18.0",
+        "typescript-eslint": "^8.0.0",
         "vite": "^7.3.0",
         "vite-plugin-circular-dependency": "^0.5.0",
-        "vite-tsconfig-paths": "^6.0.3"
+        "vite-tsconfig-paths": "^6.0.3",
+        "vitest": "^4.0.16"
     },
     "resolutions": {
         "@babel/runtime": "7.28.4",

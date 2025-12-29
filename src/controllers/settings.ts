@@ -16,7 +16,9 @@ import { i18n } from 'translations/i18n';
 // TODO: should probably remove storing functions in serialized mode and all related logic
 
 function deserializeFunctionRaw<T>(strFunction: string): T {
-    return isSandbox() ? new Function(`return ${strFunction}`)() : strFunction;
+    return (isSandbox()
+        ? new Function(`return ${strFunction}`)()
+        : strFunction) as T;
 }
 
 function deserializeMatcher(strFunction: string): ISettings['matcher'] {
@@ -83,7 +85,7 @@ export function deserialize(strSettings: string): ISettings {
 }
 
 export function serialize(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     settings: any,
     space?: string
 ): string {
@@ -132,7 +134,9 @@ class Settings {
                     setLanguage(this.settings.language);
                     injectStaticProfiles(this.settings);
                     this.listeners.forEach((listener) => {
-                        this.settings && listener(this.settings);
+                        if (this.settings) {
+                            listener(this.settings);
+                        }
                     });
                 }
             }
@@ -160,7 +164,9 @@ class Settings {
                     injectStaticProfiles(this.settings);
                     resolve(this.settings);
                     this.listeners.forEach((listener) => {
-                        this.settings && listener(this.settings);
+                        if (this.settings) {
+                            listener(this.settings);
+                        }
                     });
                 }
             );

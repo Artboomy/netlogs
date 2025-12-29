@@ -158,7 +158,7 @@ function recursiveTextToObject<T extends RawType>(
 
     // If data is an object, recursively convert its properties
     if (typeof data === 'object') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result: any = Array.isArray(data) ? [] : {};
         for (const key in data) {
             if (Object.prototype.hasOwnProperty.call(data, key)) {

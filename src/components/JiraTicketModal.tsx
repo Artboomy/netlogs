@@ -188,11 +188,37 @@ const Required = styled.span(({ theme }) => ({
     marginLeft: '4px'
 }));
 
+function getSafeJiraUrl(
+    url: string | null | undefined,
+    jiraBaseUrl: string | null | undefined
+): string | null {
+    if (!url || !jiraBaseUrl) {
+        return null;
+    }
+    try {
+        const parsedUrl = new URL(url);
+        const base = new URL(jiraBaseUrl);
+
+        // Only allow http/https URLs pointing to the Jira host
+        if (
+            (parsedUrl.protocol === 'http:' ||
+                parsedUrl.protocol === 'https:') &&
+            parsedUrl.hostname === base.hostname
+        ) {
+            return parsedUrl.toString();
+        }
+    } catch {
+        // Invalid URL; treat as unsafe
+    }
+    return null;
+}
+
 export const JiraTicketModal: FC = () => {
     const template = useSettings((state) => state.settings.jira.template);
     const attachScreenshot = useSettings(
         (state) => state.settings.jira.attachScreenshot
     );
+    const jiraBaseUrl = useSettings((state) => state.settings.jira.baseUrl);
     const isReady = useSettings(({ settings }) => {
         const jira = settings.jira;
         return jira.baseUrl && jira.apiToken && jira.projectKey;
@@ -245,13 +271,6 @@ export const JiraTicketModal: FC = () => {
     const [lastSuccess, setLastSuccess] = useState<JiraIssueResponse | null>(
         null
     );
-    // const callUrl = useSettings(({ settings }) => {
-    //     const jira = settings.jira;
-    //     if (!jira.baseUrl) return '';
-    //     const apiVersion = jira.apiVersion || '3';
-    //     const baseUrl = jira.baseUrl.replace(/\/+$/, '');
-    //     return `${baseUrl}/rest/api/${apiVersion}/issue`;
-    // });
 
     const createIssue = async () => {
         setLastError(null);
@@ -373,15 +392,20 @@ export const JiraTicketModal: FC = () => {
                 render({ data }) {
                     const issue = data as JiraIssueResponse;
                     if (issue.url) {
+                        const safeUrl = getSafeJiraUrl(issue.url, jiraBaseUrl);
                         return (
                             <span>
                                 {i18n.t('jiraTicketModal_issueCreated')}:{' '}
-                                <a
-                                    href={issue.url}
-                                    target='_blank'
-                                    rel='noreferrer noopener'>
-                                    {issue.key}
-                                </a>
+                                {safeUrl ? (
+                                    <a
+                                        href={safeUrl}
+                                        target='_blank'
+                                        rel='noreferrer noopener'>
+                                        {issue.key}
+                                    </a>
+                                ) : (
+                                    issue.key
+                                )}
                             </span>
                         );
                     }
@@ -445,12 +469,23 @@ export const JiraTicketModal: FC = () => {
                 <SuccessBlock>
                     <span>
                         {i18n.t('jiraTicketModal_issueCreated')}:{' '}
-                        <a
-                            href={lastSuccess.url}
-                            target='_blank'
-                            rel='noreferrer noopener'>
-                            {lastSuccess.key}
-                        </a>
+                        {(() => {
+                            const safeUrl = getSafeJiraUrl(
+                                lastSuccess.url,
+                                jiraBaseUrl
+                            );
+                            if (!safeUrl) {
+                                return lastSuccess.key;
+                            }
+                            return (
+                                <a
+                                    href={safeUrl}
+                                    target='_blank'
+                                    rel='noreferrer noopener'>
+                                    {lastSuccess.key}
+                                </a>
+                            );
+                        })()}
                     </span>
                 </SuccessBlock>
             )}

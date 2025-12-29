@@ -11,3 +11,4 @@ stats-*.html
 stats
 img/noncommit
 test_build
+coverage

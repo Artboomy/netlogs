@@ -7,7 +7,12 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 export default tseslint.config(
     {
         // config with just ignores is the replacement for `.eslintignore`
-        ignores: ['**/coverage/**', '**/dist/**', '**/node_modules/**']
+        ignores: [
+            '**/coverage/**',
+            '**/dist/**',
+            '**/node_modules/**',
+            'src/secrets.json'
+        ]
     },
     eslint.configs.recommended,
     ...tseslint.configs.recommended,

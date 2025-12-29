@@ -20,6 +20,19 @@
 - Prod build (includes lint): `yarn build:prod`
 - Watch build: `yarn build:watch`
 
+## Testing
+- Run tests: `yarn test`
+- Run tests with coverage: `yarn test:coverage`
+- Run tests with UI: `yarn test:ui`
+- Coverage thresholds: 95% statements/functions/lines, 88% branches
+
+## Git Hooks (Husky)
+- Pre-commit hook automatically runs:
+  - ESLint checks (`yarn run lint:ci`)
+  - Tests with coverage (`yarn test:coverage --run`)
+- Hooks are set up automatically when running `yarn install`
+- To bypass hooks (not recommended): `git commit --no-verify`
+
 ## Packaging
 - Create zip: `yarn package`
 
@@ -37,7 +50,8 @@
 ## Definition of done (end-of-task verification)
 Before you report the task as complete (final message / PR-ready state), run:
 - `yarn run lint`
+- `yarn run test:coverage`
 - `yarn run build`
 
 If you cannot run commands in this environment, say so explicitly and provide the exact commands for me to run.
-If the build fails, fix it and re-run before marking the task done.
+If the build or tests fail, fix them and re-run before marking the task done.
