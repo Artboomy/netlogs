@@ -2,7 +2,6 @@ import React, { FC, useCallback, useMemo } from 'react';
 import Inspector, {
     chromeDark,
     chromeLight,
-    DOMInspector,
     InspectorAsTreeProps
 } from 'react-inspector';
 import { Image } from './render/Image';
@@ -216,7 +215,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
             data.__getRaw(),
             'text/html'
         );
-        return <DOMInspector data={renderData} theme={customTheme} />;
+        return <Inspector data={renderData} theme={customTheme} />;
     }
     if (isXml(data)) {
         const domParser = new DOMParser();
@@ -224,7 +223,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
             data.__getRaw(),
             'text/xml'
         );
-        return <DOMInspector data={renderData} theme={customTheme} />;
+        return <Inspector data={renderData} theme={customTheme} />;
     }
     let name = tagName || (isMimeType(data) && data.__mimeType) || 'result';
     const unwrappedData = isMimeType(data) ? data.__getRaw() : data;

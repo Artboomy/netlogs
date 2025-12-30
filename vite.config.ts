@@ -3,8 +3,11 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { PluginVisualizerOptions, visualizer } from 'rollup-plugin-visualizer';
 import circleDependency from 'vite-plugin-circular-dependency';
-import { fileURLToPath, resolve } from 'node:url';
-import { existsSync, rmSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { resolve as pathResolve } from 'node:path';
+import { existsSync, rmSync, readFileSync, writeFileSync } from 'node:fs';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const plugins = [
     // for some reason cleanOutDir does not work properly
@@ -15,11 +18,75 @@ const plugins = [
         buildStart() {
             // Get the correct directory path
             const currentDir = fileURLToPath(new URL('.', import.meta.url));
-            const distJsPath = resolve(currentDir, 'dist/js');
+            const distJsPath = pathResolve(currentDir, 'dist/js');
             console.log('distJsPath', currentDir, distJsPath);
             if (existsSync(distJsPath)) {
                 rmSync(distJsPath, { recursive: true, force: true });
                 console.log('✨ Cleaned dist/js directory');
+            }
+        }
+    } as Plugin,
+
+    {
+        name: 'update-manifest-version',
+        closeBundle() {
+            // Only run in development mode
+            if (process.env.NODE_ENV !== 'development') {
+                return;
+            }
+
+            const currentDir = fileURLToPath(new URL('.', import.meta.url));
+            const manifestPath = pathResolve(currentDir, 'dist/manifest.json');
+            const runtimePath = pathResolve(currentDir, 'src/api/runtime.ts');
+            const counterPath = pathResolve(currentDir, '.dev-build-counter');
+
+            if (!existsSync(manifestPath)) {
+                console.warn('⚠️  dist/manifest.json not found, skipping version update');
+                return;
+            }
+
+            try {
+                const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+
+                // Read and increment counter
+                let counter = 1;
+                if (existsSync(counterPath)) {
+                    try {
+                        counter = parseInt(readFileSync(counterPath, 'utf-8').trim(), 10) || 1;
+                        counter++;
+                    } catch {
+                        counter = 1;
+                    }
+                }
+
+                // Save incremented counter
+                writeFileSync(counterPath, String(counter));
+
+                // Strip existing fourth number if present (e.g., "2.10.0.123" -> "2.10.0")
+                const parts = manifest.version.split('.');
+                const baseVersion = parts.length === 4 ? parts.slice(0, 3).join('.') : manifest.version;
+                const newVersion = `${baseVersion}.${counter}`;
+
+                // Update manifest.json
+                manifest.version = newVersion;
+                writeFileSync(manifestPath, JSON.stringify(manifest, null, 4) + '\n');
+
+                // Update runtime.ts
+                if (existsSync(runtimePath)) {
+                    let runtimeContent = readFileSync(runtimePath, 'utf-8');
+                    // Replace both version strings in runtime.ts
+                    runtimeContent = runtimeContent.replace(
+                        /version: '[^']+'/g,
+                        `version: '${newVersion}'`
+                    );
+                    writeFileSync(runtimePath, runtimeContent);
+                    console.log(`🔢 Updated manifest and runtime versions to ${newVersion}`);
+                } else {
+                    console.log(`🔢 Updated manifest version to ${newVersion}`);
+                    console.warn('⚠️  src/api/runtime.ts not found');
+                }
+            } catch (error) {
+                console.error('❌ Failed to update versions:', error);
             }
         }
     } as Plugin,
@@ -43,12 +110,16 @@ export default defineConfig({
     plugins,
     resolve: {
         alias: {
+            'react-inspector': pathResolve(
+                __dirname,
+                'node_modules/react-inspector/dist/es/react-inspector.js'
+            ),
             tslib: 'tslib/tslib.es6.js',
-            'react/jsx-dev-runtime.js': resolve(
+            'react/jsx-dev-runtime.js': pathResolve(
                 __dirname,
                 'node_modules/react/jsx-dev-runtime.js'
             ),
-            'react/jsx-runtime.js': resolve(
+            'react/jsx-runtime.js': pathResolve(
                 __dirname,
                 'node_modules/react/jsx-runtime.js'
             )

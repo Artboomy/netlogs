@@ -1,8 +1,12 @@
 # AGENTS
 
+## MCP Tools - Context7
+Always use context7 when I need code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to explicitly ask.
+
 ## Development Environment
 - Node.js version manager: **fnm** (Fast Node Manager)
 - To run commands call `fnm use 22.12.0 && <your command>`
+- **IMPORTANT**: This is a Windows environment. NEVER use `2>nul` or `>nul` in bash commands - it creates a problematic file instead of redirecting to null device. Use `2>/dev/null` or omit error redirection entirely.
 
 ## Repo layout (quick map)
 - `src/` main extension code (React + TypeScript)

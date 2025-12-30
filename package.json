@@ -59,6 +59,7 @@
     },
     "devDependencies": {
         "@ladle/react": "^5.0.3",
+        "@modelcontextprotocol/server-puppeteer": "^2025.5.12",
         "@types/base16": "1.0.2",
         "@types/chrome": "0.0.262",
         "@types/classnames": "2.2.11",
@@ -80,6 +81,7 @@
         "happy-dom": "^20.0.11",
         "husky": "^9.1.7",
         "prettier": "^3.2.5",
+        "puppeteer": "^24.34.0",
         "rollup-plugin-visualizer": "^6.0.5",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.0.0",
