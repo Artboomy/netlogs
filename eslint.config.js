@@ -11,6 +11,7 @@ export default tseslint.config(
             '**/coverage/**',
             '**/dist/**',
             '**/node_modules/**',
+            '**/.cache/**',
             'src/secrets.json'
         ]
     },

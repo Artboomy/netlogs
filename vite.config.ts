@@ -41,18 +41,26 @@ const plugins = [
             const counterPath = pathResolve(currentDir, '.dev-build-counter');
 
             if (!existsSync(manifestPath)) {
-                console.warn('⚠️  dist/manifest.json not found, skipping version update');
+                console.warn(
+                    '⚠️  dist/manifest.json not found, skipping version update'
+                );
                 return;
             }
 
             try {
-                const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+                const manifest = JSON.parse(
+                    readFileSync(manifestPath, 'utf-8')
+                );
 
                 // Read and increment counter
                 let counter = 1;
                 if (existsSync(counterPath)) {
                     try {
-                        counter = parseInt(readFileSync(counterPath, 'utf-8').trim(), 10) || 1;
+                        counter =
+                            parseInt(
+                                readFileSync(counterPath, 'utf-8').trim(),
+                                10
+                            ) || 1;
                         counter++;
                     } catch {
                         counter = 1;
@@ -64,12 +72,18 @@ const plugins = [
 
                 // Strip existing fourth number if present (e.g., "2.10.0.123" -> "2.10.0")
                 const parts = manifest.version.split('.');
-                const baseVersion = parts.length === 4 ? parts.slice(0, 3).join('.') : manifest.version;
+                const baseVersion =
+                    parts.length === 4
+                        ? parts.slice(0, 3).join('.')
+                        : manifest.version;
                 const newVersion = `${baseVersion}.${counter}`;
 
                 // Update manifest.json
                 manifest.version = newVersion;
-                writeFileSync(manifestPath, JSON.stringify(manifest, null, 4) + '\n');
+                writeFileSync(
+                    manifestPath,
+                    JSON.stringify(manifest, null, 4) + '\n'
+                );
 
                 // Update runtime.ts
                 if (existsSync(runtimePath)) {
@@ -80,7 +94,9 @@ const plugins = [
                         `version: '${newVersion}'`
                     );
                     writeFileSync(runtimePath, runtimeContent);
-                    console.log(`🔢 Updated manifest and runtime versions to ${newVersion}`);
+                    console.log(
+                        `🔢 Updated manifest and runtime versions to ${newVersion}`
+                    );
                 } else {
                     console.log(`🔢 Updated manifest version to ${newVersion}`);
                     console.warn('⚠️  src/api/runtime.ts not found');

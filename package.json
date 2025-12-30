@@ -9,7 +9,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "lint": "node scripts/lint-translations.cjs && npx tsc --noEmit && npx eslint -c eslint.config.js --max-warnings=0 ./src",
+        "lint": "node scripts/lint-translations.cjs && npm-run-all --parallel lint:tsc lint:eslint",
+        "lint:tsc": "tsc --noEmit --incremental --tsBuildInfoFile ./.cache/.tsbuildinfo-noEmit",
+        "lint:eslint": "eslint -c eslint.config.js --cache --cache-location ./.cache/.eslintcache --max-warnings=0 ./src",
         "lint:ci": "node -e \"require('fs').writeFileSync('src/secrets.json', JSON.stringify({api_secret: 'mockData', measurement_id: 'mockData'}))\" && yarn run lint",
         "build": "cross-env NODE_ENV=development vite build --mode development",
         "build:prod": "yarn run lint && vite build --mode production",
@@ -59,7 +61,6 @@
     },
     "devDependencies": {
         "@ladle/react": "^5.0.3",
-        "@modelcontextprotocol/server-puppeteer": "^2025.5.12",
         "@types/base16": "1.0.2",
         "@types/chrome": "0.0.262",
         "@types/classnames": "2.2.11",
@@ -80,8 +81,8 @@
         "eslint-plugin-react": "^7.34.1",
         "happy-dom": "^20.0.11",
         "husky": "^9.1.7",
+        "npm-run-all": "^4.1.5",
         "prettier": "^3.2.5",
-        "puppeteer": "^24.34.0",
         "rollup-plugin-visualizer": "^6.0.5",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.0.0",
