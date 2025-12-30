@@ -123,6 +123,9 @@ if (process.env.ANALYZE) {
 
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 export default defineConfig({
+    legacy: {
+        inconsistentCjsInterop: true // Fix for react-use default imports in Vite 8
+    },
     plugins,
     resolve: {
         alias: {

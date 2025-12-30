@@ -46,6 +46,7 @@ Always use context7 when I need code generation, setup or configuration steps, o
 
 ## Contributing
 - Ask clarification questions
+- **IMPORTANT: Always ask user permission before upgrading or downgrading dependencies** - Get explicit approval first
 - Implement asked feature
 - Run `yarn lint`
 - Run `yarn build`
