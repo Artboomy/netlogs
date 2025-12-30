@@ -11,3 +11,6 @@ stats-*.html
 stats
 img/noncommit
 test_build
+coverage
+.mcp.json
+.dev-build-counter

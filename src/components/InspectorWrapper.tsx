@@ -2,7 +2,6 @@ import React, { FC, useCallback, useMemo } from 'react';
 import Inspector, {
     chromeDark,
     chromeLight,
-    DOMInspector,
     InspectorAsTreeProps
 } from 'react-inspector';
 import { Image } from './render/Image';
@@ -158,7 +157,7 @@ function recursiveTextToObject<T extends RawType>(
 
     // If data is an object, recursively convert its properties
     if (typeof data === 'object') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result: any = Array.isArray(data) ? [] : {};
         for (const key in data) {
             if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -216,7 +215,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
             data.__getRaw(),
             'text/html'
         );
-        return <DOMInspector data={renderData} theme={customTheme} />;
+        return <Inspector data={renderData} theme={customTheme} />;
     }
     if (isXml(data)) {
         const domParser = new DOMParser();
@@ -224,7 +223,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
             data.__getRaw(),
             'text/xml'
         );
-        return <DOMInspector data={renderData} theme={customTheme} />;
+        return <Inspector data={renderData} theme={customTheme} />;
     }
     let name = tagName || (isMimeType(data) && data.__mimeType) || 'result';
     const unwrappedData = isMimeType(data) ? data.__getRaw() : data;

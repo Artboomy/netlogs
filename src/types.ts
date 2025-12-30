@@ -28,7 +28,11 @@ type CustomEventName =
     | 'download'
     | 'searchOnPage'
     | 'setHost'
-    | 'cachedNetworkRequest';
+    | 'cachedNetworkRequest'
+    | 'jira.createIssue'
+    | 'jira.getMetadata'
+    | 'jira.testSettings'
+    | 'chrome.permissions.request';
 
 type TabEventName = 'chrome.tabs.create';
 
@@ -43,13 +47,15 @@ type AnalyticsEventName =
     | 'analytics.error'
     | 'analytics.searchOnPage'
     | 'analytics.copyObject'
+    | 'analytics.jiraTicketCreated'
     | AnalyticsDurationEventName;
 
 type DebuggerEventName =
     | 'debugger.attach'
     | 'debugger.detach'
     | 'debugger.status'
-    | 'debugger.getStatus';
+    | 'debugger.getStatus'
+    | 'debugger.evaluate';
 
 export type EventName =
     | 'onIframeReady'
