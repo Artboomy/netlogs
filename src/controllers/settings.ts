@@ -6,7 +6,7 @@ import {
 } from './settings/types';
 import { defaultSettings } from './settings/base';
 import storage from '../api/storage';
-import { isSandbox } from 'utils';
+import { isSandbox, isExtension } from 'utils';
 import { defaultProfile } from './settings/profiles/default';
 import { NetworkRequest } from 'models/types';
 import { isJsonRpc, jsonRpcProfile } from './settings/profiles/jsonRpc';
@@ -16,7 +16,8 @@ import { i18n } from 'translations/i18n';
 // TODO: should probably remove storing functions in serialized mode and all related logic
 
 function deserializeFunctionRaw<T>(strFunction: string): T {
-    return (isSandbox()
+    // Deserialize functions in sandbox or standalone mode (not in extension panel mode)
+    return (isSandbox() || !isExtension()
         ? new Function(`return ${strFunction}`)()
         : strFunction) as T;
 }

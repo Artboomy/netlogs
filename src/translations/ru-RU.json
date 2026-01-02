@@ -113,5 +113,6 @@
     "jira_testAuthFailed": "Ошибка аутентификации Jira",
     "jira_testProjectNotFound": "Проект \\%{project}\\ не найден или нет доступа.",
     "jira_testIssueTypeNotFound": "Тип задачи \\%{issueType}\\ не найден.",
-    "jira_service_info": "$service_info$"
+    "jira_service_info": "$service_info$",
+    "import": "Импортировать HAR файл"
 }

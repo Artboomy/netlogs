@@ -1,4 +1,5 @@
 dist/js/*
+standalone/
 node_modules/
 .idea
 .husky

@@ -18,6 +18,7 @@ import { useSettings } from 'hooks/useSettings';
 import copy from 'copy-to-clipboard';
 import { Flip, toast } from 'react-toastify';
 import { i18n } from 'translations/i18n';
+import { isMimeType, RawType } from 'components/utils/IsMimeType';
 
 type TDomData = {
     __mimeType: 'text/html';
@@ -27,13 +28,6 @@ type TDomData = {
 type TXmlData = {
     __mimeType: 'text/xml';
     __getRaw: () => string;
-};
-
-type RawType = Record<string, unknown> | string | null | undefined | number;
-
-type WithMimeType = {
-    __mimeType: string;
-    __getRaw: () => RawType;
 };
 
 type TData = {
@@ -90,10 +84,6 @@ const isAudio = (data: unknown): data is TAudioData => {
 
 const isXml = (data: unknown): data is TXmlData => {
     return Boolean(isMimeType(data) && data.__mimeType.endsWith('xml'));
-};
-
-export const isMimeType = (data: unknown): data is WithMimeType => {
-    return Boolean(data && typeof data === 'object' && '__mimeType' in data);
 };
 
 export interface InspectorWrapperProps {

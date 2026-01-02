@@ -9,14 +9,13 @@ import { existsSync, rmSync, readFileSync, writeFileSync } from 'node:fs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
-const plugins = [
+const plugins: Plugin[] = [
     // for some reason cleanOutDir does not work properly
     // @see https://github.com/vitejs/vite/issues/10696
     {
         name: 'clean-dist-js',
         enforce: 'pre',
         buildStart() {
-            // Get the correct directory path
             const currentDir = fileURLToPath(new URL('.', import.meta.url));
             const distJsPath = pathResolve(currentDir, 'dist/js');
             console.log('distJsPath', currentDir, distJsPath);
@@ -111,6 +110,7 @@ const plugins = [
     tsconfigPaths(),
     react()
 ];
+
 if (process.env.ANALYZE) {
     plugins.push(
         visualizer({
@@ -177,7 +177,7 @@ export default defineConfig({
                     return '[name].[ext]';
                 },
                 manualChunks(id) {
-                    // NOTE: pack all libs into one chunk so css packs into react-verndors.css
+                    // NOTE: pack all libs into one chunk so css packs into react-vendors.css
                     // only it is imported in the html
                     if (
                         id.includes('react') ||
@@ -201,17 +201,9 @@ export default defineConfig({
                 }
             }
         },
-        assetsInlineLimit: 8192 // Inline assets smaller than 4KB
-    },
-    css: {
-        // Configuration for CSS
-    },
-    esbuild: {
-        // If you were using esbuild-loader for specific loader options, you can specify esbuild options here.
+        assetsInlineLimit: 8192 // Inline assets smaller than 8KB
     },
     define: {
         'process.env': process.env
     }
 });
-
-// NOTE: reference https://github.com/rollup/rollup/issues/2756

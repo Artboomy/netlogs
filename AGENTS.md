@@ -43,6 +43,7 @@ Always use context7 when I need code generation, setup or configuration steps, o
 ## Translation
 - Use `scripts/translate-and-merge-key.cjs` to add translations.
 - Be sure to translate with context: Chrome web extension for Frontend Software Developers.
+- **After adding translations, always rebuild the extension with `yarn build`**
 
 ## Contributing
 - Ask clarification questions

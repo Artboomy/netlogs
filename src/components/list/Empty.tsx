@@ -99,7 +99,7 @@ const ThemeLine = styled.p(({ theme }) => ({
     }
 }));
 
-const LanguageLine = styled.p(({ theme }) => ({
+const _LanguageLine = styled.p(({ theme }) => ({
     ...fixedLine(theme),
     top: '32px',
     right: '8px',
@@ -172,12 +172,14 @@ export const Empty: FC = () => {
                     </KbdLine>
                 </Column>
                 <HelpColumn>
-                    <Line>
-                        ⛰️ <Link href='https://nextjs.org/' text='Next' />
-                        /
-                        <Link href='https://nuxt.com/' text='Nuxt' />{' '}
-                        {i18n.t('nextHelper')}
-                    </Line>
+                    {isExtension() && (
+                        <Line>
+                            ⛰️ <Link href='https://nextjs.org/' text='Next' />
+                            /
+                            <Link href='https://nuxt.com/' text='Nuxt' />{' '}
+                            {i18n.t('nextHelper')}
+                        </Line>
+                    )}
                     <Line>👆 {i18n.t('timeHelper')}</Line>
                     <Line>
                         📖 {i18n.t('readmeHelper')}{' '}
@@ -196,9 +198,6 @@ export const Empty: FC = () => {
                     </Line>
                 </HelpColumn>
             </Columns>
-            {isExtension() && (
-                <LanguageLine>🌎 {i18n.t('changeLanguage')}</LanguageLine>
-            )}
             <ThemeLine>🎨 {i18n.t('themeHelper')}</ThemeLine>
             {isExtension() && (
                 <WebsocketLine>🔴 {i18n.t('webSocketHelper')}</WebsocketLine>

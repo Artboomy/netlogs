@@ -113,5 +113,6 @@
     "jira_testAuthFailed": "Jira authentication failed",
     "jira_testProjectNotFound": "Project \\%{project}\\ not found or no access.",
     "jira_testIssueTypeNotFound": "Issue type \\%{issueType}\\ not found.",
-    "jira_service_info": "$service_info$"
+    "jira_service_info": "$service_info$",
+    "import": "导入HAR文件"
 }
