@@ -6,6 +6,7 @@ import { Block } from './Block';
 import Inspector from 'react-inspector';
 import { ISettings } from 'controllers/settings/types';
 import { getDefaultTemplate } from 'utils/getDefaultTemplate';
+import { PasswordInput } from '../PasswordInput';
 
 const Grid = styled.div`
     display: grid;
@@ -17,6 +18,7 @@ const Grid = styled.div`
     textarea,
     input:not([type='checkbox']) {
         width: 100%;
+        box-sizing: border-box;
     }
 
     textarea {
@@ -281,12 +283,19 @@ export const JiraOptions: FC = () => {
                                         handleChange(key, e.target.checked)
                                     }
                                 />
+                            ) : key === 'apiToken' ? (
+                                <PasswordInput
+                                    id={`jira-${key}`}
+                                    placeholder={placeholders[key]}
+                                    value={localJira[key] as string}
+                                    onChange={(value) =>
+                                        handleChange(key, value)
+                                    }
+                                />
                             ) : (
                                 <input
                                     id={`jira-${key}`}
-                                    type={
-                                        key === 'apiToken' ? 'password' : 'text'
-                                    }
+                                    type='text'
                                     placeholder={placeholders[key]}
                                     value={localJira[key] as string}
                                     onChange={(e) =>

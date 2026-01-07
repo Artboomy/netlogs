@@ -1,8 +1,7 @@
 import React, { FC, useCallback, useContext, useRef, useState } from 'react';
 import { toggleUnpack, useListStore } from 'controllers/network';
-import runtime from '../api/runtime';
-import { Har } from 'har-format';
 import { callParent, callParentVoid, isExtension, isMacOs } from 'utils';
+import { Har } from 'har-format';
 import { IconButton, ICONS } from './IconButton';
 import { useHotkey } from 'hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
@@ -19,6 +18,7 @@ import ContentOnlyItem from '../models/ContentOnlyItem';
 import TransactionItem from '../models/TransactionItem';
 import WebSocketItem from '../models/WebSocketItem';
 import { ItemType } from 'models/enums';
+import { getFileName, getHarData } from '../utils/harUtils';
 
 const Root = styled.header(({ theme }) => ({
     borderBottom: `1px solid ${theme.borderColor}`,
@@ -65,30 +65,6 @@ interface IProps {
     caseSensitive?: boolean;
     onCaseSensitiveChange: (value: boolean) => void;
 }
-
-export function getFileName(): string {
-    const now = new Date();
-    return now.toISOString().replace(/:/g, '-');
-}
-
-export const getHarData = (): Har => {
-    const { version, name } = runtime.getManifest();
-    const { list } = useListStore.getState();
-    const entries = list
-        .filter((i) => i.shouldShow())
-        .map((item) => item.toJSON());
-    return {
-        log: {
-            version: '1.2',
-            creator: {
-                name,
-                version
-            },
-            entries,
-            comment: 'Format: http://www.softwareishard.com/blog/har-12-spec/'
-        }
-    };
-};
 
 const doExport = () => {
     const fileData = getHarData();
@@ -184,6 +160,7 @@ export const Header: FC<IProps> = ({
     const isUnpack = useListStore((state) => state.isUnpack);
     const [secondRowVisible, setSecondRowVisible] = useState(false);
     const { setValue } = useContext(ModalContext);
+    const keyRef = useRef(1);
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         useListStore.setState({ isPreserve: e.target.checked });
     };
@@ -284,7 +261,10 @@ export const Header: FC<IProps> = ({
                 />
                 {isExtension() && (
                     <JiraButton
-                        onClick={() => setValue(<JiraTicketModal />)}
+                        onClick={() => {
+                            keyRef.current = keyRef.current + 1;
+                            setValue(<JiraTicketModal key={keyRef.current} />);
+                        }}
                         title='Create Jira issue'>
                         Jira
                     </JiraButton>

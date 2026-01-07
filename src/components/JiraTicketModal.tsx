@@ -5,12 +5,13 @@ import { toast } from 'react-toastify';
 import { useSettings } from 'hooks/useSettings';
 import { ModalContext } from './modal/Context';
 import Inspector from 'react-inspector';
-import { getFileName, getHarData } from './Header';
+import { getFileName, getHarData } from '../utils/harUtils';
 
 import { generateZip } from 'utils/generateZip';
 import { i18n } from 'translations/i18n';
 import { getDefaultTemplate } from 'utils/getDefaultTemplate';
 import { MultiSelectStyled } from './MultiSelectStyled';
+import { PasswordInput } from './PasswordInput';
 
 const Form = styled.form(({ theme }) => ({
     display: 'flex',
@@ -188,6 +189,51 @@ const Required = styled.span(({ theme }) => ({
     marginLeft: '4px'
 }));
 
+const CollapsibleHeader = styled.div(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '4px 6px',
+    backgroundColor: theme.panelColor,
+    border: `1px solid ${theme.borderColor}`,
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '12px',
+    '&:hover': {
+        backgroundColor: theme.rowHover
+    }
+}));
+
+const CollapsibleContent = styled.div(({ theme }) => ({
+    border: `1px solid ${theme.borderColor}`,
+    borderTop: 'none',
+    borderRadius: '0 0 4px 4px',
+    padding: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+}));
+
+const SettingsRow = styled.div({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    fontSize: '12px'
+});
+
+const SettingsActions = styled.div({
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'flex-end',
+    marginTop: '4px'
+});
+
+const SmallButton = styled(Button)({
+    padding: '4px 8px',
+    fontSize: '11px'
+});
+
 function getSafeJiraUrl(
     url: string | null | undefined,
     jiraBaseUrl: string | null | undefined
@@ -214,6 +260,7 @@ function getSafeJiraUrl(
 }
 
 export const JiraTicketModal: FC = () => {
+    const jiraSettings = useSettings((state) => state.settings.jira);
     const template = useSettings((state) => state.settings.jira.template);
     const attachScreenshot = useSettings(
         (state) => state.settings.jira.attachScreenshot
@@ -223,8 +270,24 @@ export const JiraTicketModal: FC = () => {
         const jira = settings.jira;
         return jira.baseUrl && jira.apiToken && jira.projectKey;
     });
-    console.log('isReady', isReady);
     const { setValue } = useContext(ModalContext);
+
+    // Collapsible settings state
+    const [localJiraSettings, setLocalJiraSettings] = useState({
+        baseUrl: jiraSettings.baseUrl,
+        apiToken: jiraSettings.apiToken,
+        projectKey: jiraSettings.projectKey,
+        issueType: jiraSettings.issueType
+    });
+
+    // Check if any primary fields are empty to determine default open state
+    const hasEmptyFields =
+        !jiraSettings.baseUrl ||
+        !jiraSettings.apiToken ||
+        !jiraSettings.projectKey ||
+        !jiraSettings.issueType;
+    const [isSettingsOpen, setIsSettingsOpen] = useState(hasEmptyFields);
+    const [settingsSaved, setSettingsSaved] = useState(false);
     const [summary, setSummary] = useState('');
     const [description, setDescription] = useState(
         template || getDefaultTemplate()
@@ -271,6 +334,27 @@ export const JiraTicketModal: FC = () => {
     const [lastSuccess, setLastSuccess] = useState<JiraIssueResponse | null>(
         null
     );
+
+    const handleSaveSettings = () => {
+        useSettings.getState().patchSettings({
+            jira: {
+                ...jiraSettings,
+                ...localJiraSettings
+            }
+        });
+        setSettingsSaved(true);
+        setTimeout(() => setSettingsSaved(false), 2000);
+    };
+
+    const handleLocalSettingChange = (
+        key: keyof typeof localJiraSettings,
+        value: string
+    ) => {
+        setLocalJiraSettings({
+            ...localJiraSettings,
+            [key]: value
+        });
+    };
 
     const createIssue = async () => {
         setLastError(null);
@@ -338,7 +422,6 @@ export const JiraTicketModal: FC = () => {
                 fields
             })
         );
-        console.log('createIssue response', response);
         const parsed = JSON.parse(response) as JiraIssueResponse;
         if (!parsed.ok) {
             setLastError(parsed);
@@ -463,6 +546,108 @@ export const JiraTicketModal: FC = () => {
                     </Button>
                 </Actions>
             </TitleRow>
+            <div>
+                <CollapsibleHeader
+                    onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
+                    <span>
+                        {i18n.t('jiraTicketModal_settingsTitle', {
+                            defaultValue: 'Jira Settings'
+                        })}
+                    </span>
+                    <span>{isSettingsOpen ? '▼' : '▶'}</span>
+                </CollapsibleHeader>
+                {isSettingsOpen && (
+                    <CollapsibleContent>
+                        <SettingsRow>
+                            <label>
+                                {i18n.t('jiraSettings_baseUrl', {
+                                    defaultValue: 'Base URL'
+                                })}
+                            </label>
+                            <Input
+                                type='text'
+                                placeholder='https://myorg.atlassian.net'
+                                value={localJiraSettings.baseUrl}
+                                onChange={(e) =>
+                                    handleLocalSettingChange(
+                                        'baseUrl',
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </SettingsRow>
+                        <SettingsRow>
+                            <label>
+                                {i18n.t('jiraSettings_apiToken', {
+                                    defaultValue: 'API Token (PAT)'
+                                })}
+                                <a
+                                    href='https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html#UsingPersonalAccessTokens-CreatingPATsintheapplication'
+                                    target='_blank'
+                                    rel='noreferrer'
+                                    style={{ marginLeft: '8px' }}>
+                                    ?
+                                </a>
+                            </label>
+                            <PasswordInput
+                                placeholder='your-api-token-here'
+                                value={localJiraSettings.apiToken}
+                                onChange={(value) =>
+                                    handleLocalSettingChange('apiToken', value)
+                                }
+                            />
+                        </SettingsRow>
+                        <SettingsRow>
+                            <label>
+                                {i18n.t('jiraSettings_projectKey', {
+                                    defaultValue: 'Project Key'
+                                })}
+                            </label>
+                            <Input
+                                type='text'
+                                placeholder='MYPROJ'
+                                value={localJiraSettings.projectKey}
+                                onChange={(e) =>
+                                    handleLocalSettingChange(
+                                        'projectKey',
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </SettingsRow>
+                        <SettingsRow>
+                            <label>
+                                {i18n.t('jiraSettings_issueType', {
+                                    defaultValue: 'Issue Type'
+                                })}
+                            </label>
+                            <Input
+                                type='text'
+                                placeholder='Bug'
+                                value={localJiraSettings.issueType}
+                                onChange={(e) =>
+                                    handleLocalSettingChange(
+                                        'issueType',
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </SettingsRow>
+                        <SettingsActions>
+                            <SmallButton
+                                type='button'
+                                onClick={handleSaveSettings}>
+                                {settingsSaved
+                                    ? i18n.t('saved', {
+                                          defaultValue: 'Saved!'
+                                      })
+                                    : i18n.t('save', { defaultValue: 'Save' })}
+                            </SmallButton>
+                        </SettingsActions>
+                    </CollapsibleContent>
+                )}
+            </div>
+
             {/*<Hint>{callUrl}</Hint>*/}
             {!isReady && <Hint>{i18n.t('jiraTicketModal_notReadyHint')}</Hint>}
             {lastSuccess && (
