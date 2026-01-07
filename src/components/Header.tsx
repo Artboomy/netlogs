@@ -39,6 +39,23 @@ const HideUnrelated = styled.label({
     display: 'flex'
 });
 
+const JiraButton = styled.button(({ theme }) => ({
+    backgroundColor: theme.name === 'light' ? '#0052CC' : '#172B4D',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '0 12px',
+    height: '26px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    '&:hover': {
+        backgroundColor: theme.name === 'light' ? '#0747A6' : '#0747A6'
+    }
+}));
+
 interface IProps {
     className?: string;
     searchValue: string;
@@ -266,11 +283,11 @@ export const Header: FC<IProps> = ({
                     icon={ICONS.rotateView}
                 />
                 {isExtension() && (
-                    <IconButton
+                    <JiraButton
                         onClick={() => setValue(<JiraTicketModal />)}
                         title='Create Jira issue'>
                         Jira
-                    </IconButton>
+                    </JiraButton>
                 )}
                 <input
                     ref={fileInputRef}
