@@ -5,7 +5,7 @@ test.describe('Application Loading & Initialization', () => {
         await page.goto('/');
 
         // Check page title
-        await expect(page).toHaveTitle('NET LOGS - Standalone');
+        await expect(page).toHaveTitle('NET LOGS');
 
         // Check that header is visible
         await expect(page.locator('header')).toBeVisible();
@@ -18,8 +18,11 @@ test.describe('Application Loading & Initialization', () => {
     });
 
     test('should load all static assets correctly', async ({ page }) => {
-        const responses: { url: string; status: number; contentType: string }[] =
-            [];
+        const responses: {
+            url: string;
+            status: number;
+            contentType: string;
+        }[] = [];
 
         // Capture all responses
         page.on('response', (response) => {
@@ -79,7 +82,9 @@ test.describe('Application Loading & Initialization', () => {
         ];
 
         for (const buttonText of iconButtons) {
-            const button = page.locator(`button[title*="${buttonText}"]`).first();
+            const button = page
+                .locator(`button[title*="${buttonText}"]`)
+                .first();
             await expect(button).toBeVisible();
 
             // Check that button has an icon (div child with mask)
