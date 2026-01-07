@@ -92,7 +92,7 @@ export const IconButton: FC<IconButtonProps> = ({
 export const ICONS: Record<string, IconButtonProps['icon']> = {
     clear: '-4px 144px',
     brackets: '-60px 48px',
-    settings: '-168px 168px',
+    settings: '-172px 168px',
     import: '52px -96px',
     export: '-199px 144px',
     cross: '-84px 216px',
@@ -105,5 +105,5 @@ export const ICONS: Record<string, IconButtonProps['icon']> = {
     debugOn: '-88px 24px',
     inspect: '136px -72px',
     drop: '52px -72px',
-    rotateView: '-168px 192px'
+    rotateView: '-172px 192px'
 } as const;

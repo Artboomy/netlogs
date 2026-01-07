@@ -32,7 +32,7 @@ const Row = styled.div(({ theme }) => ({
     boxSizing: 'border-box',
     height: '30px',
     alignItems: 'center',
-    gap: '8px'
+    gap: '6px'
 }));
 
 const HideUnrelated = styled.label({
@@ -265,13 +265,6 @@ export const Header: FC<IProps> = ({
                     active={isVerticalView}
                     icon={ICONS.rotateView}
                 />
-                {isExtension() && (
-                    <IconButton
-                        icon={ICONS.settings}
-                        onClick={() => runtime.openOptionsPage()}
-                        title={i18n.t('options')}
-                    />
-                )}
                 {isExtension() && (
                     <IconButton
                         onClick={() => setValue(<JiraTicketModal />)}

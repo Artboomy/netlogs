@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 
 export const MultiSelectStyled = styled(MultiSelect)(({ theme }) => ({
     marginLeft: 'auto',
-    '--rmsc-h': '24px!important',
+    '--rmsc-h': '20px!important',
     fontSize: '10px',
     '--rmsc-p': '4px',
     width: '160px',
