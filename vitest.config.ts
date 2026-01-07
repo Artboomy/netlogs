@@ -6,6 +6,7 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'happy-dom',
+        exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'json-summary', 'html'],
@@ -20,7 +21,8 @@ export default defineConfig({
                 '**/types/**',
                 'scripts/**',
                 '.ladle/**',
-                '**/controllers/settings/base.ts'
+                '**/controllers/settings/base.ts',
+                'e2e/**'
             ],
             thresholds: {
                 lines: 95,

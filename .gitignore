@@ -1,5 +1,5 @@
 dist/js/*
-standalone/
+/standalone/
 node_modules/
 .idea
 .husky
@@ -13,5 +13,10 @@ stats
 img/noncommit
 test_build
 coverage
+coverage-e2e
+playwright-report
 .mcp.json
 .dev-build-counter
+/test-results/
+e2e/fixtures/large.har
+.plans/

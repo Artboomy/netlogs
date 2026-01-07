@@ -33,8 +33,13 @@
         "build-storybook": "yarn ladle build",
         "bump": "node update-version.cjs",
         "test": "vitest",
-        "test:coverage": "vitest --coverage",
+        "test:coverage": "vitest run --coverage",
         "test:ui": "vitest --ui",
+        "test:e2e": "playwright test",
+        "test:e2e:ui": "playwright test --ui",
+        "test:e2e:headed": "playwright test --headed",
+        "test:e2e:report": "playwright show-report",
+        "build:e2e": "cross-env NODE_ENV=test vite build --config vite.config.standalone.ts --mode development",
         "prepare": "husky"
     },
     "dependencies": {
@@ -63,7 +68,9 @@
         "zustand": "^4.5.2"
     },
     "devDependencies": {
+        "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@ladle/react": "^5.0.3",
+        "@playwright/test": "^1.57.0",
         "@types/base16": "1.0.2",
         "@types/chrome": "0.0.262",
         "@types/classnames": "2.2.11",
@@ -91,6 +98,7 @@
         "typescript-eslint": "^8.0.0",
         "vite": "^8.0.0-beta.5",
         "vite-plugin-circular-dependency": "^0.5.0",
+        "vite-plugin-istanbul": "^7.2.1",
         "vite-tsconfig-paths": "^6.0.3",
         "vitest": "^4.0.16"
     },

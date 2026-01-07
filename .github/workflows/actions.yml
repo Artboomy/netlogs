@@ -11,7 +11,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  lint-and-test:
+  lint-and-unit-tests:
+    name: Lint and Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -29,12 +30,108 @@ jobs:
       - name: Run ESLint
         run: yarn run lint:ci
 
-      - name: Run tests with coverage
+      - name: Run unit tests with coverage
         run: yarn test:coverage --run
 
-      - name: Report Coverage on PR
+      - name: Report Unit Test Coverage on PR
         if: always() && github.event_name == 'pull_request'
         uses: davelosert/vitest-coverage-report-action@v2
         with:
+          name: 'Unit Test Coverage'
           json-summary-path: './coverage/coverage-summary.json'
           json-final-path: './coverage/coverage-final.json'
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build standalone for E2E with coverage instrumentation
+        run: yarn build:e2e
+
+      - name: Run E2E tests
+        run: yarn test:e2e
+
+      - name: Generate E2E coverage report
+        if: always()
+        run: npx nyc report --reporter=json-summary --reporter=text
+
+      - name: Read E2E coverage summary
+        if: always() && github.event_name == 'pull_request'
+        id: e2e-coverage
+        run: |
+          if [ -f coverage-e2e/coverage-summary.json ]; then
+            STATEMENTS=$(jq '.total.statements.pct' coverage-e2e/coverage-summary.json)
+            BRANCHES=$(jq '.total.branches.pct' coverage-e2e/coverage-summary.json)
+            FUNCTIONS=$(jq '.total.functions.pct' coverage-e2e/coverage-summary.json)
+            LINES=$(jq '.total.lines.pct' coverage-e2e/coverage-summary.json)
+            echo "statements=$STATEMENTS" >> $GITHUB_OUTPUT
+            echo "branches=$BRANCHES" >> $GITHUB_OUTPUT
+            echo "functions=$FUNCTIONS" >> $GITHUB_OUTPUT
+            echo "lines=$LINES" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment E2E Coverage on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const statements = '${{ steps.e2e-coverage.outputs.statements }}';
+            const branches = '${{ steps.e2e-coverage.outputs.branches }}';
+            const functions = '${{ steps.e2e-coverage.outputs.functions }}';
+            const lines = '${{ steps.e2e-coverage.outputs.lines }}';
+
+            if (!statements) {
+              console.log('No E2E coverage data found');
+              return;
+            }
+
+            const body = `## E2E Test Coverage Report
+
+| Metric | Coverage | Threshold |
+|--------|----------|-----------|
+| Statements | ${statements}% | 70% |
+| Branches | ${branches}% | 65% |
+| Functions | ${functions}% | 70% |
+| Lines | ${lines}% | 70% |
+
+${statements >= 70 && branches >= 65 && functions >= 70 && lines >= 70 ? '✅ Coverage thresholds met!' : '⚠️ Coverage below thresholds'}
+
+[View detailed report in artifacts]`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload E2E coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-coverage
+          path: coverage-e2e/
+          retention-days: 30

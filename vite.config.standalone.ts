@@ -4,6 +4,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import { fileURLToPath } from 'node:url';
 import { resolve as pathResolve } from 'node:path';
 import { existsSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
+import istanbul from 'vite-plugin-istanbul';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -40,6 +41,28 @@ const plugins: Plugin[] = [
     tsconfigPaths(),
     react()
 ];
+
+// Add Istanbul coverage instrumentation for E2E tests
+if (process.env.NODE_ENV === 'test') {
+    plugins.push(
+        istanbul({
+            include: 'src/*',
+            exclude: [
+                'node_modules',
+                'test/',
+                'e2e/',
+                'dist/',
+                '**/*.test.ts',
+                '**/*.spec.ts'
+            ],
+            extension: ['.ts', '.tsx'],
+            requireEnv: false,
+            cypress: false,
+            forceBuildInstrument: true
+        })
+    );
+    console.log('✨ Istanbul coverage instrumentation enabled for E2E tests');
+}
 
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 export default defineConfig({
