@@ -34,6 +34,13 @@ export const MimetypeSelect: FC = memo(() => {
         [language]
     );
 
+    const valueRenderer = (selected: typeof options) => {
+        if (!selected.length) {
+            return 'Mimetype';
+        }
+        return `${selected.length} selected`;
+    };
+
     const handleOnChange = (
         selectedOptions: { label: string; value: string }[]
     ) => {
@@ -49,13 +56,17 @@ export const MimetypeSelect: FC = memo(() => {
         callParentVoid('analytics.mimeFilterChange');
     };
     return (
-        <MultiSelectStyled
-            options={options}
-            value={selectedTypes}
-            labelledBy='Mimetype'
-            onChange={handleOnChange}
-            overrideStrings={overrideStrings}
-        />
+        <>
+            <label id={'Mimetype'}>Mimetype</label>
+            <MultiSelectStyled
+                options={options}
+                valueRenderer={valueRenderer}
+                value={selectedTypes}
+                labelledBy='Mimetype'
+                onChange={handleOnChange}
+                overrideStrings={overrideStrings}
+            />
+        </>
     );
 });
 

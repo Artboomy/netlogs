@@ -198,7 +198,8 @@ export const Empty: FC = () => {
                     </Line>
                 </HelpColumn>
             </Columns>
-            <ThemeLine>🎨 {i18n.t('themeHelper')}</ThemeLine>
+            {/* eslint-disable-next-line no-constant-binary-expression */}
+            {false && <ThemeLine>🎨 {i18n.t('themeHelper')}</ThemeLine>}
             {isExtension() && (
                 <WebsocketLine>🔴 {i18n.t('webSocketHelper')}</WebsocketLine>
             )}
