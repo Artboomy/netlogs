@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { fileURLToPath } from 'node:url';
 import { resolve as pathResolve } from 'node:path';
-import { existsSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
+import { existsSync, rmSync, writeFileSync, readFileSync, cpSync, mkdirSync } from 'node:fs';
 import istanbul from 'vite-plugin-istanbul';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -35,6 +35,22 @@ const plugins: Plugin[] = [
             const htmlContent = readFileSync(templatePath, 'utf-8');
             writeFileSync(htmlPath, htmlContent);
             console.log('✨ Generated index.html for standalone build');
+        }
+    } as Plugin,
+
+    {
+        name: 'copy-icons',
+        enforce: 'post',
+        closeBundle() {
+            const currentDir = fileURLToPath(new URL('.', import.meta.url));
+            const iconsSourcePath = pathResolve(currentDir, 'dist/icons');
+            const iconsDestPath = pathResolve(currentDir, 'standalone/icons');
+
+            if (existsSync(iconsSourcePath)) {
+                mkdirSync(iconsDestPath, { recursive: true });
+                cpSync(iconsSourcePath, iconsDestPath, { recursive: true });
+                console.log('✨ Copied icons to standalone directory');
+            }
         }
     } as Plugin,
 
