@@ -13,7 +13,7 @@ test.describe('HAR File Import', () => {
         await page.evaluate(() => localStorage.clear());
     });
 
-    test.fixme('should import valid HAR file via file input', async ({ page }) => {
+    test('should import valid HAR file via file input', async ({ page }) => {
         await page.goto('/');
         await page.waitForLoadState('networkidle');
 
@@ -23,20 +23,20 @@ test.describe('HAR File Import', () => {
             path.join(__dirname, '../fixtures/sample.har')
         );
 
-        // Wait for success toast
+        // Wait for success message
         await expect(
             page.locator('text=/Opened file.*sample\\.har/i')
         ).toBeVisible({ timeout: 10000 });
 
-        // Check that requests are displayed (2 requests + 1 "Opened file" message = 3 items total)
-        await expect(page.locator('text=/2.*requests/i')).toBeVisible();
+        // Check that requests are displayed (2 HAR entries + 1 synthetic "Opened file" = 3 total)
+        await expect(page.locator('text=/3.*\\/.*3.*requests/i')).toBeVisible();
 
-        // Verify specific request is visible
-        await expect(
-            page.locator('text=jsonplaceholder.typicode.com')
-        ).toBeVisible();
+        // Verify specific request is visible (pathname shown, not domain)
+        await expect(page.locator('text=/posts/')).toBeVisible();
     });
 
+    // TODO: Programmatic drag & drop via dispatchEvent doesn't trigger drop handler
+    // File input test covers the same import functionality
     test.fixme('should import HAR file via drag & drop', async ({ page }) => {
         await page.goto('/');
         await page.waitForLoadState('networkidle');
@@ -56,13 +56,13 @@ test.describe('HAR File Import', () => {
         // Trigger drop event on the drop container
         await page.dispatchEvent('body', 'drop', { dataTransfer });
 
-        // Wait for success toast
+        // Wait for success message
         await expect(
             page.locator('text=/Opened file.*sample\\.har/i')
         ).toBeVisible({ timeout: 10000 });
 
-        // Check requests are displayed
-        await expect(page.locator('text=/2.*requests/i')).toBeVisible();
+        // Check requests are displayed (2 HAR entries + 1 synthetic = 3 total)
+        await expect(page.locator('text=/3.*\\/.*3.*requests/i')).toBeVisible();
     });
 
     test('should show error for invalid file format', async ({ page }) => {
@@ -103,7 +103,7 @@ test.describe('HAR File Import', () => {
         await expect(page.locator('text=No items')).toBeVisible();
     });
 
-    test.fixme('should handle empty HAR file', async ({ page }) => {
+    test('should handle empty HAR file', async ({ page }) => {
         await page.goto('/');
 
         // Upload empty HAR file
@@ -112,19 +112,16 @@ test.describe('HAR File Import', () => {
             path.join(__dirname, '../fixtures/empty.har')
         );
 
-        // File should be accepted
+        // File should be accepted - synthetic "Opened file" entry is added
         await expect(
             page.locator('text=/Opened file.*empty\\.har/i')
         ).toBeVisible({ timeout: 5000 });
 
-        // Should show "No items" message
-        await expect(page.locator('text=No items')).toBeVisible();
-
-        // Request count should be 0
-        await expect(page.locator('text=/0.*\\/.*0.*requests/i')).toBeVisible();
+        // With 0 HAR entries + 1 synthetic = 1 item, footer shows "1 / 1 requests"
+        await expect(page.locator('text=/1.*\\/.*1.*requests/i')).toBeVisible();
     });
 
-    test.fixme('should import multiple files sequentially', async ({ page }) => {
+    test('should import multiple files sequentially', async ({ page }) => {
         await page.goto('/');
 
         // Import first file
@@ -133,24 +130,23 @@ test.describe('HAR File Import', () => {
             path.join(__dirname, '../fixtures/sample.har')
         );
 
-        // Wait for first file to load
-        await expect(page.locator('text=/2.*requests/i')).toBeVisible({
+        // Wait for first file to load (2 HAR + 1 synthetic = 3)
+        await expect(page.locator('text=/3.*\\/.*3.*requests/i')).toBeVisible({
             timeout: 5000
         });
 
-        // Import second file (empty)
+        // Import second file (filtering-test.har for more variety)
         fileInput = page.locator('input[type="file"]');
         await fileInput.setInputFiles(
-            path.join(__dirname, '../fixtures/empty.har')
+            path.join(__dirname, '../fixtures/filtering-test.har')
         );
 
         // Wait for second file message
         await expect(
-            page.locator('text=/Opened file.*empty\\.har/i')
+            page.locator('text=/Opened file.*filtering-test\\.har/i')
         ).toBeVisible({ timeout: 5000 });
 
-        // Previous data should be cleared, showing 0 requests
-        await expect(page.locator('text=/0.*\\/.*0.*requests/i')).toBeVisible();
-        await expect(page.locator('text=No items')).toBeVisible();
+        // New file should replace old data (5 HAR + 1 synthetic = 6)
+        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
     });
 });

@@ -20,3 +20,4 @@ playwright-report
 /test-results/
 e2e/fixtures/large.har
 .plans/
+pending.md

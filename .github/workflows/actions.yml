@@ -68,7 +68,7 @@ jobs:
 
       - name: Generate E2E coverage report
         if: always()
-        run: npx nyc report --reporter=json-summary --reporter=text
+        run: npx nyc report --temp-dir coverage-e2e/.nyc_output --report-dir coverage-e2e --reporter=json-summary --reporter=html --reporter=text
 
       - name: Read E2E coverage summary
         if: always() && github.event_name == 'pull_request'
@@ -100,7 +100,9 @@ jobs:
               return;
             }
 
-            const body = `## E2E Test Coverage Report
+            const marker = '<!-- e2e-coverage-report -->';
+            const body = `${marker}
+            ## E2E Test Coverage Report
 
             | Metric | Coverage | Threshold |
             |--------|----------|-----------|
@@ -113,12 +115,32 @@ jobs:
 
             [View detailed report in artifacts]`;
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // Find existing comment with marker
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: body
+              issue_number: context.issue.number
             });
+
+            const existingComment = comments.find(comment => comment.body.includes(marker));
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body
+              });
+              console.log('Updated existing E2E coverage comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+              console.log('Created new E2E coverage comment');
+            }
 
       - name: Upload E2E test results
         if: always()

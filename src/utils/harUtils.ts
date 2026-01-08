@@ -4,7 +4,7 @@ import { useListStore } from 'controllers/network';
 
 export function getFileName(): string {
     const now = new Date();
-    return now.toISOString().replace(/:/g, '-');
+    return now.toISOString().replace(/:/g, '-') + '.netlogs.zip';
 }
 
 export const getHarData = (): Har => {

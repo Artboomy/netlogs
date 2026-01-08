@@ -56,7 +56,7 @@ test.describe('Theme Support', () => {
         expect(finalBg).toBe(initialBg);
     });
 
-    test.fixme('should persist theme across page reloads', async ({ page }) => {
+    test('should persist theme across page reloads', async ({ page }) => {
         await page.goto('/');
 
         // Toggle theme

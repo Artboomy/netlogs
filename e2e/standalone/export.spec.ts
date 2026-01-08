@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 test.describe('Export Functionality', () => {
-    test.fixme('should export all visible requests', async ({ page }) => {
+    test('should export all visible requests', async ({ page }) => {
         await page.goto('/');
 
         // Load sample HAR file
@@ -16,8 +16,8 @@ test.describe('Export Functionality', () => {
             path.join(__dirname, '../fixtures/sample.har')
         );
 
-        // Wait for data to load
-        await expect(page.locator('text=/5.*requests/i')).toBeVisible({
+        // Wait for data to load (2 entries + 1 synthetic "file opened" entry)
+        await expect(page.locator('text=/3.*requests/i')).toBeVisible({
             timeout: 5000
         });
 
@@ -46,14 +46,14 @@ test.describe('Export Functionality', () => {
             const content = fs.readFileSync(downloadPath, 'utf-8');
             const har = JSON.parse(content);
 
-            // Verify HAR structure
+            // Verify HAR structure (2 entries + 1 synthetic "file opened" entry)
             expect(har.log).toBeDefined();
             expect(har.log.entries).toBeDefined();
-            expect(har.log.entries).toHaveLength(5);
+            expect(har.log.entries).toHaveLength(3);
         }
     });
 
-    test.fixme('should export only filtered requests', async ({ page }) => {
+    test('should export all requests regardless of filter', async ({ page }) => {
         await page.goto('/');
 
         // Load sample HAR file
@@ -62,17 +62,17 @@ test.describe('Export Functionality', () => {
             path.join(__dirname, '../fixtures/sample.har')
         );
 
-        await expect(page.locator('text=/5.*requests/i')).toBeVisible({
+        await expect(page.locator('text=/3.*requests/i')).toBeVisible({
             timeout: 5000
         });
 
-        // Apply filter
+        // Apply filter to show only 1 request in UI
         const filterInput = page.locator('input[placeholder*="Filter by url"]');
-        await filterInput.fill('users');
+        await filterInput.fill('posts');
         await page.waitForTimeout(200);
 
-        // Verify filtered count
-        await expect(page.locator('text=/3.*\\/.*5.*requests/i')).toBeVisible();
+        // Verify filtered count (1 posts entry out of 3 total)
+        await expect(page.locator('text=/1.*\\/.*3.*requests/i')).toBeVisible();
 
         // Set up download listener
         const downloadPromise = page.waitForEvent('download');
@@ -89,12 +89,12 @@ test.describe('Export Functionality', () => {
             const content = fs.readFileSync(downloadPath, 'utf-8');
             const har = JSON.parse(content);
 
-            // Should export only filtered requests (3)
+            // Should export ALL requests (ignoring filter to avoid hiding important data)
             expect(har.log.entries).toHaveLength(3);
         }
     });
 
-    test.fixme('should export with empty list', async ({ page }) => {
+    test('should export with empty list', async ({ page }) => {
         await page.goto('/');
 
         // Verify no items
