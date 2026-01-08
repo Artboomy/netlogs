@@ -33,9 +33,8 @@ export interface IProfileWebSocket {
     isMatch: (request: IItemWebSocketCfg) => boolean;
 }
 
-export type IProfileSerialized = Omit<IProfile, 'functions'> & {
-    functions: Record<keyof IProfile['functions'], string>;
-};
+// IProfileSerialized and ISettingsSerialized types have been removed
+// They are no longer needed since we don't serialize/deserialize functions
 
 export type Host = string;
 export type FilteredMethod = string;
@@ -46,9 +45,7 @@ export interface ISettings {
     newFeatureFlags: {
         language: boolean;
     };
-    matcher: (request: NetworkRequest) => ProfileName;
     sendAnalytics: boolean;
-    profiles: Record<ProfileName, IProfile>;
     nextjsIntegration: boolean;
     nuxtjsIntegration: boolean;
     methodChecks: {
@@ -72,8 +69,3 @@ export interface ISettings {
         openTicketInNewTab: boolean;
     };
 }
-
-export type ISettingsSerialized = Omit<ISettings, 'matcher' | 'profiles'> & {
-    matcher: string;
-    profiles: Record<keyof ISettings['profiles'], IProfileSerialized>;
-};

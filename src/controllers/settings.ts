@@ -1,86 +1,24 @@
-import {
-    IProfile,
-    IProfileSerialized,
-    ISettings,
-    ISettingsSerialized
-} from './settings/types';
+import { IProfile, ISettings, ProfileName } from './settings/types';
 import { defaultSettings } from './settings/base';
 import storage from '../api/storage';
-import { isSandbox, isExtension } from 'utils';
 import { defaultProfile } from './settings/profiles/default';
 import { NetworkRequest } from 'models/types';
 import { isJsonRpc, jsonRpcProfile } from './settings/profiles/jsonRpc';
 import { graphqlProfile, isGraphql } from './settings/profiles/graphql';
 import { i18n } from 'translations/i18n';
 
-// TODO: should probably remove storing functions in serialized mode and all related logic
-
-function deserializeFunctionRaw<T>(strFunction: string): T {
-    // Deserialize functions in sandbox or standalone mode (not in extension panel mode)
-    return (isSandbox() || !isExtension()
-        ? new Function(`return ${strFunction}`)()
-        : strFunction) as T;
-}
-
-function deserializeMatcher(strFunction: string): ISettings['matcher'] {
-    try {
-        return deserializeFunctionRaw(strFunction);
-    } catch (_e) {
-        return defaultSettings.matcher;
-    }
-}
-
-export function deserializeFunctionsRaw(
-    functions: Record<string, string>
-): IProfile['functions'] {
-    return Object.assign(
-        {},
-        ...Object.entries(functions).map(([key, strFunction]) => {
-            return { [key]: deserializeFunctionRaw(strFunction) };
-        })
-    );
-}
-
-function deserializeFunctions(
-    functions: Record<string, string>
-): IProfile['functions'] {
-    let deserializedFunctions;
-    try {
-        deserializedFunctions = deserializeFunctionsRaw(functions);
-    } catch (_e) {
-        deserializedFunctions = defaultProfile.functions;
-    }
-    return { ...defaultProfile.functions, ...deserializedFunctions };
-}
-
-function deserializeProfile(profile: IProfileSerialized): IProfile {
-    return {
-        ...profile,
-        functions: deserializeFunctions(profile.functions)
-    };
-}
+// Serialization/deserialization of functions has been removed
+// Profiles are now imported directly where needed
 
 export function deserialize(strSettings: string): ISettings {
-    const deserialized = JSON.parse(strSettings) as ISettingsSerialized;
+    const deserialized = JSON.parse(strSettings) as Partial<ISettings & { profiles?: unknown }>;
+    const { profiles: _profiles, ...settingsWithoutProfiles } = deserialized;
     return {
         ...defaultSettings,
-        ...deserialized,
+        ...settingsWithoutProfiles,
         jira: {
             ...defaultSettings.jira,
             ...(deserialized.jira || {})
-        },
-        ...{ matcher: deserializeMatcher(deserialized.matcher) },
-        ...{
-            profiles: Object.assign(
-                {},
-                ...Object.entries(deserialized.profiles || {}).map(
-                    ([key, profile]) => ({
-                        [key]: deserializeProfile(profile)
-                    })
-                ),
-                // default should always be latest, not from storage
-                { default: defaultProfile }
-            )
         }
     };
 }
@@ -90,25 +28,12 @@ export function serialize(
     settings: any,
     space?: string
 ): string {
-    return JSON.stringify(
-        settings,
-        (_key, value: unknown) => {
-            if (typeof value === 'function') {
-                return value.toString();
-            }
-            return value;
-        },
-        space
-    );
+    // Remove profiles if present before serialization
+    const { profiles: _profiles, ...settingsWithoutProfiles } = settings;
+    return JSON.stringify(settingsWithoutProfiles, null, space);
 }
 
 export type SettingsListener = (newSettings: ISettings) => void;
-
-function injectStaticProfiles(settings: ISettings): void {
-    settings.profiles.default = defaultProfile;
-    settings.profiles.jsonRpc = jsonRpcProfile;
-    settings.profiles.graphql = graphqlProfile;
-}
 
 function setLanguage(language: string) {
     i18n.locale = language;
@@ -120,7 +45,6 @@ class Settings {
 
     constructor() {
         this.settings = defaultSettings;
-        injectStaticProfiles(this.settings);
         storage.onChanged.addListener(
             (
                 changes: { [key: string]: chrome.storage.StorageChange },
@@ -133,7 +57,6 @@ class Settings {
                 ) {
                     this.settings = deserialize(changes.settings.newValue);
                     setLanguage(this.settings.language);
-                    injectStaticProfiles(this.settings);
                     this.listeners.forEach((listener) => {
                         if (this.settings) {
                             listener(this.settings);
@@ -162,7 +85,6 @@ class Settings {
                     } catch (_e) {
                         this.settings = defaultSettings;
                     }
-                    injectStaticProfiles(this.settings);
                     resolve(this.settings);
                     this.listeners.forEach((listener) => {
                         if (this.settings) {
@@ -182,7 +104,7 @@ class Settings {
         }
     }
 
-    getMather(): ISettings['matcher'] {
+    getMather(): (request: NetworkRequest) => ProfileName {
         return (request: NetworkRequest) => {
             const params = defaultProfile.functions.getParams(request);
             const result = request.response.content.text
@@ -200,15 +122,23 @@ class Settings {
             ) {
                 return 'graphql';
             }
-            return this.settings.matcher(request);
+            return 'default';
         };
     }
 
     getFunctions(request: NetworkRequest): IProfile['functions'] {
-        return this.settings.profiles[this.getMather()(request)]?.functions;
+        const profileName = this.getMather()(request);
+        switch (profileName) {
+            case 'jsonRpc':
+                return jsonRpcProfile.functions;
+            case 'graphql':
+                return graphqlProfile.functions;
+            default:
+                return defaultProfile.functions;
+        }
     }
 
-    set(newSettings: ISettings | ISettingsSerialized) {
+    set(newSettings: ISettings) {
         return storage.local.set({ settings: serialize(newSettings) });
     }
 

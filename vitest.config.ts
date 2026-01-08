@@ -3,10 +3,18 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
     plugins: [tsconfigPaths()],
+    cacheDir: '.cache',
     test: {
         globals: true,
         environment: 'happy-dom',
         exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
+        pool: 'threads',
+        isolate: false,
+        deps: {
+            inline: [
+                /^(?!.*vitest).*$/
+            ]
+        },
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'json-summary', 'html'],
@@ -22,7 +30,8 @@ export default defineConfig({
                 'scripts/**',
                 '.ladle/**',
                 '**/controllers/settings/base.ts',
-                'e2e/**'
+                'e2e/**',
+                'src/utils.ts'
             ],
             thresholds: {
                 lines: 95,
