@@ -10,6 +10,7 @@ const path = require('path');
 
 const PORT = 3000;
 const STANDALONE_DIR = 'standalone';
+const ROOT_DIR = path.resolve(STANDALONE_DIR);
 
 const CONTENT_TYPES = {
     html: 'text/html',
@@ -26,12 +27,20 @@ const CONTENT_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-    const urlPath = req.url === '/' ? 'index.html' : req.url;
-    const filePath = path.join(STANDALONE_DIR, urlPath);
-    const ext = path.extname(filePath).slice(1);
+    const requestUrl = new URL(req.url, 'http://localhost');
+    const pathname = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
+    const safePath = path.resolve(ROOT_DIR, '.' + pathname);
+
+    if (safePath !== ROOT_DIR && !safePath.startsWith(ROOT_DIR + path.sep)) {
+        res.writeHead(403, { 'Content-Type': 'text/plain' });
+        res.end('Forbidden');
+        return;
+    }
+
+    const ext = path.extname(safePath).slice(1);
     const contentType = CONTENT_TYPES[ext] || 'text/plain';
 
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(safePath, (err, data) => {
         if (err) {
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Not found');
