@@ -43,6 +43,43 @@ class InMemoryStorage {
     };
 }
 
+const STORAGE_KEY = 'netlogs_settings';
+
+class InLocalStorage {
+    static _listeners: Callback[] = [];
+    static onChanged = {
+        addListener(callback: Callback) {
+            InLocalStorage._listeners.push(callback);
+        }
+    };
+    static local = {
+        get: (...args: Parameters<chrome.storage.StorageArea['get']>) => {
+            if (args[0] && typeof args[0] === 'object') {
+                const defaults = args[0] as { settings?: string };
+                const stored = window.localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    args[1]({ settings: stored });
+                } else {
+                    args[1](defaults);
+                }
+            }
+        },
+        set: (data: Parameters<StorageArea['set']>[0]) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const settings = data.settings as string;
+            window.localStorage.setItem(STORAGE_KEY, settings);
+            InLocalStorage._listeners.forEach((callback) =>
+                callback({ settings: { newValue: settings } }, 'local')
+            );
+        },
+        clear: (callback: Parameters<StorageArea['clear']>[0]) => {
+            window.localStorage.removeItem(STORAGE_KEY);
+            callback?.();
+        }
+    };
+}
+
 class SandboxStorage {
     static _listeners: Callback[] = [];
 
@@ -91,6 +128,8 @@ const currentStorage = isSandbox()
     ? new SandboxStorage()
     : window.chrome?.storage
       ? window.chrome?.storage
-      : InMemoryStorage;
+      : window.localStorage
+        ? InLocalStorage
+        : InMemoryStorage;
 
 export default currentStorage;

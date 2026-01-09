@@ -1,4 +1,4 @@
-import { ISettings, ISettingsSerialized } from 'controllers/settings/types';
+import { ISettings } from 'controllers/settings/types';
 import instance, { SettingsListener } from '../controllers/settings';
 import { create } from 'zustand';
 
@@ -8,9 +8,9 @@ export const useSettings = create<{
     deinit: () => void;
     settings: ISettings;
     patchSettings: (
-        newSettingsPartial: Partial<ISettings | ISettingsSerialized>
+        newSettingsPartial: Partial<ISettings>
     ) => void;
-    setSettings: (newSettings: ISettings | ISettingsSerialized) => void;
+    setSettings: (newSettings: ISettings) => void;
     resetSettings: () => void;
 }>((set, get) => ({
     __listener: (newSettings) => set({ settings: newSettings }),
@@ -22,11 +22,9 @@ export const useSettings = create<{
     },
     settings: instance.get(),
     patchSettings: (newSettingsPartial) => {
-        return instance.set({ ...get().settings, ...newSettingsPartial } as
-            | ISettings
-            | ISettingsSerialized);
+        return instance.set({ ...get().settings, ...newSettingsPartial });
     },
-    setSettings: (newSettings: ISettings | ISettingsSerialized) =>
+    setSettings: (newSettings: ISettings) =>
         instance.set(newSettings),
     resetSettings: () =>
         instance.reset().then(() => set({ settings: instance.get() }))

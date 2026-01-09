@@ -2,7 +2,6 @@ import React, { FC, useCallback, useMemo } from 'react';
 import Inspector, {
     chromeDark,
     chromeLight,
-    DOMInspector,
     InspectorAsTreeProps
 } from 'react-inspector';
 import { Image } from './render/Image';
@@ -19,6 +18,7 @@ import { useSettings } from 'hooks/useSettings';
 import copy from 'copy-to-clipboard';
 import { Flip, toast } from 'react-toastify';
 import { i18n } from 'translations/i18n';
+import { isMimeType, RawType } from 'components/utils/IsMimeType';
 
 type TDomData = {
     __mimeType: 'text/html';
@@ -28,13 +28,6 @@ type TDomData = {
 type TXmlData = {
     __mimeType: 'text/xml';
     __getRaw: () => string;
-};
-
-type RawType = Record<string, unknown> | string | null | undefined | number;
-
-type WithMimeType = {
-    __mimeType: string;
-    __getRaw: () => RawType;
 };
 
 type TData = {
@@ -91,10 +84,6 @@ const isAudio = (data: unknown): data is TAudioData => {
 
 const isXml = (data: unknown): data is TXmlData => {
     return Boolean(isMimeType(data) && data.__mimeType.endsWith('xml'));
-};
-
-export const isMimeType = (data: unknown): data is WithMimeType => {
-    return Boolean(data && typeof data === 'object' && '__mimeType' in data);
 };
 
 export interface InspectorWrapperProps {
@@ -158,7 +147,7 @@ function recursiveTextToObject<T extends RawType>(
 
     // If data is an object, recursively convert its properties
     if (typeof data === 'object') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result: any = Array.isArray(data) ? [] : {};
         for (const key in data) {
             if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -216,7 +205,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
             data.__getRaw(),
             'text/html'
         );
-        return <DOMInspector data={renderData} theme={customTheme} />;
+        return <Inspector data={renderData} theme={customTheme} />;
     }
     if (isXml(data)) {
         const domParser = new DOMParser();
@@ -224,7 +213,7 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
             data.__getRaw(),
             'text/xml'
         );
-        return <DOMInspector data={renderData} theme={customTheme} />;
+        return <Inspector data={renderData} theme={customTheme} />;
     }
     let name = tagName || (isMimeType(data) && data.__mimeType) || 'result';
     const unwrappedData = isMimeType(data) ? data.__getRaw() : data;
