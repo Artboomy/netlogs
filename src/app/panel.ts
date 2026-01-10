@@ -65,6 +65,13 @@ const messageHandler = (
             } catch (_e) {
                 // pass
             }
+        } else if (type === 'pendingRequest') {
+            postSandbox(
+                createEventPayload(
+                    'pendingRequest',
+                    typeof e.data === 'string' ? e.data : JSON.stringify(e.data)
+                )
+            );
         } else if (type === 'connectionTest') {
             console.log('message', type, e.data);
             const data = e.data as unknown as { host: string };

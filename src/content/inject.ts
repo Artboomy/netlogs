@@ -1,13 +1,31 @@
-// NOTE: no non-type imports in this file or build will FAIL!
 /* eslint-disable */
 import { IItemContentOnlyCfg, IItemTransactionCfg } from 'models/types';
 import { ISettings } from 'controllers/settings/types';
+import type { PendingRequestData } from '../types';
+import {
+    createPendingRequestFromFetch,
+    createPendingRequestFromXHR
+} from './interceptors';
 
 declare global {
     interface Window {
         __NEXT_DATA__: any;
         __NUXT__: any;
         netlogs: (cfg: IItemTransactionCfg | IItemContentOnlyCfg) => void;
+        /** Internal: tracks pending XHR request data */
+        __netlogs_xhr?: {
+            method: string;
+            url: string;
+            headers: Array<{ name: string; value: string }>;
+        };
+    }
+    interface XMLHttpRequest {
+        /** Internal: tracks pending XHR request data */
+        __netlogs?: {
+            method: string;
+            url: string;
+            headers: Array<{ name: string; value: string }>;
+        };
     }
 }
 
@@ -99,6 +117,120 @@ netlogs.help = (): void => {
 
 window.netlogs = netlogs;
 
+// Store original implementations for wrapping
+const originalFetch = window.fetch.bind(window);
+const originalXHROpen = XMLHttpRequest.prototype.open;
+const originalXHRSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
+const originalXHRSend = XMLHttpRequest.prototype.send;
+
+// Track if interceptors are already installed
+let interceptorsInstalled = false;
+
+/**
+ * Safely post a pending request message.
+ * Never throws - errors are silently ignored to avoid breaking page functionality.
+ */
+function safePostPendingRequest(data: PendingRequestData): void {
+    try {
+        window.postMessage(
+            {
+                type: 'PENDING_REQUEST',
+                data: data
+            },
+            '*'
+        );
+    } catch (e) {
+        console.error('[NETLOGS:inject] Failed to post PENDING_REQUEST:', e);
+    }
+}
+
+/**
+ * Install fetch/XHR interceptors to capture request starts.
+ * Safe wrappers that never break original functionality.
+ */
+function installInterceptors(): void {
+    if (interceptorsInstalled) {
+        return;
+    }
+    interceptorsInstalled = true;
+
+    // Wrap fetch
+    window.fetch = function (
+        input: RequestInfo | URL,
+        init?: RequestInit
+    ): Promise<Response> {
+        try {
+            const pendingRequest = createPendingRequestFromFetch(input, init);
+            safePostPendingRequest(pendingRequest);
+        } catch {
+            // Silently ignore interception errors
+        }
+        return originalFetch(input, init);
+    };
+
+    // Wrap XHR.open to capture method and URL
+    XMLHttpRequest.prototype.open = function (
+        method: string,
+        url: string | URL,
+        async: boolean = true,
+        username?: string | null,
+        password?: string | null
+    ): void {
+        try {
+            this.__netlogs = {
+                method,
+                url: typeof url === 'string' ? url : url.href,
+                headers: []
+            };
+        } catch {
+            // Silently ignore
+        }
+        return originalXHROpen.call(
+            this,
+            method,
+            url,
+            async,
+            username,
+            password
+        );
+    };
+
+    // Wrap XHR.setRequestHeader to capture headers
+    XMLHttpRequest.prototype.setRequestHeader = function (
+        name: string,
+        value: string
+    ): void {
+        try {
+            if (this.__netlogs) {
+                this.__netlogs.headers.push({ name, value });
+            }
+        } catch {
+            // Silently ignore
+        }
+        return originalXHRSetRequestHeader.call(this, name, value);
+    };
+
+    // Wrap XHR.send to capture body and emit pending request
+    XMLHttpRequest.prototype.send = function (
+        body?: Document | XMLHttpRequestBodyInit | null
+    ): void {
+        try {
+            if (this.__netlogs) {
+                const pendingRequest = createPendingRequestFromXHR(
+                    this.__netlogs.method,
+                    this.__netlogs.url,
+                    this.__netlogs.headers,
+                    body
+                );
+                safePostPendingRequest(pendingRequest);
+            }
+        } catch {
+            // Silently ignore
+        }
+        return originalXHRSend.call(this, body);
+    };
+}
+
 function injectAfterSettings(settings: Partial<ISettings>) {
     if ('__NEXT_DATA__' in window && settings.nextjsIntegration) {
         netlogs({
@@ -113,5 +245,14 @@ function injectAfterSettings(settings: Partial<ISettings>) {
             tag: 'NUXT',
             content: window.__NUXT__
         });
+    }
+    // Install request interceptors if enabled
+    if (settings.interceptRequests) {
+        console.log('[NETLOGS:inject] Installing request interceptors');
+        installInterceptors();
+    } else {
+        console.log(
+            '[NETLOGS:inject] Request interceptors disabled in settings'
+        );
     }
 }

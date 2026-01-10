@@ -68,4 +68,6 @@ export interface ISettings {
         attachScreenshot: boolean;
         openTicketInNewTab: boolean;
     };
+    /** Enable intercepting fetch/XHR to show pending requests */
+    interceptRequests: boolean;
 }

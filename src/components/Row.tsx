@@ -1,10 +1,12 @@
 import React, { memo, MouseEventHandler } from 'react';
 import ContentOnlyItem from '../models/ContentOnlyItem';
+import PendingItem from '../models/PendingItem';
 import { TransactionItemAbstract } from 'models/TransactionItem';
 import { google } from 'base16';
 import { Tag } from './Tag';
 import { ContentOnly } from './row/ContentOnly';
 import { Transaction } from './row/Transaction';
+import { PendingDuration } from './row/PendingDuration';
 import { mediaQuerySmallOnly } from 'utils';
 import styled from '@emotion/styled';
 import { useTheme } from '@emotion/react';
@@ -19,7 +21,8 @@ const Date = styled.div<{
     clickable: boolean;
     contentOnly: boolean;
     oddRow: boolean;
-}>(({ theme: { isVerticalView, ...theme }, clickable, contentOnly, oddRow }) => ({
+    isPending?: boolean;
+}>(({ theme: { isVerticalView, ...theme }, clickable, contentOnly, oddRow, isPending }) => ({
     color: theme.dateColor,
     position: 'relative',
     fontSize: '12px',
@@ -36,11 +39,14 @@ const Date = styled.div<{
     ...(oddRow && {
         backgroundColor: theme.oddRowBg
     }),
-    '&:after': {
-        content: '" ms"',
-        fontSize: '0.8em',
-        color: theme.icon.normal
-    }
+    // Only show " ms" suffix for non-pending items (PendingDuration has its own suffix)
+    ...(!isPending && {
+        '&:after': {
+            content: '" ms"',
+            fontSize: '0.8em',
+            color: theme.icon.normal
+        }
+    })
 }));
 
 const DateUnderlay = styled.div<{ color: string }>(({ color }) => ({
@@ -70,16 +76,35 @@ export const Row: React.FC<IRowProps> = memo(({ item, idx }) => {
     const tag = item.getTag();
     const meta = item.getMeta();
     const handleClick: MouseEventHandler = useRowClickPanel(item);
+    const isPending = item instanceof PendingItem;
+
+    // For pending items, we use the animated PendingDuration component
+    // For regular items, use static duration with color coding
     let dateColor = google.base0B;
     const duration = item.getDuration();
-    if (duration > 1000) {
-        dateColor = base16Darcula.base0F;
-    } else if (duration > 500) {
-        dateColor = base16Darcula.base0E;
-    } else if (duration > 300) {
-        dateColor = google.base0A;
+    if (!isPending) {
+        if (duration > 1000) {
+            dateColor = base16Darcula.base0F;
+        } else if (duration > 500) {
+            dateColor = base16Darcula.base0E;
+        } else if (duration > 300) {
+            dateColor = google.base0A;
+        }
     }
-    const durationWidth = Math.round(Math.min(duration / 1000, 1) * 100);
+    const durationWidth = isPending ? 0 : Math.round(Math.min(duration / 1000, 1) * 100);
+
+    const dateContent = isPending ? (
+        <PendingDuration startTimestamp={item.timestamp} />
+    ) : (
+        <>
+            {duration.toFixed(2)}
+            <DateUnderlay
+                color={dateColor}
+                style={{ right: `${100 - durationWidth}%` }}
+            />
+        </>
+    );
+
     const commonProps = {
         css: idx % 2 ? { backgroundColor: theme.oddRowBg } : {},
         date: (
@@ -87,12 +112,9 @@ export const Row: React.FC<IRowProps> = memo(({ item, idx }) => {
                 clickable={!!meta}
                 contentOnly={item instanceof ContentOnlyItem}
                 oddRow={Boolean(idx % 2)}
-                onClick={handleClick}>
-                {duration.toFixed(2)}
-                <DateUnderlay
-                    color={dateColor}
-                    style={{ right: `${100 - durationWidth}%` }}
-                />
+                onClick={handleClick}
+                isPending={isPending}>
+                {dateContent}
             </Date>
         ),
         tag: tag ? (

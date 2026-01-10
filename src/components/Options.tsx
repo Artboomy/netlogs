@@ -48,6 +48,7 @@ const globalStyles = {
 
 export const Options: FC = () => {
     const { settings, setSettings } = useSettings();
+    console.log('settings', settings);
 
     useEffect(() => {
         i18n.locale = settings.language;
@@ -236,6 +237,22 @@ export const Options: FC = () => {
                             })}>
                             ❓
                         </span>
+                    </label>
+                </CheckboxRow>
+                <CheckboxRow>
+                    <label>
+                        <input
+                            type='checkbox'
+                            name='interceptRequests'
+                            checked={settings.interceptRequests}
+                            onChange={(e) =>
+                                useSettings.getState().patchSettings({
+                                    interceptRequests: e.target.checked
+                                })
+                            }
+                        />
+                        {i18n.t('interceptRequests')}{' '}
+                        <span title={i18n.t('interceptRequestsHelp')}>❓</span>
                     </label>
                 </CheckboxRow>
             </Block>

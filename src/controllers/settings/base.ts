@@ -28,5 +28,6 @@ export const defaultSettings: ISettings = {
         attachScreenshot: true,
         openTicketInNewTab: true,
         template: ''
-    }
+    },
+    interceptRequests: true
 };

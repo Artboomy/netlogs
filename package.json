@@ -43,6 +43,8 @@
         "test:e2e:coverage:report": "nyc report --temp-dir coverage-e2e/.nyc_output --report-dir coverage-e2e --reporter=html --reporter=text-summary",
         "test:e2e:coverage:open": "start coverage-e2e/index.html",
         "build:e2e": "cross-env NODE_ENV=test vite build --config vite.config.standalone.ts --mode development",
+        "verify": "yarn lint && yarn test:coverage --run && yarn build",
+        "verify:e2e": "yarn verify && yarn build:standalone && cross-env CI=true yarn test:e2e",
         "prepare": "husky"
     },
     "dependencies": {

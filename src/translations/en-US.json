@@ -114,5 +114,7 @@
     "jira_testProjectNotFound": "Project \\%{project}\\ not found or no access.",
     "jira_testIssueTypeNotFound": "Issue type \\%{issueType}\\ not found.",
     "jira_service_info": "$service_info$",
-    "import": "Import HAR file"
+    "import": "Import HAR file",
+    "interceptRequests": "Show pending requests",
+    "interceptRequestsHelp": "Intercepts fetch/XHR requests to show them before response arrives"
 }

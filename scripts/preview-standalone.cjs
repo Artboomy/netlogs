@@ -12,6 +12,52 @@ const PORT = 3000;
 const STANDALONE_DIR = 'standalone';
 const ROOT_DIR = path.resolve(STANDALONE_DIR);
 
+// Test API routes for E2E testing of request interception
+const API_ROUTES = {
+    // GET endpoint - returns JSON after small delay
+    'GET /api/test/get': (_req, res) => {
+        setTimeout(() => {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(
+                JSON.stringify({
+                    success: true,
+                    method: 'GET',
+                    timestamp: Date.now()
+                })
+            );
+        }, 100);
+    },
+
+    // POST endpoint - echoes body
+    'POST /api/test/post': (req, res) => {
+        let body = '';
+        req.on('data', (chunk) => (body += chunk));
+        req.on('end', () => {
+            setTimeout(() => {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(
+                    JSON.stringify({
+                        success: true,
+                        method: 'POST',
+                        body,
+                        timestamp: Date.now()
+                    })
+                );
+            }, 100);
+        });
+    },
+
+    // Slow endpoint for testing pending state visibility (2 second delay)
+    'GET /api/test/slow': (_req, res) => {
+        setTimeout(() => {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(
+                JSON.stringify({ success: true, method: 'GET', slow: true })
+            );
+        }, 2000);
+    }
+};
+
 const CONTENT_TYPES = {
     html: 'text/html',
     css: 'text/css',
@@ -28,7 +74,16 @@ const CONTENT_TYPES = {
 
 const server = http.createServer((req, res) => {
     const requestUrl = new URL(req.url, 'http://localhost');
-    const pathname = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
+
+    // Check API routes first
+    const routeKey = `${req.method} ${requestUrl.pathname}`;
+    if (API_ROUTES[routeKey]) {
+        API_ROUTES[routeKey](req, res);
+        return;
+    }
+
+    const pathname =
+        requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
     const safePath = path.resolve(ROOT_DIR, '.' + pathname);
 
     if (safePath !== ROOT_DIR && !safePath.startsWith(ROOT_DIR + path.sep)) {

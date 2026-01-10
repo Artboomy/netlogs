@@ -54,6 +54,9 @@ function getColor(
     if (type === ItemType.WebSocket) {
         return color ? color : solarized.base0B;
     }
+    if (type === ItemType.Pending) {
+        return color ? color : google.base0A; // Yellow/orange for pending
+    }
     return google.base0C;
 }
 

@@ -29,6 +29,7 @@ type CustomEventName =
     | 'searchOnPage'
     | 'setHost'
     | 'cachedNetworkRequest'
+    | 'pendingRequest'
     | 'jira.createIssue'
     | 'jira.getMetadata'
     | 'jira.testSettings'
@@ -73,3 +74,37 @@ export type IframeEvent = {
     data: string;
     id: string;
 };
+
+/**
+ * Pending request sent from inject script (subset of HAR Entry).
+ * Used to display requests in progress before response is received.
+ */
+export interface PendingRequestData {
+    /** Unique ID for matching (generated in inject) */
+    id: string;
+    /** Start time in milliseconds */
+    timestamp: number;
+    /** Request data (subset of HAR Request) */
+    request: {
+        method: string;
+        url: string;
+        httpVersion: string;
+        headers: Array<{ name: string; value: string }>;
+        queryString: Array<{ name: string; value: string }>;
+        postData?: {
+            mimeType: string;
+            text: string;
+        };
+    };
+}
+
+/**
+ * Key for pending requests map (for O(1) matching).
+ * Used to match completed requests with their pending counterparts.
+ */
+export interface PendingRequestKey {
+    method: string;
+    url: string;
+    /** Hash of body for POST requests (for accurate matching) */
+    bodyHash?: string;
+}
