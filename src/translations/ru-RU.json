@@ -95,6 +95,7 @@
     "jiraTicketModal_notReadyHint": "Заполните настройки Jira на странице опций перед созданием задачи.",
     "jiraTicketModal_pending": "Создание задачи в Jira...",
     "jiraTicketModal_summary": "Резюме",
+    "jiraTicketModal_resetCachedFields": "Сбросить кешированные поля",
     "reset": "Сбросить настройки до значений по умолчанию",
     "jira_checkSettings": "Проверить настройки",
     "jira_testing": "Тестирование...",

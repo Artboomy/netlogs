@@ -60,6 +60,9 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Build default mode
+        run: yarn build
+
       - name: Build standalone for E2E with coverage instrumentation
         run: yarn build:e2e
 

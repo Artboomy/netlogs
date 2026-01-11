@@ -5,6 +5,7 @@ Always use context7 when I need code generation, setup or configuration steps, o
 
 ## Development Environment
 - Node.js version manager: **fnm** (Fast Node Manager)
+- Before running any commands, ensure the shell is initialized with `fnm env` (per https://github.com/Schniz/fnm#shell-setup).
 - To run commands call `fnm use 22.12.0 && <your command>`
 - **IMPORTANT**: This is a Windows environment. NEVER use `2>nul` or `>nul` in bash commands - it creates a problematic file instead of redirecting to null device. Use `2>/dev/null` or omit error redirection entirely.
 
