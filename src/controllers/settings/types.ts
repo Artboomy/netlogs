@@ -67,7 +67,20 @@ export interface ISettings {
         template: string;
         attachScreenshot: boolean;
         openTicketInNewTab: boolean;
+        cachedFields: {
+            baseUrl: string;
+            projectKey: string;
+            issueType: string;
+            fields: {
+                key: string;
+                name: string;
+                type: string;
+                allowedValues?: { id: string; value: string }[];
+            }[];
+            values: Record<string, unknown>;
+        } | null;
     };
+
     /** Enable intercepting fetch/XHR to show pending requests */
     interceptRequests: boolean;
 }

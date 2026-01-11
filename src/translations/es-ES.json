@@ -95,6 +95,7 @@
     "jiraTicketModal_notReadyHint": "Complete la configuración de Jira en la página de Opciones antes de crear una incidencia.",
     "jiraTicketModal_pending": "Creando incidencia en Jira...",
     "jiraTicketModal_summary": "Resumen",
+    "jiraTicketModal_resetCachedFields": "Restablecer campos en caché",
     "reset": "Restablecer los ajustes a los valores predeterminados",
     "jira_checkSettings": "Comprobar configuración",
     "jira_testing": "Probando...",

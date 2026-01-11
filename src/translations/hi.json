@@ -95,6 +95,7 @@
     "jiraTicketModal_notReadyHint": "इश्यू बनाने से पहले विकल्प पृष्ठ में Jira सेटिंग्स भरें।",
     "jiraTicketModal_pending": "Jira इश्यू बनाया जा रहा है...",
     "jiraTicketModal_summary": "सारांश",
+    "jiraTicketModal_resetCachedFields": "कैश किए गए फ़ील्ड रीसेट करें",
     "reset": "सेटिंग्स को डिफ़ॉल्ट मानों पर रीसेट करें",
     "jira_checkSettings": "सेटिंग्स जांचें",
     "jira_testing": "परीक्षण किया जा रहा है...",

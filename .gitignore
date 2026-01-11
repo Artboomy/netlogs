@@ -21,3 +21,4 @@ playwright-report
 e2e/fixtures/large.har
 .plans/
 pending.md
+opencode.jsonc

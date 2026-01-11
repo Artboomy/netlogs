@@ -27,7 +27,8 @@ export const defaultSettings: ISettings = {
         apiVersion: '2',
         attachScreenshot: true,
         openTicketInNewTab: true,
-        template: ''
+        template: '',
+        cachedFields: null
     },
     interceptRequests: true
 };
