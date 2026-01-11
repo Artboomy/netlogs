@@ -94,7 +94,7 @@
     "jiraTicketModal_issueCreated": "Jira課題が作成されました",
     "jiraTicketModal_notReadyHint": "課題を作成する前に、オプションページでJiraの設定を入力してください。",
     "jiraTicketModal_pending": "Jira課題を作成中...",
-    "jiraTicketModal_summary": "要約",
+    "jiraTicketModal_resetCachedFields": "キャッシュ済みフィールドをリセット",
     "reset": "設定をデフォルト値にリセット",
     "jira_checkSettings": "設定を確認",
     "jira_testing": "テスト中...",
@@ -114,5 +114,8 @@
     "jira_testProjectNotFound": "Project \\%{project}\\ not found or no access.",
     "jira_testIssueTypeNotFound": "Issue type \\%{issueType}\\ not found.",
     "jira_service_info": "$service_info$",
-    "import": "HARファイルをインポート"
+    "import": "HARファイルをインポート",
+    "jiraSettings_user": "担当者のメールアドレス",
+    "jiraTicketModal_settingsTitle": "Jira設定",
+    "jiraTicketModal_summary": "タイトル"
 }

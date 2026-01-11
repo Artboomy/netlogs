@@ -5,14 +5,15 @@
     "main": "index.js",
     "author": "artboomy",
     "repository": "https://github.com/Artboomy/netlogs",
-    "license": "MIT",
+    "license": "LGPL-3.0-only",
     "private": true,
     "type": "module",
     "scripts": {
         "lint": "node scripts/lint-translations.cjs && npm-run-all --parallel lint:tsc lint:eslint",
         "lint:tsc": "tsc --noEmit --incremental --tsBuildInfoFile ./.cache/.tsbuildinfo-noEmit",
         "lint:eslint": "eslint -c eslint.config.js --cache --cache-location ./.cache/.eslintcache --max-warnings=0 ./src",
-        "lint:ci": "node -e \"require('fs').writeFileSync('src/secrets.json', JSON.stringify({api_secret: 'mockData', measurement_id: 'mockData'}))\" && yarn run lint",
+        "mockSecrets": "node scripts/mock-secrets.cjs",
+        "lint:ci": "yarn run mockSecrets && yarn run lint",
         "build": "cross-env NODE_ENV=development vite build --config vite.config.extension.ts --mode development",
         "build:prod": "yarn run lint && vite build --config vite.config.extension.ts --mode production",
         "dev:standalone": "cross-env NODE_ENV=development vite build --config vite.config.standalone.ts --mode development",
@@ -74,6 +75,9 @@
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@ladle/react": "^5.0.3",
         "@playwright/test": "^1.57.0",
+        "@testing-library/dom": "10.0.0",
+        "@testing-library/jest-dom": "6.4.2",
+        "@testing-library/react": "16.0.1",
         "@types/base16": "1.0.2",
         "@types/chrome": "0.0.262",
         "@types/classnames": "2.2.11",
@@ -109,7 +113,8 @@
     "resolutions": {
         "@babel/runtime": "7.28.4",
         "@babel/helpers": "7.28.4",
-        "@ladle/react/vite": "^6.0.5"
+        "@ladle/react/vite": "^6.0.5",
+        "lodash": ">=4.17.21"
     },
     "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
     "nyc": {

@@ -1,5 +1,6 @@
 import Port = chrome.runtime.Port;
 import { defaultSettings } from 'controllers/settings/base';
+import { ISettings } from 'controllers/settings/types';
 
 export type JiraCreateMessage = {
     type: 'jira.createIssue';
@@ -71,6 +72,132 @@ export function createJiraError(
     details?: JiraIssueResponse['details']
 ): JiraResponseMessage['data'] {
     return JSON.stringify({ ok: false, error, details });
+}
+
+export type JiraV2UserPickerResponse = {
+    users: Array<{
+        name: string;
+        key?: string;
+        html: string;
+        displayName: string;
+        accountId?: string;
+    }>;
+    total: number;
+    header: string;
+};
+
+const isJiraCloud = (baseUrl: string): boolean => {
+    try {
+        const host = new URL(baseUrl).hostname.toLowerCase();
+        return host.endsWith('.atlassian.net');
+    } catch {
+        // If baseUrl is malformed, default to non-cloud behavior.
+        return false;
+    }
+};
+
+const toBasicAuth = (usernameOrEmail: string, apiToken: string): string => {
+    // btoa expects latin1; encode UTF-8 safely
+    const raw = `${usernameOrEmail}:${apiToken}`;
+    const utf8 = new TextEncoder().encode(raw);
+    let bin = '';
+    utf8.forEach((b) => (bin += String.fromCharCode(b)));
+    return `Basic ${btoa(bin)}`;
+};
+
+const getAuthFields = (
+    method: 'GET' | 'POST',
+    jiraSettings: ISettings['jira']
+): RequestInit => {
+    const useBasic = isJiraCloud(jiraSettings.baseUrl);
+
+    // For Jira Cloud: Basic auth = email/username + API token
+    // For Server/DC: Bearer = PAT (or whatever token your instance expects)
+    const authorization = useBasic
+        ? toBasicAuth(jiraSettings.user, jiraSettings.apiToken)
+        : `Bearer ${jiraSettings.apiToken}`;
+
+    return {
+        method,
+        credentials: 'omit',
+        headers: {
+            Authorization: authorization,
+            'X-Atlassian-Token': 'no-check',
+            'Content-Type': 'application/json'
+        }
+    };
+};
+
+async function resolveAssigneeAccountId(
+    jiraSettings: ISettings['jira'],
+    baseUrl: string,
+    projectKey: string
+): Promise<{ name: string } | { id: string } | undefined> {
+    const assigneeEmail = jiraSettings.user?.trim();
+    if (!assigneeEmail) {
+        return undefined;
+    }
+
+    const apiVersion = jiraSettings.apiVersion || '2';
+    const query = encodeURIComponent(assigneeEmail);
+
+    if (apiVersion === '2') {
+        // Jira API v2: use user/picker endpoint
+        const url = `${baseUrl}/rest/api/2/user/picker?query=${query}`;
+        const response = await fetch(url, {
+            ...getAuthFields('GET', jiraSettings)
+        });
+
+        if (!response.ok) {
+            return undefined;
+        }
+
+        const data = (await response.json().catch(() => ({
+            users: []
+        }))) as JiraV2UserPickerResponse;
+
+        if (
+            !data.users ||
+            !Array.isArray(data.users) ||
+            data.users.length === 0
+        ) {
+            return undefined;
+        }
+
+        const firstUser = data.users[0];
+        if (firstUser?.name) {
+            return { name: firstUser?.name };
+        }
+        return firstUser?.accountId ? { id: firstUser?.accountId } : undefined;
+    }
+
+    // Jira API v3: use multiProjectSearch endpoint
+    const project = encodeURIComponent(projectKey);
+    const url = `${baseUrl}/rest/api/3/user/assignable/multiProjectSearch?projectKeys=${project}&query=${query}`;
+    const response = await fetch(url, {
+        ...getAuthFields('GET', jiraSettings)
+    });
+
+    if (!response.ok) {
+        return undefined;
+    }
+
+    const users = (await response.json().catch(() => [])) as Array<{
+        accountId?: string;
+        emailAddress?: string;
+    }>;
+
+    if (!Array.isArray(users)) {
+        return undefined;
+    }
+
+    const exactMatch = users.find(
+        (user) =>
+            user.emailAddress?.toLowerCase() === assigneeEmail.toLowerCase()
+    );
+
+    const accountId = exactMatch?.accountId || users[0]?.accountId;
+    return accountId ? { id: accountId } : undefined;
 }
 
 export async function handleJiraCreateIssue(
@@ -188,22 +315,25 @@ export async function handleJiraCreateIssue(
         }
     }
 
+    const assignee = await resolveAssigneeAccountId(
+        jiraSettings,
+        baseUrl,
+        project
+    );
+    const assigneeField = assignee ? { assignee } : {};
     const body = {
         fields: {
             project: { key: project },
             summary: payload.summary,
             description: description,
             issuetype: { name: issueType },
+            ...assigneeField,
             ...(payload.fields || {})
         }
     };
     try {
         const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${jiraSettings.apiToken}`
-            },
+            ...getAuthFields('POST', jiraSettings),
             body: JSON.stringify(body)
         });
 
@@ -289,11 +419,7 @@ export async function handleJiraCreateIssue(
                 await fetch(
                     `${baseUrl}/rest/api/${apiVersion}/issue/${issueKey}/attachments`,
                     {
-                        method: 'POST',
-                        headers: {
-                            'X-Atlassian-Token': 'no-check',
-                            Authorization: `Bearer ${jiraSettings.apiToken}`
-                        },
+                        ...getAuthFields('POST', jiraSettings),
                         body: formData
                     }
                 );
@@ -331,11 +457,7 @@ export async function handleJiraCreateIssue(
                 await fetch(
                     `${baseUrl}/rest/api/${apiVersion}/issue/${issueKey}/attachments`,
                     {
-                        method: 'POST',
-                        headers: {
-                            'X-Atlassian-Token': 'no-check',
-                            Authorization: `Bearer ${jiraSettings.apiToken}`
-                        },
+                        ...getAuthFields('POST', jiraSettings),
                         body: formData
                     }
                 );
@@ -349,7 +471,7 @@ export async function handleJiraCreateIssue(
         if (issueKey && payload.pageState) {
             try {
                 const metaBlob = new Blob([payload.pageState], {
-                    type: 'text/plain'
+                    type: 'text/plain;charset=utf-8'
                 });
                 const formData = new FormData();
                 formData.append('file', metaBlob, 'meta.txt');
@@ -357,11 +479,7 @@ export async function handleJiraCreateIssue(
                 await fetch(
                     `${baseUrl}/rest/api/${apiVersion}/issue/${issueKey}/attachments`,
                     {
-                        method: 'POST',
-                        headers: {
-                            'X-Atlassian-Token': 'no-check',
-                            Authorization: `Bearer ${jiraSettings.apiToken}`
-                        },
+                        ...getAuthFields('POST', jiraSettings),
                         body: formData
                     }
                 );
@@ -438,15 +556,9 @@ export async function handleJiraTestSettings(
     }
 
     try {
-        const authHeader = `Bearer ${jiraSettings.apiToken}`;
-
         // 1. Test Authentication
         const response = await fetch(endpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: authHeader
-            }
+            ...getAuthFields('GET', jiraSettings)
         });
 
         const responseBody = await response.json().catch(() => ({}));
@@ -473,11 +585,7 @@ export async function handleJiraTestSettings(
         if (projectKey) {
             const projectEndpoint = `${baseUrl}/rest/api/${apiVersion}/project/${projectKey}`;
             const projectResponse = await fetch(projectEndpoint, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: authHeader
-                }
+                ...getAuthFields('GET', jiraSettings)
             });
 
             if (!projectResponse.ok) {
@@ -501,11 +609,7 @@ export async function handleJiraTestSettings(
         const issueType = jiraSettings.issueType || 'Task';
         const issueTypeEndpoint = `${baseUrl}/rest/api/${apiVersion}/issuetype`;
         const issueTypeResponse = await fetch(issueTypeEndpoint, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: authHeader
-            }
+            ...getAuthFields('GET', jiraSettings)
         });
 
         if (issueTypeResponse.ok) {
@@ -534,20 +638,6 @@ export async function handleJiraTestSettings(
     }
 }
 
-let metadataCache: {
-    projectKey: string;
-    issueType: string;
-    baseUrl: string;
-    fields: {
-        key: string;
-        name: string;
-        type: string | undefined;
-        required: boolean;
-        hasDefaultValue: boolean | undefined;
-        allowedValues: { id: string; value: string | undefined }[] | undefined;
-    }[];
-} | null = null;
-
 export async function handleJiraGetMetadata(
     message: JiraGetMetadataMessage,
     port: Port
@@ -574,44 +664,47 @@ export async function handleJiraGetMetadata(
         return;
     }
 
+    // Check persisted cache from settings
+    const cachedFields = jiraSettings.cachedFields;
     if (
-        metadataCache &&
-        metadataCache.projectKey === projectKey &&
-        metadataCache.issueType === issueType &&
-        metadataCache.baseUrl === baseUrl
+        cachedFields &&
+        cachedFields.projectKey === projectKey &&
+        cachedFields.issueType === issueType &&
+        cachedFields.baseUrl === baseUrl &&
+        cachedFields.fields
     ) {
-        const initialFields = metadataCache.fields.filter((field) => {
-            return (
-                field.required &&
-                !field.hasDefaultValue &&
-                field.key !== 'project' &&
-                field.key !== 'issuetype' &&
-                field.key !== 'summary' &&
-                field.key !== 'description'
-            );
-        });
+        const initialFields = cachedFields.fields.filter(
+            (field: {
+                key: string;
+                required?: boolean;
+                hasDefaultValue?: boolean;
+            }) => {
+                return (
+                    field.required &&
+                    !field.hasDefaultValue &&
+                    field.key !== 'project' &&
+                    field.key !== 'issuetype' &&
+                    field.key !== 'summary' &&
+                    field.key !== 'description'
+                );
+            }
+        );
         respond(
             JSON.stringify({
                 ok: true,
                 fields: initialFields,
-                allFields: metadataCache.fields
+                allFields: cachedFields.fields
             })
         );
         return;
     }
 
     try {
-        const authHeader = `Bearer ${jiraSettings.apiToken}`;
-
         // 1. Get Project to find issueTypeId
         const projectResponse = await fetch(
             `${baseUrl}/rest/api/${apiVersion}/project/${projectKey}`,
             {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: authHeader
-                }
+                ...getAuthFields('GET', jiraSettings)
             }
         );
 
@@ -648,11 +741,7 @@ export async function handleJiraGetMetadata(
         // 2. Get Metadata for the specific project and issue type
         const metaUrl = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta/${projectKey}/issuetypes/${issueTypeId}`;
         const metaResponse = await fetch(metaUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: authHeader
-            }
+            ...getAuthFields('GET', jiraSettings)
         });
 
         const metaBody = await metaResponse.json().catch(() => ({}));
@@ -696,12 +785,32 @@ export async function handleJiraGetMetadata(
             };
         });
 
-        metadataCache = {
+        // Persist metadata to settings
+        const newCachedFields = {
             projectKey,
             issueType,
             baseUrl,
-            fields: mappedFields
+            fields: mappedFields.map((f) => ({
+                key: f.key,
+                name: f.name,
+                type: f.type || '',
+                required: f.required,
+                hasDefaultValue: f.hasDefaultValue,
+                allowedValues: f.allowedValues
+            })),
+            values: {}
         };
+
+        // Save to chrome storage
+        const { settings } = await chrome.storage.local.get({
+            settings: JSON.stringify(defaultSettings)
+        });
+        const parsedSettings = JSON.parse(settings);
+        parsedSettings.jira = parsedSettings.jira || {};
+        parsedSettings.jira.cachedFields = newCachedFields;
+        await chrome.storage.local.set({
+            settings: JSON.stringify(parsedSettings)
+        });
 
         const initialFields = mappedFields.filter((field) => {
             return (

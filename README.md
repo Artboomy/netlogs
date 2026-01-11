@@ -7,7 +7,7 @@
 
 [Install for Chrome/Edge](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
 
-This is a more high-level version of a Network tab for easier debugging.
+Better filtering and less clicking than Chrome's Network tab. Built for debugging modern web apps with Next.js/GraphQL support and Jira integration.
 
 ## 💡 Features
 
@@ -19,6 +19,7 @@ The extension will appear in devtools as a `📜 Net logs` tab.
 * 📡 **WebSocket Listening**: Capture and analyze WebSocket traffic in real-time.
 * ✨ **Log Viewing**: Analyze live or import logs from HAR/*.netlogs.zip files.
 * 🤝 **Collaboration**: Export and share logs for team debugging.
+* 🎫 **Jira Integration**: Create detailed bug tickets in one click with HAR files and screenshots.
 
 ![main.gif](./img/main.gif)
 
@@ -44,6 +45,26 @@ Features: query name extraction, result unwrapping, colored tag.
 Features: method extraction, result unwrapping, coloring for error responses.
 
 ![json-rpc.png](./img/json-rpc.png)
+
+## 🎫 Jira Integration
+
+Create comprehensive bug reports directly from the extension with a single click. The integration automatically bundles network logs (HAR format), page screenshots, and contextual metadata into a properly formatted Jira ticket.
+
+https://github.com/user-attachments/assets/7abfed92-1da8-4923-b223-4db981ed0f57
+
+**Features:**
+
+* **Automated Attachment**: HAR files and screenshots are automatically attached to tickets
+* **Template System**: Customizable ticket descriptions with dynamic variable substitution
+* **Metadata Capture**: Includes browser info, page URL, timestamp, and user agent
+* **Field Mapping**: Supports custom Jira fields with caching for improved performance
+* **One-Click Workflow**: From debugging to ticket creation in seconds
+
+Configure your Jira instance settings (base URL, API token, project key) in the extension options:
+
+<img src="./img/jira-settings.png" alt="Jira Settings" width="600" />
+
+*Jira integration works with both Jira Cloud and self-hosted Jira instances. Requires API token (PAT).*
 
 ## ⛰️ [Next.js](https://nextjs.org/) and [NuxtJS](https://nuxtjs.org/) debugging
 

@@ -85,6 +85,7 @@ export default defineConfig({
     legacy: {
         inconsistentCjsInterop: true // Fix for react-use default imports in Vite 8
     },
+    base: process.env.PAGES_BASE_PATH ?? './',
     plugins,
     resolve: {
         alias: {

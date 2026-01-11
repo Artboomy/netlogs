@@ -15,11 +15,7 @@
     "permissions": [
         "storage",
         "contextMenus",
-        "debugger",
-        "activeTab"
-    ],
-    "optional_permissions": [
-        "tabs"
+        "debugger"
     ],
     "background": {
         "service_worker": "js/background.mjs",

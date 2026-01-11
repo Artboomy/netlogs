@@ -65,7 +65,22 @@ export interface ISettings {
         issueType: string;
         apiVersion: string;
         template: string;
+        user: string;
         attachScreenshot: boolean;
         openTicketInNewTab: boolean;
+        cachedFields: {
+            baseUrl: string;
+            projectKey: string;
+            issueType: string;
+            fields: {
+                key: string;
+                name: string;
+                type: string;
+                required?: boolean;
+                hasDefaultValue?: boolean;
+                allowedValues?: { id: string; value: string }[];
+            }[];
+            values: Record<string, unknown>;
+        } | null;
     };
 }

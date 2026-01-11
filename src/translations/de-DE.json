@@ -94,7 +94,7 @@
     "jiraTicketModal_issueCreated": "Jira-Ticket erstellt",
     "jiraTicketModal_notReadyHint": "Füllen Sie die Jira-Einstellungen auf der Optionsseite aus, bevor Sie ein Ticket erstellen.",
     "jiraTicketModal_pending": "Jira-Ticket wird erstellt...",
-    "jiraTicketModal_summary": "Zusammenfassung",
+    "jiraTicketModal_resetCachedFields": "Zwischengespeicherte Felder zurücksetzen",
     "reset": "Einstellungen auf Standardwerte zurücksetzen",
     "jira_checkSettings": "Einstellungen prüfen",
     "jira_testing": "Testen...",
@@ -114,5 +114,8 @@
     "jira_testProjectNotFound": "Project \\%{project}\\ not found or no access.",
     "jira_testIssueTypeNotFound": "Issue type \\%{issueType}\\ not found.",
     "jira_service_info": "$service_info$",
-    "import": "HAR-Datei importieren"
+    "import": "HAR-Datei importieren",
+    "jiraSettings_user": "E-Mail des Bearbeiters",
+    "jiraTicketModal_settingsTitle": "Jira-Einstellungen",
+    "jiraTicketModal_summary": "Titel"
 }

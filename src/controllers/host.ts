@@ -5,7 +5,6 @@ class HostController {
     host: Host = '' as Host;
     subscribe() {
         subscribeParent('setHost', (host) => {
-            console.log('host', host);
             this.host = host as Host;
         });
     }

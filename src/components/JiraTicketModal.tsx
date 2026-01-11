@@ -1,4 +1,11 @@
-import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+    FC,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState
+} from 'react';
 import styled from '@emotion/styled';
 import { callParent } from 'utils';
 import { toast } from 'react-toastify';
@@ -36,7 +43,8 @@ const Row = styled.label(({ theme }) => ({
 
 const DescriptionRow = styled(Row)({
     flex: 1,
-    minHeight: '300px'
+    minHeight: '300px',
+    display: 'none'
 });
 
 const TitleRow = styled.div({
@@ -167,6 +175,112 @@ type JiraMetadataResponse = {
     error?: string;
 };
 
+export type JiraCachedFields = {
+    baseUrl: string;
+    projectKey: string;
+    issueType: string;
+    fields: JiraFieldMetadata[];
+    values: Record<string, unknown>;
+};
+
+export const buildInitialFieldValues = (fields: JiraFieldMetadata[]) => {
+    const initialValues: Record<string, unknown> = {};
+    fields.forEach((f) => {
+        if (f.type === 'option' || f.type === 'select') {
+            initialValues[f.key] = f.allowedValues?.[0]?.id || '';
+        } else if (f.type === 'checkbox') {
+            initialValues[f.key] = [];
+        } else if (f.type === 'array') {
+            initialValues[f.key] = f.allowedValues ? [] : '';
+        } else {
+            initialValues[f.key] = '';
+        }
+    });
+    return initialValues;
+};
+
+export const isJiraCacheMatch = (
+    cache: JiraCachedFields | null | undefined,
+    settings: {
+        baseUrl: string;
+        projectKey: string;
+        issueType: string;
+    }
+) => {
+    if (!cache) {
+        return false;
+    }
+    return (
+        cache.baseUrl === settings.baseUrl &&
+        cache.projectKey === settings.projectKey &&
+        cache.issueType === settings.issueType
+    );
+};
+
+export const mergeJiraFieldsWithCache = (
+    metadataFields: JiraFieldMetadata[],
+    allFields: JiraFieldMetadata[],
+    cache: JiraCachedFields | null | undefined
+) => {
+    const initialValues = buildInitialFieldValues(allFields);
+    if (!cache) {
+        return {
+            fields: metadataFields,
+            values: initialValues
+        };
+    }
+    const mergedFields = [...metadataFields];
+    cache.fields.forEach((field) => {
+        if (!mergedFields.some((existing) => existing.key === field.key)) {
+            mergedFields.push(field);
+        }
+    });
+
+    const mergedValues = { ...initialValues, ...cache.values };
+    const filteredValues = mergedFields.reduce<Record<string, unknown>>(
+        (acc, field) => {
+            if (mergedValues[field.key] !== undefined) {
+                acc[field.key] = mergedValues[field.key];
+            }
+            return acc;
+        },
+        {}
+    );
+
+    return {
+        fields: mergedFields,
+        values: filteredValues
+    };
+};
+
+export const buildJiraCachedFields = (
+    fields: JiraFieldMetadata[],
+    values: Record<string, unknown>,
+    settings: {
+        baseUrl: string;
+        projectKey: string;
+        issueType: string;
+    }
+): JiraCachedFields => {
+    const filteredValues = fields.reduce<Record<string, unknown>>(
+        (acc, field) => {
+            if (values[field.key] !== undefined) {
+                acc[field.key] = values[field.key];
+            }
+            return acc;
+        },
+        {}
+    );
+
+    return {
+        baseUrl: settings.baseUrl,
+        projectKey: settings.projectKey,
+        issueType: settings.issueType,
+        fields,
+        values: filteredValues
+    };
+};
+
 type JiraIssueResponse = {
     ok: boolean;
     key?: string;
@@ -266,6 +380,9 @@ export const JiraTicketModal: FC = () => {
         (state) => state.settings.jira.attachScreenshot
     );
     const jiraBaseUrl = useSettings((state) => state.settings.jira.baseUrl);
+    const cachedFields = useSettings(
+        (state) => state.settings.jira.cachedFields
+    );
     const isReady = useSettings(({ settings }) => {
         const jira = settings.jira;
         return jira.baseUrl && jira.apiToken && jira.projectKey;
@@ -277,7 +394,8 @@ export const JiraTicketModal: FC = () => {
         baseUrl: jiraSettings.baseUrl,
         apiToken: jiraSettings.apiToken,
         projectKey: jiraSettings.projectKey,
-        issueType: jiraSettings.issueType
+        issueType: jiraSettings.issueType,
+        user: jiraSettings.user
     });
 
     // Check if any primary fields are empty to determine default open state
@@ -296,39 +414,50 @@ export const JiraTicketModal: FC = () => {
     const [allFields, setAllFields] = useState<JiraFieldMetadata[]>([]);
     const [fieldValues, setFieldValues] = useState<Record<string, unknown>>({});
 
-    const initializeFieldValues = (fields: JiraFieldMetadata[]) => {
-        const initialValues: Record<string, unknown> = {};
-        fields.forEach((f) => {
-            if (f.type === 'option' || f.type === 'select') {
-                initialValues[f.key] = f.allowedValues?.[0]?.id || '';
-            } else if (f.type === 'checkbox') {
-                initialValues[f.key] = [];
-            } else if (f.type === 'array') {
-                initialValues[f.key] = f.allowedValues ? [] : '';
-            } else {
-                initialValues[f.key] = '';
+    const refreshMetadata = useCallback(
+        async (useCache = true) => {
+            if (!isReady) {
+                return;
             }
-        });
-        return initialValues;
-    };
+            const response = await callParent('jira.getMetadata');
+            const parsed = JSON.parse(response) as JiraMetadataResponse;
+            if (parsed.ok && parsed.fields) {
+                const metadataFields = parsed.fields;
+                const metadataAllFields = parsed.allFields || parsed.fields;
+                setAllFields(metadataAllFields);
+
+                const cache =
+                    useCache &&
+                    isJiraCacheMatch(cachedFields, {
+                        baseUrl: jiraSettings.baseUrl,
+                        projectKey: jiraSettings.projectKey,
+                        issueType: jiraSettings.issueType
+                    })
+                        ? cachedFields
+                        : null;
+
+                const { fields, values } = mergeJiraFieldsWithCache(
+                    metadataFields,
+                    metadataAllFields,
+                    cache
+                );
+
+                setDynamicFields(fields);
+                setFieldValues(values);
+            }
+        },
+        [
+            cachedFields,
+            isReady,
+            jiraSettings.baseUrl,
+            jiraSettings.issueType,
+            jiraSettings.projectKey
+        ]
+    );
 
     useEffect(() => {
-        if (isReady) {
-            callParent('jira.getMetadata').then((response) => {
-                const parsed = JSON.parse(response) as JiraMetadataResponse;
-                if (parsed.ok && parsed.fields) {
-                    setDynamicFields(parsed.fields);
-                    if (parsed.allFields) {
-                        setAllFields(parsed.allFields);
-                    }
-                    // Initialize field values
-                    setFieldValues(
-                        initializeFieldValues(parsed.allFields || parsed.fields)
-                    );
-                }
-            });
-        }
-    }, [isReady]);
+        refreshMetadata();
+    }, [refreshMetadata]);
 
     const [lastError, setLastError] = useState<JiraIssueResponse | null>(null);
     const [lastSuccess, setLastSuccess] = useState<JiraIssueResponse | null>(
@@ -344,6 +473,16 @@ export const JiraTicketModal: FC = () => {
         });
         setSettingsSaved(true);
         setTimeout(() => setSettingsSaved(false), 2000);
+    };
+
+    const handleResetCachedFields = async () => {
+        useSettings.getState().patchSettings({
+            jira: {
+                ...jiraSettings,
+                cachedFields: null
+            }
+        });
+        await refreshMetadata(false);
     };
 
     const handleLocalSettingChange = (
@@ -462,6 +601,20 @@ export const JiraTicketModal: FC = () => {
             throw new Error(parsed.error || 'Jira request failed');
         }
         setLastSuccess(parsed);
+        useSettings.getState().patchSettings({
+            jira: {
+                ...jiraSettings,
+                cachedFields: buildJiraCachedFields(
+                    dynamicFields,
+                    fieldValues,
+                    {
+                        baseUrl: jiraSettings.baseUrl,
+                        projectKey: jiraSettings.projectKey,
+                        issueType: jiraSettings.issueType
+                    }
+                )
+            }
+        });
         return parsed;
     };
 
@@ -633,7 +786,37 @@ export const JiraTicketModal: FC = () => {
                                 }
                             />
                         </SettingsRow>
+                        <SettingsRow>
+                            <label>
+                                {i18n.t('jiraSettings_user', {
+                                    defaultValue: 'Assignee email'
+                                })}
+                            </label>
+                            <Input
+                                type='email'
+                                placeholder='name@example.com'
+                                value={localJiraSettings.user}
+                                onChange={(e) =>
+                                    handleLocalSettingChange(
+                                        'user',
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </SettingsRow>
                         <SettingsActions>
+                            {cachedFields && (
+                                <SmallButton
+                                    type='button'
+                                    onClick={handleResetCachedFields}>
+                                    {i18n.t(
+                                        'jiraTicketModal_resetCachedFields',
+                                        {
+                                            defaultValue: 'Reset cached fields'
+                                        }
+                                    )}
+                                </SmallButton>
+                            )}
                             <SmallButton
                                 type='button'
                                 onClick={handleSaveSettings}>

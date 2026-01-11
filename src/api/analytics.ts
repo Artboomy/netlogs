@@ -30,10 +30,11 @@ class Analytics {
 
     async checkNewUser() {
         try {
-            const { firstTime } = await chrome.storage.local.get('firstTime');
-            if (!firstTime) {
-                await chrome.storage.local.set({ firstTime: false });
-                this.fireEvent('first_open');
+            const { firstTimeShown } =
+                await chrome.storage.local.get('firstTimeShown');
+            if (!firstTimeShown) {
+                await chrome.storage.local.set({ firstTimeShown: true });
+                this.fireEvent('customFirstInstall');
             }
         } catch (_e) {
             // pass
@@ -45,9 +46,18 @@ class Analytics {
     // the extension is installed.
     async getOrCreateClientId() {
         let { clientId } = await chrome.storage.local.get('clientId');
-        if (!clientId) {
-            // Generate a unique client ID, the actual value is not relevant
-            clientId = self.crypto.randomUUID();
+
+        // Validate format: must be <number>.<number>
+        const isValidFormat = clientId && /^\d+\.\d+$/.test(clientId);
+
+        if (!clientId || !isValidFormat) {
+            // Generate a unique client ID in GA4 format: <number>.<number>
+            // First part: random number (10 digits)
+            // Second part: timestamp in seconds
+            const randomNum =
+                Math.floor(Math.random() * 9000000000) + 1000000000;
+            const timestamp = Math.floor(Date.now() / 1000);
+            clientId = `${randomNum}.${timestamp}`;
             await chrome.storage.local.set({ clientId });
         }
         return clientId;
@@ -99,28 +109,58 @@ class Analytics {
             params.engagement_time_msec = DEFAULT_ENGAGEMENT_TIME_MSEC;
         }
 
-        try {
-            const response = await fetch(
-                `${
-                    this.debug ? GA_DEBUG_ENDPOINT : GA_ENDPOINT
-                }?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
+        // In debug mode, add debug_mode flag for DebugView
+        if (this.debug) {
+            params.debug_mode = true;
+        }
+
+        const payload = {
+            client_id: await this.getOrCreateClientId(),
+            events: [
                 {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        client_id: await this.getOrCreateClientId(),
-                        events: [
-                            {
-                                name,
-                                params
-                            }
-                        ]
-                    })
+                    name,
+                    params
                 }
-            );
-            if (!this.debug) {
-                return;
+            ]
+        };
+
+        try {
+            // In debug mode: first validate, then send to real endpoint
+            if (this.debug) {
+                // 1. Validate with debug endpoint
+                const debugPayload = {
+                    ...payload,
+                    validation_behavior: 'ENFORCE_RECOMMENDATIONS'
+                };
+                const debugResponse = await fetch(
+                    `${GA_DEBUG_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(debugPayload)
+                    }
+                );
+                const validationResult = await debugResponse.text();
+                console.log('[GA4 Debug] Validation result:', validationResult);
+
+                // 2. Send to real endpoint (so it shows in DebugView with debug_mode flag)
+                await fetch(
+                    `${GA_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    }
+                );
+                console.log('[GA4 Debug] Event sent to production endpoint');
+            } else {
+                // Production mode: just send to real endpoint
+                await fetch(
+                    `${GA_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    }
+                );
             }
-            console.log(await response.text());
         } catch (e) {
             console.error(
                 'Google Analytics request failed with an exception',
@@ -144,7 +184,7 @@ class Analytics {
 
     // Fire an error event.
     async fireErrorEvent(
-        error: chrome.cast.Error | Error,
+        error: { message: string; stack: unknown },
         additionalParams: Params = {}
     ) {
         if (this.noSend) {
@@ -153,7 +193,7 @@ class Analytics {
         // Note: 'error' is a reserved event name and cannot be used
         // see https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference?client_type=gtag#reserved_names
         return this.fireEvent('extension_error', {
-            ...error,
+            error: JSON.stringify(error),
             ...additionalParams
         });
     }

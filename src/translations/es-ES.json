@@ -94,7 +94,7 @@
     "jiraTicketModal_issueCreated": "Incidencia en Jira creada",
     "jiraTicketModal_notReadyHint": "Complete la configuración de Jira en la página de Opciones antes de crear una incidencia.",
     "jiraTicketModal_pending": "Creando incidencia en Jira...",
-    "jiraTicketModal_summary": "Resumen",
+    "jiraTicketModal_resetCachedFields": "Restablecer campos en caché",
     "reset": "Restablecer los ajustes a los valores predeterminados",
     "jira_checkSettings": "Comprobar configuración",
     "jira_testing": "Probando...",
@@ -114,5 +114,8 @@
     "jira_testProjectNotFound": "Project \\%{project}\\ not found or no access.",
     "jira_testIssueTypeNotFound": "Issue type \\%{issueType}\\ not found.",
     "jira_service_info": "$service_info$",
-    "import": "Importar archivo HAR"
+    "import": "Importar archivo HAR",
+    "jiraSettings_user": "Correo del asignado",
+    "jiraTicketModal_settingsTitle": "Configuración de Jira",
+    "jiraTicketModal_summary": "Título"
 }

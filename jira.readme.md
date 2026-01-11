@@ -17,8 +17,7 @@ Use this guide to fill in the Jira settings added to the Options page.
 3. **API token / password**
    - **Jira Cloud:** create an API token at
      <https://id.atlassian.com/manage-profile/security/api-tokens>.
-   - **Jira Server/Data Center:** use a personal access token (if enabled) or
-     your password, depending on your Jira security policy.
+   - **Jira Server/Data Center:** use a personal access token.
 
 4. **Project key**
    - Open the target project in Jira and check **Project settings → Details**.

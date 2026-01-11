@@ -104,15 +104,57 @@ type JiraIssueResponse = {
     };
 };
 
-const placeholders: Partial<Record<keyof ISettings['jira'], string>> = {
+type JiraEditableSettings = Pick<
+    ISettings['jira'],
+    | 'baseUrl'
+    | 'apiToken'
+    | 'projectKey'
+    | 'issueType'
+    | 'apiVersion'
+    | 'attachScreenshot'
+    | 'openTicketInNewTab'
+    | 'template'
+    | 'user'
+>;
+
+const jiraOptionKeys: Array<keyof JiraEditableSettings> = [
+    'baseUrl',
+    'apiToken',
+    'projectKey',
+    'issueType',
+    'apiVersion',
+    'attachScreenshot',
+    'openTicketInNewTab',
+    'template',
+    'user'
+];
+
+const placeholders: Partial<Record<keyof JiraEditableSettings, string>> = {
     baseUrl: 'https://myorg.atlassian.net',
     apiToken: 'your-api-token-here',
-    projectKey: 'MYPROJ'
+    projectKey: 'MYPROJ',
+    user: 'name@example.com'
 };
 
+const getEditableJiraSettings = (
+    settings: ISettings['jira']
+): JiraEditableSettings => ({
+    baseUrl: settings.baseUrl,
+    apiToken: settings.apiToken,
+    projectKey: settings.projectKey,
+    issueType: settings.issueType,
+    apiVersion: settings.apiVersion,
+    attachScreenshot: settings.attachScreenshot,
+    openTicketInNewTab: settings.openTicketInNewTab,
+    template: settings.template,
+    user: settings.user
+});
+
 export const JiraOptions: FC = () => {
-    const { settings, setSettings } = useSettings();
-    const [localJira, setLocalJira] = useState(settings.jira);
+    const jiraSettings = useSettings(({ settings }) => settings.jira);
+    const [localJira, setLocalJira] = useState(() =>
+        getEditableJiraSettings(jiraSettings)
+    );
     const [isSaved, setIsSaved] = useState(false);
     const [isTesting, setIsTesting] = useState(false);
     const [testResult, setTestResult] = useState<JiraIssueResponse | null>(
@@ -120,13 +162,15 @@ export const JiraOptions: FC = () => {
     );
 
     useEffect(() => {
-        setLocalJira(settings.jira);
-    }, [settings.jira]);
+        setLocalJira(getEditableJiraSettings(jiraSettings));
+    }, [jiraSettings]);
 
     const handleSave = () => {
-        setSettings({
-            ...settings,
-            jira: localJira
+        useSettings.getState().patchSettings({
+            jira: {
+                ...jiraSettings,
+                ...localJira
+            }
         });
         setIsSaved(true);
         setTimeout(() => setIsSaved(false), 2000);
@@ -147,9 +191,11 @@ export const JiraOptions: FC = () => {
         setTestResult(null);
         try {
             // first save current local settings to make sure we test what is on the screen
-            setSettings({
-                ...settings,
-                jira: localJira
+            useSettings.getState().patchSettings({
+                jira: {
+                    ...jiraSettings,
+                    ...localJira
+                }
             });
             const response = await new Promise<string>((resolve) => {
                 chrome.runtime.sendMessage(
@@ -247,9 +293,8 @@ export const JiraOptions: FC = () => {
                         ) : null}
                     </ErrorBlock>
                 )}
-                {(Object.keys(localJira) as Array<keyof typeof localJira>).map(
-                    (key) => (
-                        <React.Fragment key={key}>
+                {jiraOptionKeys.map((key) => (
+                    <React.Fragment key={key}>
                             <label htmlFor={`jira-${key}`}>
                                 {i18n.t(`jiraSettings_${key}`)}
                                 {key === 'apiToken' && (

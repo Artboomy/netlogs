@@ -176,9 +176,7 @@ function unsubscribeFromDebugger() {
         return;
     }
     chrome.debugger.onEvent.removeListener(handleDebuggerEvent);
-    chrome.debugger.onDetach.removeListener(function (source, _reason) {
-        cleanup(source.tabId);
-    });
+    chrome.debugger.onDetach.removeListener(handleDetach);
     Object.keys(ports).forEach((id) => {
         detachDebugger(Number(id));
     });

@@ -5,7 +5,8 @@ Always use context7 when I need code generation, setup or configuration steps, o
 
 ## Development Environment
 - Node.js version manager: **fnm** (Fast Node Manager)
-- To run commands call `fnm use 22.12.0 && <your command>`
+- Before running any commands, ensure the shell is initialized with `fnm env --shell bash` (per https://github.com/Schniz/fnm#shell-setup).
+- To run commands call `fnm use 22.15.0 && <your command>`
 - **IMPORTANT**: This is a Windows environment. NEVER use `2>nul` or `>nul` in bash commands - it creates a problematic file instead of redirecting to null device. Use `2>/dev/null` or omit error redirection entirely.
 
 ## Repo layout (quick map)
@@ -29,6 +30,7 @@ Always use context7 when I need code generation, setup or configuration steps, o
 - Run tests with coverage: `yarn test:coverage`
 - Run tests with UI: `yarn test:ui`
 - Coverage thresholds: 95% statements/functions/lines, 88% branches
+- **IMPORTANT**: Unit tests must live in `src/<dir>/<FileName>.test.ts` alongside the file under test (no combined omnibus test files).
 
 ## Git Hooks (Husky)
 - Pre-commit hook automatically runs:
