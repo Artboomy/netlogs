@@ -26,6 +26,7 @@ We love your input! We want to make contributing to this project as easy and tra
 5. Open a pull request.
 
 ## License
-By contributing, you agree that your contributions will be licensed under its MIT License.
+By contributing, you agree that your contributions will be licensed under its LGPL-3.0-only License.
+
 
 Created from [template](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62)

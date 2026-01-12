@@ -111,8 +111,8 @@ const placeholders: Partial<Record<keyof ISettings['jira'], string>> = {
 };
 
 export const JiraOptions: FC = () => {
-    const { settings, setSettings } = useSettings();
-    const [localJira, setLocalJira] = useState(settings.jira);
+    const jiraSettings = useSettings(({ settings }) => settings.jira);
+    const [localJira, setLocalJira] = useState(jiraSettings);
     const [isSaved, setIsSaved] = useState(false);
     const [isTesting, setIsTesting] = useState(false);
     const [testResult, setTestResult] = useState<JiraIssueResponse | null>(
@@ -120,13 +120,15 @@ export const JiraOptions: FC = () => {
     );
 
     useEffect(() => {
-        setLocalJira(settings.jira);
-    }, [settings.jira]);
+        setLocalJira(jiraSettings);
+    }, [jiraSettings]);
 
     const handleSave = () => {
-        setSettings({
-            ...settings,
-            jira: localJira
+        useSettings.getState().patchSettings({
+            jira: {
+                ...jiraSettings,
+                ...localJira
+            }
         });
         setIsSaved(true);
         setTimeout(() => setIsSaved(false), 2000);
@@ -147,9 +149,11 @@ export const JiraOptions: FC = () => {
         setTestResult(null);
         try {
             // first save current local settings to make sure we test what is on the screen
-            setSettings({
-                ...settings,
-                jira: localJira
+            useSettings.getState().patchSettings({
+                jira: {
+                    ...jiraSettings,
+                    ...localJira
+                }
             });
             const response = await new Promise<string>((resolve) => {
                 chrome.runtime.sendMessage(

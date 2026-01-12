@@ -5,7 +5,7 @@
     "main": "index.js",
     "author": "artboomy",
     "repository": "https://github.com/Artboomy/netlogs",
-    "license": "MIT",
+    "license": "LGPL-3.0-only",
     "private": true,
     "type": "module",
     "scripts": {
