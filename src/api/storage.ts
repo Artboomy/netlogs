@@ -124,12 +124,18 @@ class SandboxStorage {
     };
 }
 
+const chromeStorage = window.chrome?.storage;
+const hasChromeStorage =
+    typeof chromeStorage?.onChanged?.addListener === 'function' &&
+    Boolean(chromeStorage?.local);
+
 const currentStorage = isSandbox()
     ? new SandboxStorage()
-    : window.chrome?.storage
-      ? window.chrome?.storage
+    : hasChromeStorage
+      ? chromeStorage
       : window.localStorage
         ? InLocalStorage
         : InMemoryStorage;
+
 
 export default currentStorage;

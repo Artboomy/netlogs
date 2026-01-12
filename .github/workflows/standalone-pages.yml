@@ -1,0 +1,62 @@
+name: Deploy standalone to GitHub Pages
+
+on:
+  push:
+    # TODO: rename branch to master after testing
+    branches: [dev/2.10.0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      NODE_ENV: production
+      PAGES_BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+      VITE_GA_API_SECRET: ${{ vars.GA_API_SECRET }}
+      VITE_GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.0'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build standalone site
+        run: yarn run build:standalone
+
+      - name: Ensure standalone output exists
+        run: |
+          if [ ! -d "standalone" ]; then
+            echo "Standalone output directory missing."
+            exit 1
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: standalone
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
