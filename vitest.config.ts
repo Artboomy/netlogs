@@ -18,11 +18,9 @@ export default defineConfig({
         environment: 'happy-dom',
         exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
         pool: 'threads',
-        isolate: false,
+        isolate: true,
         deps: {
-            inline: [
-                /^(?!.*vitest).*$/
-            ]
+            inline: [/^(?!.*vitest).*$/]
         },
         coverage: {
             provider: 'v8',

@@ -73,6 +73,7 @@ class InLocalStorage {
                 callback({ settings: { newValue: settings } }, 'local')
             );
         },
+
         clear: (callback: Parameters<StorageArea['clear']>[0]) => {
             window.localStorage.removeItem(STORAGE_KEY);
             callback?.();
@@ -129,13 +130,21 @@ const hasChromeStorage =
     typeof chromeStorage?.onChanged?.addListener === 'function' &&
     Boolean(chromeStorage?.local);
 
-const currentStorage = isSandbox()
-    ? new SandboxStorage()
+const storageKind = isSandbox()
+    ? 'sandbox'
     : hasChromeStorage
-      ? chromeStorage
+      ? 'chrome'
       : window.localStorage
-        ? InLocalStorage
-        : InMemoryStorage;
+        ? 'localStorage'
+        : 'memory';
 
+const currentStorage =
+    storageKind === 'sandbox'
+        ? new SandboxStorage()
+        : storageKind === 'chrome'
+          ? chromeStorage
+          : storageKind === 'localStorage'
+            ? InLocalStorage
+            : InMemoryStorage;
 
 export default currentStorage;

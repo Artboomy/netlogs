@@ -1,9 +1,10 @@
 name: Deploy standalone to GitHub Pages
 
 on:
-  push:
-    # TODO: rename branch to master after testing
-    branches: [dev/2.10.0]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -18,6 +19,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
