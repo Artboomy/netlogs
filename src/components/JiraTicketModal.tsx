@@ -43,7 +43,8 @@ const Row = styled.label(({ theme }) => ({
 
 const DescriptionRow = styled(Row)({
     flex: 1,
-    minHeight: '300px'
+    minHeight: '300px',
+    display: 'none'
 });
 
 const TitleRow = styled.div({
@@ -379,7 +380,9 @@ export const JiraTicketModal: FC = () => {
         (state) => state.settings.jira.attachScreenshot
     );
     const jiraBaseUrl = useSettings((state) => state.settings.jira.baseUrl);
-    const cachedFields = useSettings((state) => state.settings.jira.cachedFields);
+    const cachedFields = useSettings(
+        (state) => state.settings.jira.cachedFields
+    );
     const isReady = useSettings(({ settings }) => {
         const jira = settings.jira;
         return jira.baseUrl && jira.apiToken && jira.projectKey;
@@ -391,7 +394,8 @@ export const JiraTicketModal: FC = () => {
         baseUrl: jiraSettings.baseUrl,
         apiToken: jiraSettings.apiToken,
         projectKey: jiraSettings.projectKey,
-        issueType: jiraSettings.issueType
+        issueType: jiraSettings.issueType,
+        user: jiraSettings.user
     });
 
     // Check if any primary fields are empty to determine default open state
@@ -605,11 +609,15 @@ export const JiraTicketModal: FC = () => {
         useSettings.getState().patchSettings({
             jira: {
                 ...jiraSettings,
-                cachedFields: buildJiraCachedFields(dynamicFields, fieldValues, {
-                    baseUrl: jiraSettings.baseUrl,
-                    projectKey: jiraSettings.projectKey,
-                    issueType: jiraSettings.issueType
-                })
+                cachedFields: buildJiraCachedFields(
+                    dynamicFields,
+                    fieldValues,
+                    {
+                        baseUrl: jiraSettings.baseUrl,
+                        projectKey: jiraSettings.projectKey,
+                        issueType: jiraSettings.issueType
+                    }
+                )
             }
         });
         return parsed;
@@ -783,14 +791,35 @@ export const JiraTicketModal: FC = () => {
                                 }
                             />
                         </SettingsRow>
+                        <SettingsRow>
+                            <label>
+                                {i18n.t('jiraSettings_user', {
+                                    defaultValue: 'Assignee email'
+                                })}
+                            </label>
+                            <Input
+                                type='email'
+                                placeholder='name@example.com'
+                                value={localJiraSettings.user}
+                                onChange={(e) =>
+                                    handleLocalSettingChange(
+                                        'user',
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </SettingsRow>
                         <SettingsActions>
                             {cacheMatches && (
                                 <SmallButton
                                     type='button'
                                     onClick={handleResetCachedFields}>
-                                    {i18n.t('jiraTicketModal_resetCachedFields', {
-                                        defaultValue: 'Reset cached fields'
-                                    })}
+                                    {i18n.t(
+                                        'jiraTicketModal_resetCachedFields',
+                                        {
+                                            defaultValue: 'Reset cached fields'
+                                        }
+                                    )}
                                 </SmallButton>
                             )}
                             <SmallButton

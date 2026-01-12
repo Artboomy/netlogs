@@ -117,5 +117,6 @@
     "jira_service_info": "$service_info$",
     "import": "导入HAR文件",
     "interceptRequests": "显示待处理请求",
-    "interceptRequestsHelp": "拦截fetch/XHR请求，在响应到达前显示"
+    "interceptRequestsHelp": "拦截fetch/XHR请求，在响应到达前显示",
+    "jiraSettings_user": "负责人邮箱"
 }

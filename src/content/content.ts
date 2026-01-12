@@ -29,6 +29,7 @@ const defaultSettings: ISettings = {
         attachScreenshot: true,
         openTicketInNewTab: true,
         template: ``,
+        user: '',
         cachedFields: null
     },
 

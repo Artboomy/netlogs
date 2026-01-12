@@ -73,6 +73,47 @@ export function createJiraError(
     return JSON.stringify({ ok: false, error, details });
 }
 
+async function resolveAssigneeAccountId(
+    jiraSettings: Awaited<ReturnType<typeof getJiraSettings>>,
+    baseUrl: string,
+    projectKey: string
+): Promise<string | undefined> {
+    const assigneeEmail = jiraSettings.user?.trim();
+    if (!assigneeEmail) {
+        return undefined;
+    }
+
+    const query = encodeURIComponent(assigneeEmail);
+    const project = encodeURIComponent(projectKey);
+    const url = `${baseUrl}/rest/api/3/user/assignable/multiProjectSearch?projectKeys=${project}&query=${query}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jiraSettings.apiToken}`
+        }
+    });
+
+    if (!response.ok) {
+        return undefined;
+    }
+
+    const users = (await response.json().catch(() => [])) as Array<{
+        accountId?: string;
+        emailAddress?: string;
+    }>;
+
+    if (!Array.isArray(users)) {
+        return undefined;
+    }
+
+    const exactMatch = users.find(
+        (user) => user.emailAddress?.toLowerCase() === assigneeEmail.toLowerCase()
+    );
+
+    return exactMatch?.accountId || users[0]?.accountId;
+}
+
 export async function handleJiraCreateIssue(
     port: Port,
     message: JiraCreateMessage,
@@ -188,12 +229,20 @@ export async function handleJiraCreateIssue(
         }
     }
 
+    const assigneeAccountId = await resolveAssigneeAccountId(
+        jiraSettings,
+        baseUrl,
+        project
+    );
     const body = {
         fields: {
             project: { key: project },
             summary: payload.summary,
             description: description,
             issuetype: { name: issueType },
+            ...(assigneeAccountId
+                ? { assignee: { id: assigneeAccountId } }
+                : {}),
             ...(payload.fields || {})
         }
     };

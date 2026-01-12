@@ -62,7 +62,7 @@ global.console = {
 
 describe('jira.ts', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     afterEach(() => {
@@ -265,12 +265,119 @@ describe('jira.ts', () => {
             expect(data.url).toBe('https://test.atlassian.net/browse/TEST-123');
         });
 
+        it('should send assignee when jira user is set', async () => {
+            mockChrome.storage.local.get.mockResolvedValue({
+                settings: JSON.stringify({
+                    ...defaultSettings,
+                    jira: {
+                        ...defaultSettings.jira,
+                        baseUrl: 'https://test.atlassian.net',
+                        apiToken: 'test-token',
+                        projectKey: 'TEST',
+                        user: 'assignee@example.com'
+                    }
+                })
+            });
+
+            const mockFetch = global.fetch as any;
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => [
+                        {
+                            accountId: 'account-123',
+                            emailAddress: 'assignee@example.com'
+                        }
+                    ]
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-124' })
+                });
+
+            const payload: JiraIssuePayload = {
+                summary: 'Test issue',
+                description: 'Test description'
+            };
+
+            const message: JiraCreateMessage = {
+                type: 'jira.createIssue',
+                requestId: 'req-1',
+                data: JSON.stringify(payload)
+            };
+
+            await handleJiraCreateIssue(mockPort, message, debuggerAttachedMap);
+
+            expect(mockFetch).toHaveBeenNthCalledWith(
+                1,
+                'https://test.atlassian.net/rest/api/3/user/assignable/multiProjectSearch?projectKeys=TEST&query=assignee%40example.com',
+                expect.objectContaining({
+                    method: 'GET',
+                    headers: expect.objectContaining({
+                        Authorization: 'Bearer test-token'
+                    })
+                })
+            );
+
+            const fetchCall = mockFetch.mock.calls[1];
+            const body = JSON.parse(fetchCall[1].body);
+            expect(body.fields.assignee).toEqual({ id: 'account-123' });
+        });
+
+        it('should omit assignee when lookup returns no users', async () => {
+            mockChrome.storage.local.get.mockResolvedValue({
+                settings: JSON.stringify({
+                    ...defaultSettings,
+                    jira: {
+                        ...defaultSettings.jira,
+                        baseUrl: 'https://test.atlassian.net',
+                        apiToken: 'test-token',
+                        projectKey: 'TEST',
+                        user: 'missing@example.com'
+                    }
+                })
+            });
+
+            const mockFetch = global.fetch as any;
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => []
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-124' })
+                });
+
+            const payload: JiraIssuePayload = {
+                summary: 'Test issue',
+                description: 'Test description'
+            };
+
+            const message: JiraCreateMessage = {
+                type: 'jira.createIssue',
+                requestId: 'req-1',
+                data: JSON.stringify(payload)
+            };
+
+            await handleJiraCreateIssue(mockPort, message, debuggerAttachedMap);
+
+            const fetchCall = mockFetch.mock.calls[1];
+            const body = JSON.parse(fetchCall[1].body);
+            expect(body.fields.assignee).toBeUndefined();
+        });
+
         it('should use custom issueType from payload', async () => {
             const mockFetch = global.fetch as any;
-            mockFetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ key: 'TEST-124' })
-            });
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => []
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-124' })
+                });
 
             const payload: JiraIssuePayload = {
                 summary: 'Test issue',
@@ -295,7 +402,7 @@ describe('jira.ts', () => {
             const mockFetch = global.fetch as any;
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: async () => ({ key: 'TEST-125' })
+                json: async () => ({ key: 'TEST-124' })
             });
 
             const payload: JiraIssuePayload = {
@@ -411,7 +518,7 @@ describe('jira.ts', () => {
             const mockFetch = global.fetch as any;
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: async () => ({ key: 'TEST-126' })
+                json: async () => ({ key: 'TEST-125' })
             });
 
             mockChrome.debugger.sendCommand.mockResolvedValueOnce({
@@ -461,7 +568,7 @@ describe('jira.ts', () => {
             const mockFetch = global.fetch as any;
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: async () => ({ key: 'TEST-127' })
+                json: async () => ({ key: 'TEST-126' })
             });
 
             mockChrome.debugger.sendCommand.mockResolvedValueOnce({
@@ -499,7 +606,7 @@ describe('jira.ts', () => {
             const mockFetch = global.fetch as any;
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: async () => ({ key: 'TEST-128' })
+                json: async () => ({ key: 'TEST-127' })
             });
 
             debuggerAttachedMap[123] = true;
@@ -534,7 +641,7 @@ describe('jira.ts', () => {
             const mockFetch = global.fetch as any;
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: async () => ({ key: 'TEST-129' })
+                json: async () => ({ key: 'TEST-128' })
             });
 
             mockChrome.debugger.attach.mockRejectedValueOnce(
@@ -630,7 +737,7 @@ describe('jira.ts', () => {
             const mockFetch = global.fetch as any;
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: async () => ({ key: 'TEST-131' })
+                json: async () => ({ key: 'TEST-129' })
             });
 
             mockChrome.debugger.sendCommand
@@ -666,15 +773,10 @@ describe('jira.ts', () => {
 
         it('should attach HAR zip when harZipData is provided', async () => {
             const mockFetch = global.fetch as any;
-            mockFetch
-                .mockResolvedValueOnce({
-                    ok: true,
-                    json: async () => ({ key: 'TEST-132' })
-                })
-                .mockResolvedValueOnce({
-                    ok: true,
-                    json: async () => ({})
-                });
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ key: 'TEST-132' })
+            });
 
             const payload: JiraIssuePayload = {
                 summary: 'Test issue',
@@ -705,15 +807,10 @@ describe('jira.ts', () => {
 
         it('should attach page state meta.txt when pageState is provided', async () => {
             const mockFetch = global.fetch as any;
-            mockFetch
-                .mockResolvedValueOnce({
-                    ok: true,
-                    json: async () => ({ key: 'TEST-133' })
-                })
-                .mockResolvedValueOnce({
-                    ok: true,
-                    json: async () => ({})
-                });
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ key: 'TEST-133' })
+            });
 
             const payload: JiraIssuePayload = {
                 summary: 'Test issue',

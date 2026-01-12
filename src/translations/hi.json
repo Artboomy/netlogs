@@ -117,5 +117,6 @@
     "jira_service_info": "$service_info$",
     "import": "HAR फ़ाइल आयात करें",
     "interceptRequests": "लंबित अनुरोध दिखाएं",
-    "interceptRequestsHelp": "प्रतिक्रिया आने से पहले दिखाने के लिए fetch/XHR अनुरोधों को रोकता है"
+    "interceptRequestsHelp": "प्रतिक्रिया आने से पहले दिखाने के लिए fetch/XHR अनुरोधों को रोकता है",
+    "jiraSettings_user": "असाइनी ईमेल"
 }

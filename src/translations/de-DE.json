@@ -117,5 +117,6 @@
     "jira_service_info": "$service_info$",
     "import": "HAR-Datei importieren",
     "interceptRequests": "Ausstehende Anfragen anzeigen",
-    "interceptRequestsHelp": "Fängt fetch/XHR-Anfragen ab, um sie vor dem Eintreffen der Antwort anzuzeigen"
+    "interceptRequestsHelp": "Fängt fetch/XHR-Anfragen ab, um sie vor dem Eintreffen der Antwort anzuzeigen",
+    "jiraSettings_user": "E-Mail des Bearbeiters"
 }

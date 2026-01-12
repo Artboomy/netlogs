@@ -117,5 +117,6 @@
     "jira_service_info": "$service_info$",
     "import": "Importar archivo HAR",
     "interceptRequests": "Mostrar solicitudes pendientes",
-    "interceptRequestsHelp": "Intercepta solicitudes fetch/XHR para mostrarlas antes de que llegue la respuesta"
+    "interceptRequestsHelp": "Intercepta solicitudes fetch/XHR para mostrarlas antes de que llegue la respuesta",
+    "jiraSettings_user": "Correo del asignado"
 }

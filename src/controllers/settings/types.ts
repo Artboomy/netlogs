@@ -65,6 +65,7 @@ export interface ISettings {
         issueType: string;
         apiVersion: string;
         template: string;
+        user: string;
         attachScreenshot: boolean;
         openTicketInNewTab: boolean;
         cachedFields: {

@@ -117,5 +117,6 @@
     "jira_service_info": "$service_info$",
     "import": "HARファイルをインポート",
     "interceptRequests": "保留中のリクエストを表示",
-    "interceptRequestsHelp": "fetch/XHRリクエストを傍受してレスポンス到着前に表示"
+    "interceptRequestsHelp": "fetch/XHRリクエストを傍受してレスポンス到着前に表示",
+    "jiraSettings_user": "担当者のメールアドレス"
 }

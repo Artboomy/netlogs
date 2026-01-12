@@ -117,5 +117,6 @@
     "jira_service_info": "$service_info$",
     "import": "Импортировать HAR файл",
     "interceptRequests": "Показывать ожидающие запросы",
-    "interceptRequestsHelp": "Перехватывает fetch/XHR запросы для отображения до получения ответа"
+    "interceptRequestsHelp": "Перехватывает fetch/XHR запросы для отображения до получения ответа",
+    "jiraSettings_user": "Электронная почта исполнителя"
 }
