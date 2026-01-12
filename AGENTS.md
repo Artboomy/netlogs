@@ -30,6 +30,7 @@ Always use context7 when I need code generation, setup or configuration steps, o
 - Run tests with coverage: `yarn test:coverage`
 - Run tests with UI: `yarn test:ui`
 - Coverage thresholds: 95% statements/functions/lines, 88% branches
+- **IMPORTANT**: Unit tests must live in `src/<dir>/<FileName>.test.ts` alongside the file under test (no combined omnibus test files).
 
 ## Git Hooks (Husky)
 - Pre-commit hook automatically runs:

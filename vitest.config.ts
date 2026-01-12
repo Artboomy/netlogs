@@ -33,6 +33,7 @@ export default defineConfig({
                 'test_build/**',
                 'stats/**',
                 'img/**',
+                '**/*.json',
                 '**/*.config.{js,ts}',
                 '**/*.d.ts',
                 '**/types/**',
