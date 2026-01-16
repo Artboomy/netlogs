@@ -265,7 +265,7 @@ describe('jira.ts', () => {
             expect(data.url).toBe('https://test.atlassian.net/browse/TEST-123');
         });
 
-        it('should send assignee when jira user is set', async () => {
+        it('should send assignee when jira user is set with API v3', async () => {
             mockChrome.storage.local.get.mockResolvedValue({
                 settings: JSON.stringify({
                     ...defaultSettings,
@@ -274,7 +274,8 @@ describe('jira.ts', () => {
                         baseUrl: 'https://test.atlassian.net',
                         apiToken: 'test-token',
                         projectKey: 'TEST',
-                        user: 'assignee@example.com'
+                        user: 'assignee@example.com',
+                        apiVersion: '3'
                     }
                 })
             });
@@ -324,7 +325,7 @@ describe('jira.ts', () => {
             expect(body.fields.assignee).toEqual({ id: 'account-123' });
         });
 
-        it('should omit assignee when lookup returns no users', async () => {
+        it('should send assignee when jira user is set with API v2 using user picker', async () => {
             mockChrome.storage.local.get.mockResolvedValue({
                 settings: JSON.stringify({
                     ...defaultSettings,
@@ -333,7 +334,261 @@ describe('jira.ts', () => {
                         baseUrl: 'https://test.atlassian.net',
                         apiToken: 'test-token',
                         projectKey: 'TEST',
-                        user: 'missing@example.com'
+                        user: 'assignee@example.com',
+                        apiVersion: '2'
+                    }
+                })
+            });
+
+            const mockFetch = global.fetch as any;
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({
+                        users: [
+                            {
+                                name: 'jsmith',
+                                key: 'jsmithKey',
+                                html: '<span>John Smith</span>',
+                                displayName: 'John Smith'
+                            }
+                        ],
+                        total: 1,
+                        header: 'Showing 1 of 1 matching users'
+                    })
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-125' })
+                });
+
+            const payload: JiraIssuePayload = {
+                summary: 'Test issue',
+                description: 'Test description'
+            };
+
+            const message: JiraCreateMessage = {
+                type: 'jira.createIssue',
+                requestId: 'req-1',
+                data: JSON.stringify(payload)
+            };
+
+            await handleJiraCreateIssue(mockPort, message, debuggerAttachedMap);
+
+            expect(mockFetch).toHaveBeenNthCalledWith(
+                1,
+                'https://test.atlassian.net/rest/api/2/user/picker?query=assignee%40example.com',
+                expect.objectContaining({
+                    method: 'GET',
+                    headers: expect.objectContaining({
+                        Authorization: 'Bearer test-token'
+                    })
+                })
+            );
+
+            const fetchCall = mockFetch.mock.calls[1];
+            const body = JSON.parse(fetchCall[1].body);
+            expect(body.fields.assignee).toEqual({ name: 'jsmith' });
+        });
+
+        it('should omit assignee when API v2 user picker returns empty users', async () => {
+            mockChrome.storage.local.get.mockResolvedValue({
+                settings: JSON.stringify({
+                    ...defaultSettings,
+                    jira: {
+                        ...defaultSettings.jira,
+                        baseUrl: 'https://test.atlassian.net',
+                        apiToken: 'test-token',
+                        projectKey: 'TEST',
+                        user: 'missing@example.com',
+                        apiVersion: '2'
+                    }
+                })
+            });
+
+            const mockFetch = global.fetch as any;
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({
+                        users: [],
+                        total: 0,
+                        header: 'Showing 0 of 0 matching users'
+                    })
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-126' })
+                });
+
+            const payload: JiraIssuePayload = {
+                summary: 'Test issue',
+                description: 'Test description'
+            };
+
+            const message: JiraCreateMessage = {
+                type: 'jira.createIssue',
+                requestId: 'req-1',
+                data: JSON.stringify(payload)
+            };
+
+            await handleJiraCreateIssue(mockPort, message, debuggerAttachedMap);
+
+            const fetchCall = mockFetch.mock.calls[1];
+            const body = JSON.parse(fetchCall[1].body);
+            expect(body.fields.assignee).toBeUndefined();
+        });
+
+        it('should omit assignee when API v2 user picker request fails', async () => {
+            mockChrome.storage.local.get.mockResolvedValue({
+                settings: JSON.stringify({
+                    ...defaultSettings,
+                    jira: {
+                        ...defaultSettings.jira,
+                        baseUrl: 'https://test.atlassian.net',
+                        apiToken: 'test-token',
+                        projectKey: 'TEST',
+                        user: 'user@example.com',
+                        apiVersion: '2'
+                    }
+                })
+            });
+
+            const mockFetch = global.fetch as any;
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: false,
+                    status: 403,
+                    statusText: 'Forbidden'
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-127' })
+                });
+
+            const payload: JiraIssuePayload = {
+                summary: 'Test issue',
+                description: 'Test description'
+            };
+
+            const message: JiraCreateMessage = {
+                type: 'jira.createIssue',
+                requestId: 'req-1',
+                data: JSON.stringify(payload)
+            };
+
+            await handleJiraCreateIssue(mockPort, message, debuggerAttachedMap);
+
+            const fetchCall = mockFetch.mock.calls[1];
+            const body = JSON.parse(fetchCall[1].body);
+            expect(body.fields.assignee).toBeUndefined();
+        });
+
+        it('should handle API v2 user picker JSON parse error gracefully', async () => {
+            mockChrome.storage.local.get.mockResolvedValue({
+                settings: JSON.stringify({
+                    ...defaultSettings,
+                    jira: {
+                        ...defaultSettings.jira,
+                        baseUrl: 'https://test.atlassian.net',
+                        apiToken: 'test-token',
+                        projectKey: 'TEST',
+                        user: 'user@example.com',
+                        apiVersion: '2'
+                    }
+                })
+            });
+
+            const mockFetch = global.fetch as any;
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => {
+                        throw new Error('Invalid JSON');
+                    }
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-128' })
+                });
+
+            const payload: JiraIssuePayload = {
+                summary: 'Test issue',
+                description: 'Test description'
+            };
+
+            const message: JiraCreateMessage = {
+                type: 'jira.createIssue',
+                requestId: 'req-1',
+                data: JSON.stringify(payload)
+            };
+
+            await handleJiraCreateIssue(mockPort, message, debuggerAttachedMap);
+
+            const fetchCall = mockFetch.mock.calls[1];
+            const body = JSON.parse(fetchCall[1].body);
+            expect(body.fields.assignee).toBeUndefined();
+        });
+
+        it('should handle API v2 user picker response with invalid users array', async () => {
+            mockChrome.storage.local.get.mockResolvedValue({
+                settings: JSON.stringify({
+                    ...defaultSettings,
+                    jira: {
+                        ...defaultSettings.jira,
+                        baseUrl: 'https://test.atlassian.net',
+                        apiToken: 'test-token',
+                        projectKey: 'TEST',
+                        user: 'user@example.com',
+                        apiVersion: '2'
+                    }
+                })
+            });
+
+            const mockFetch = global.fetch as any;
+            mockFetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({
+                        users: 'not an array',
+                        total: 0,
+                        header: ''
+                    })
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ key: 'TEST-129' })
+                });
+
+            const payload: JiraIssuePayload = {
+                summary: 'Test issue',
+                description: 'Test description'
+            };
+
+            const message: JiraCreateMessage = {
+                type: 'jira.createIssue',
+                requestId: 'req-1',
+                data: JSON.stringify(payload)
+            };
+
+            await handleJiraCreateIssue(mockPort, message, debuggerAttachedMap);
+
+            const fetchCall = mockFetch.mock.calls[1];
+            const body = JSON.parse(fetchCall[1].body);
+            expect(body.fields.assignee).toBeUndefined();
+        });
+
+        it('should omit assignee when API v3 lookup returns no users', async () => {
+            mockChrome.storage.local.get.mockResolvedValue({
+                settings: JSON.stringify({
+                    ...defaultSettings,
+                    jira: {
+                        ...defaultSettings.jira,
+                        baseUrl: 'https://test.atlassian.net',
+                        apiToken: 'test-token',
+                        projectKey: 'TEST',
+                        user: 'missing@example.com',
+                        apiVersion: '3'
                     }
                 })
             });
@@ -369,15 +624,10 @@ describe('jira.ts', () => {
 
         it('should use custom issueType from payload', async () => {
             const mockFetch = global.fetch as any;
-            mockFetch
-                .mockResolvedValueOnce({
-                    ok: true,
-                    json: async () => []
-                })
-                .mockResolvedValueOnce({
-                    ok: true,
-                    json: async () => ({ key: 'TEST-124' })
-                });
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ key: 'TEST-124' })
+            });
 
             const payload: JiraIssuePayload = {
                 summary: 'Test issue',

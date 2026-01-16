@@ -73,17 +73,66 @@ export function createJiraError(
     return JSON.stringify({ ok: false, error, details });
 }
 
+export type JiraV2UserPickerResponse = {
+    users: Array<{
+        name: string;
+        key?: string;
+        html: string;
+        displayName: string;
+        accountId?: string;
+    }>;
+    total: number;
+    header: string;
+};
+
 async function resolveAssigneeAccountId(
     jiraSettings: Awaited<ReturnType<typeof getJiraSettings>>,
     baseUrl: string,
     projectKey: string
-): Promise<string | undefined> {
+): Promise<{ name: string } | { id: string } | undefined> {
     const assigneeEmail = jiraSettings.user?.trim();
     if (!assigneeEmail) {
         return undefined;
     }
 
+    const apiVersion = jiraSettings.apiVersion || '2';
     const query = encodeURIComponent(assigneeEmail);
+
+    if (apiVersion === '2') {
+        // Jira API v2: use user/picker endpoint
+        const url = `${baseUrl}/rest/api/2/user/picker?query=${query}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jiraSettings.apiToken}`
+            }
+        });
+
+        if (!response.ok) {
+            return undefined;
+        }
+
+        const data = (await response.json().catch(() => ({
+            users: []
+        }))) as JiraV2UserPickerResponse;
+
+        if (
+            !data.users ||
+            !Array.isArray(data.users) ||
+            data.users.length === 0
+        ) {
+            return undefined;
+        }
+
+        const firstUser = data.users[0];
+        if (firstUser?.name) {
+            return { name: firstUser?.name };
+        }
+        return firstUser?.accountId ? { id: firstUser?.accountId } : undefined;
+    }
+
+    // Jira API v3: use multiProjectSearch endpoint
     const project = encodeURIComponent(projectKey);
     const url = `${baseUrl}/rest/api/3/user/assignable/multiProjectSearch?projectKeys=${project}&query=${query}`;
     const response = await fetch(url, {
@@ -108,10 +157,12 @@ async function resolveAssigneeAccountId(
     }
 
     const exactMatch = users.find(
-        (user) => user.emailAddress?.toLowerCase() === assigneeEmail.toLowerCase()
+        (user) =>
+            user.emailAddress?.toLowerCase() === assigneeEmail.toLowerCase()
     );
 
-    return exactMatch?.accountId || users[0]?.accountId;
+    const accountId = exactMatch?.accountId || users[0]?.accountId;
+    return accountId ? { id: accountId } : undefined;
 }
 
 export async function handleJiraCreateIssue(
@@ -229,20 +280,19 @@ export async function handleJiraCreateIssue(
         }
     }
 
-    const assigneeAccountId = await resolveAssigneeAccountId(
+    const assignee = await resolveAssigneeAccountId(
         jiraSettings,
         baseUrl,
         project
     );
+    const assigneeField = assignee ? { assignee } : {};
     const body = {
         fields: {
             project: { key: project },
             summary: payload.summary,
             description: description,
             issuetype: { name: issueType },
-            ...(assigneeAccountId
-                ? { assignee: { id: assigneeAccountId } }
-                : {}),
+            ...assigneeField,
             ...(payload.fields || {})
         }
     };
@@ -398,7 +448,7 @@ export async function handleJiraCreateIssue(
         if (issueKey && payload.pageState) {
             try {
                 const metaBlob = new Blob([payload.pageState], {
-                    type: 'text/plain'
+                    type: 'text/plain;charset=utf-8'
                 });
                 const formData = new FormData();
                 formData.append('file', metaBlob, 'meta.txt');

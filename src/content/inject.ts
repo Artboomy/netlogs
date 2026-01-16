@@ -139,8 +139,8 @@ function safePostPendingRequest(data: PendingRequestData): void {
             },
             '*'
         );
-    } catch (e) {
-        console.error('[NETLOGS:inject] Failed to post PENDING_REQUEST:', e);
+    } catch (_e) {
+        // console.error('[NETLOGS:inject] Failed to post PENDING_REQUEST:', e);
     }
 }
 

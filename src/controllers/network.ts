@@ -168,23 +168,11 @@ class Network {
 
         // Subscribe to pending requests from inject script
         subscribeParent('pendingRequest', (data) => {
-            console.log(
-                '[NETLOGS:network] Received pendingRequest event:',
-                data
-            );
             const { isDynamic } = useListStore.getState();
             if (isDynamic) {
                 try {
                     const pendingData: PendingRequestData =
                         typeof data === 'string' ? JSON.parse(data) : data;
-                    console.log(
-                        '[NETLOGS:network] Scheduling PendingItem display:',
-                        {
-                            id: pendingData.id,
-                            method: pendingData.request.method,
-                            url: pendingData.request.url
-                        }
-                    );
 
                     const pendingItem = new PendingItem(pendingData);
                     const key = this.getPendingKey(
