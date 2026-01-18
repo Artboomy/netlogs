@@ -173,3 +173,8 @@ Please see the [dedicated documentation](LOCAL_DEVELOPMENT.md).
 [Middle mouse click icon](https://www.flaticon.com/free-icon/click_3646205)
 
 [Right mouse click icon](https://www.flaticon.com/free-icon/right-click_3645851)
+
+## 🌐 Translations
+
+Translations are LLM-generated. If you are proficient in the language and spot mistakes – feel free to issue a pull 
+request with changes.

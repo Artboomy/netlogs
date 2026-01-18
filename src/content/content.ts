@@ -1,19 +1,11 @@
 // NOTE: no non-type imports in this file or build will FAIL!
 import { ISettings } from 'controllers/settings/types';
-import { NetworkRequest } from 'models/types';
 // same as src/controllers/settings/base.ts
 const defaultSettings: ISettings = {
     theme: 'light',
     language: 'en-US',
     newFeatureFlags: {
         language: false
-    },
-    matcher: (_request: NetworkRequest) => {
-        return 'default';
-    },
-    profiles: {
-        /*default: defaultProfile,
-        jsonRpc: jsonRpcProfile*/
     },
     nextjsIntegration: true,
     nuxtjsIntegration: true,
@@ -27,7 +19,21 @@ const defaultSettings: ISettings = {
     },
     hiddenMimeTypes: [],
     tagsToolbarVisible: true,
-    methodsSidebarVisible: false
+    methodsSidebarVisible: false,
+    jira: {
+        baseUrl: '',
+        apiToken: '',
+        projectKey: '',
+        issueType: '',
+        apiVersion: '2',
+        attachScreenshot: true,
+        openTicketInNewTab: true,
+        template: ``,
+        user: '',
+        cachedFields: null
+    },
+
+    interceptRequests: true
 };
 
 function injectScript(path: string): Promise<void> {
@@ -46,15 +52,20 @@ function injectScript(path: string): Promise<void> {
 }
 
 injectScript('js/inject.mjs').then(() => {
-    chrome.storage.local.get('settings', (data) => {
-        window.postMessage(
-            {
-                type: 'settings',
-                value: data.settings || JSON.stringify(defaultSettings)
-            },
-            '*'
-        );
-    });
+    chrome.storage.local.get(
+        {
+            settings: JSON.stringify(defaultSettings)
+        },
+        (data) => {
+            window.postMessage(
+                {
+                    type: 'settings',
+                    value: data.settings || JSON.stringify(defaultSettings)
+                },
+                '*'
+            );
+        }
+    );
 });
 
 let connectionReady = false;
@@ -95,20 +106,46 @@ const messageCallback = (event: { type: string }) => {
 
 portFromContent.onMessage.addListener(messageCallback);
 
+let cache: string[] = [];
+let pendingRequestCache: unknown[] = [];
+
 // on response send data
 function sendMessages() {
-    if (cache.length && portToSend && connectionReady) {
-        cache.forEach((data) => {
-            portToSend.postMessage({
-                type: 'fromContent',
-                data
+    if (portToSend && connectionReady) {
+        // Send regular messages
+        if (cache.length) {
+            cache.forEach((data) => {
+                portToSend.postMessage({
+                    type: 'fromContent',
+                    data
+                });
             });
-        });
-        cache = [];
+            cache = [];
+        }
+        // Send cached pending requests
+        if (pendingRequestCache.length) {
+            pendingRequestCache.forEach((data) => {
+                portToSend.postMessage({
+                    type: 'pendingRequest',
+                    data
+                });
+            });
+            pendingRequestCache = [];
+        }
     }
 }
 
-let cache: string[] = [];
+// Send pending request data
+function sendPendingRequest(data: unknown) {
+    if (portToSend && connectionReady) {
+        portToSend.postMessage({
+            type: 'pendingRequest',
+            data
+        });
+    } else {
+        pendingRequestCache.push(data);
+    }
+}
 
 window.addEventListener(
     'message',
@@ -120,6 +157,13 @@ window.addEventListener(
             if (event.data.event) {
                 cache.push(event.data.event);
                 sendMessages();
+            }
+        }
+
+        // Handle pending request messages from inject script
+        if (event.data.type && event.data.type === 'PENDING_REQUEST') {
+            if (event.data.data) {
+                sendPendingRequest(event.data.data);
             }
         }
     },

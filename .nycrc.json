@@ -1,0 +1,35 @@
+{
+  "report-dir": "coverage-e2e",
+  "temp-dir": "coverage-e2e/.nyc_output",
+  "reporter": [
+    "html",
+    "json",
+    "json-summary",
+    "lcov",
+    "text"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.tsx",
+    "src/**/__tests__/**",
+    "src/**/__stories__/**",
+    "src/**/types/**",
+    "**/*.d.ts"
+  ],
+  "extension": [
+    ".ts",
+    ".tsx"
+  ],
+  "all": true,
+  "check-coverage": true,
+  "statements": 5,
+  "branches": 5,
+  "functions": 5,
+  "lines": 5
+}

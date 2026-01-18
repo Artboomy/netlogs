@@ -4,5 +4,6 @@ export enum ItemType {
     ContentOnly = 'ContentOnly',
     WithName = 'WithName',
     Transaction = 'Transaction',
-    WebSocket = 'WebSocket'
+    WebSocket = 'WebSocket',
+    Pending = 'Pending'
 }

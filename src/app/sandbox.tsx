@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { callParent, callParentVoid, isMacOs } from '../utils';
 
 import EventsController from 'controllers/events';
@@ -10,7 +10,9 @@ EventsController.subscribe();
 HostController.subscribe();
 
 callParent('onIframeReady').then(() => {
-    ReactDOM.render(<PanelApp />, document.getElementById('root'));
+    const container = document.getElementById('root');
+    const root = createRoot(container!);
+    root.render(<PanelApp />);
 });
 
 const F5_CODE = 'F5';

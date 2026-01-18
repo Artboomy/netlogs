@@ -65,9 +65,22 @@ const messageHandler = (
             } catch (_e) {
                 // pass
             }
+        } else if (type === 'pendingRequest') {
+            postSandbox(
+                createEventPayload(
+                    'pendingRequest',
+                    typeof e.data === 'string' ? e.data : JSON.stringify(e.data)
+                )
+            );
         } else if (type === 'connectionTest') {
             console.log('message', type, e.data);
-            postSandbox(createEventPayload('setHost', e.data));
+            const data = e.data as unknown as { host: string };
+            postSandbox(
+                createEventPayload(
+                    'setHost',
+                    typeof data === 'object' ? data.host : data
+                )
+            );
         }
     }
 };

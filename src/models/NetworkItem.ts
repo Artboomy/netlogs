@@ -11,8 +11,8 @@ import {
 } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { isVisible } from 'react-inspector';
-import { isMimeType } from '../components/InspectorWrapper';
 import { ItemType } from 'models/enums';
+import { isMimeType } from 'components/utils/IsMimeType';
 
 function injectMimeType<T>(obj: T, mimeType: string): void {
     Object.defineProperty(obj, '__mimeType', {

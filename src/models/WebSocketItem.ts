@@ -8,11 +8,11 @@ import {
 import { PropTreeProps } from 'components/PropTree';
 import { Entry } from 'har-format';
 import { isVisible } from 'react-inspector';
-import { isMimeType } from 'components/InspectorWrapper';
 import { TransactionItemAbstract } from './TransactionItem';
 import { phoenixLiveViewProfile } from 'controllers/settings/profiles/phoenixLiveView';
 import { isSerializedObject } from 'utils';
 import { ItemType } from 'models/enums';
+import { isMimeType } from 'components/utils/IsMimeType';
 
 type TContent = IItemTransactionCfg['result'];
 export default class WebSocketItem

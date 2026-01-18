@@ -32,7 +32,8 @@ const Header = styled.div(({ theme }) => ({
 
 const Wrapper = styled.div({
     overflow: 'auto',
-    overflowWrap: 'break-word'
+    overflowWrap: 'break-word',
+    height: '100%'
 });
 
 type ModalProps = {
