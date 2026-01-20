@@ -107,7 +107,7 @@ const messageCallback = (event: { type: string }) => {
 portFromContent.onMessage.addListener(messageCallback);
 
 let cache: string[] = [];
-let pendingRequestCache: unknown[] = [];
+// let pendingRequestCache: unknown[] = [];
 
 // on response send data
 function sendMessages() {
@@ -123,15 +123,15 @@ function sendMessages() {
             cache = [];
         }
         // Send cached pending requests
-        if (pendingRequestCache.length) {
-            pendingRequestCache.forEach((data) => {
-                portToSend.postMessage({
-                    type: 'pendingRequest',
-                    data
-                });
-            });
-            pendingRequestCache = [];
-        }
+        // if (pendingRequestCache.length) {
+        //     pendingRequestCache.forEach((data) => {
+        //         portToSend.postMessage({
+        //             type: 'pendingRequest',
+        //             data
+        //         });
+        //     });
+        //     pendingRequestCache = [];
+        // }
     }
 }
 
@@ -143,7 +143,8 @@ function sendPendingRequest(data: unknown) {
             data
         });
     } else {
-        pendingRequestCache.push(data);
+        // dropping pendings as they serve no need in the cache
+        // pendingRequestCache.push(data);
     }
 }
 
