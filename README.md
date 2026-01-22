@@ -50,7 +50,7 @@ Features: method extraction, result unwrapping, coloring for error responses.
 
 Create comprehensive bug reports directly from the extension with a single click. The integration automatically bundles network logs (HAR format), page screenshots, and contextual metadata into a properly formatted Jira ticket.
 
-![jira-demo.gif](./img/jira-demo.gif)
+https://github.com/user-attachments/assets/7abfed92-1da8-4923-b223-4db981ed0f57
 
 **Features:**
 
