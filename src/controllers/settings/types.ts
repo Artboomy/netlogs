@@ -76,6 +76,8 @@ export interface ISettings {
                 key: string;
                 name: string;
                 type: string;
+                required?: boolean;
+                hasDefaultValue?: boolean;
                 allowedValues?: { id: string; value: string }[];
             }[];
             values: Record<string, unknown>;

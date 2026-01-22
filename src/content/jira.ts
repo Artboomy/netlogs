@@ -633,20 +633,6 @@ export async function handleJiraTestSettings(
     }
 }
 
-let metadataCache: {
-    projectKey: string;
-    issueType: string;
-    baseUrl: string;
-    fields: {
-        key: string;
-        name: string;
-        type: string | undefined;
-        required: boolean;
-        hasDefaultValue: boolean | undefined;
-        allowedValues: { id: string; value: string | undefined }[] | undefined;
-    }[];
-} | null = null;
-
 export async function handleJiraGetMetadata(
     message: JiraGetMetadataMessage,
     port: Port
@@ -673,27 +659,36 @@ export async function handleJiraGetMetadata(
         return;
     }
 
+    // Check persisted cache from settings
+    const cachedFields = jiraSettings.cachedFields;
     if (
-        metadataCache &&
-        metadataCache.projectKey === projectKey &&
-        metadataCache.issueType === issueType &&
-        metadataCache.baseUrl === baseUrl
+        cachedFields &&
+        cachedFields.projectKey === projectKey &&
+        cachedFields.issueType === issueType &&
+        cachedFields.baseUrl === baseUrl &&
+        cachedFields.fields
     ) {
-        const initialFields = metadataCache.fields.filter((field) => {
-            return (
-                field.required &&
-                !field.hasDefaultValue &&
-                field.key !== 'project' &&
-                field.key !== 'issuetype' &&
-                field.key !== 'summary' &&
-                field.key !== 'description'
-            );
-        });
+        const initialFields = cachedFields.fields.filter(
+            (field: {
+                key: string;
+                required?: boolean;
+                hasDefaultValue?: boolean;
+            }) => {
+                return (
+                    field.required &&
+                    !field.hasDefaultValue &&
+                    field.key !== 'project' &&
+                    field.key !== 'issuetype' &&
+                    field.key !== 'summary' &&
+                    field.key !== 'description'
+                );
+            }
+        );
         respond(
             JSON.stringify({
                 ok: true,
                 fields: initialFields,
-                allFields: metadataCache.fields
+                allFields: cachedFields.fields
             })
         );
         return;
@@ -795,12 +790,32 @@ export async function handleJiraGetMetadata(
             };
         });
 
-        metadataCache = {
+        // Persist metadata to settings
+        const newCachedFields = {
             projectKey,
             issueType,
             baseUrl,
-            fields: mappedFields
+            fields: mappedFields.map((f) => ({
+                key: f.key,
+                name: f.name,
+                type: f.type || '',
+                required: f.required,
+                hasDefaultValue: f.hasDefaultValue,
+                allowedValues: f.allowedValues
+            })),
+            values: {}
         };
+
+        // Save to chrome storage
+        const { settings } = await chrome.storage.local.get({
+            settings: JSON.stringify(defaultSettings)
+        });
+        const parsedSettings = JSON.parse(settings);
+        parsedSettings.jira = parsedSettings.jira || {};
+        parsedSettings.jira.cachedFields = newCachedFields;
+        await chrome.storage.local.set({
+            settings: JSON.stringify(parsedSettings)
+        });
 
         const initialFields = mappedFields.filter((field) => {
             return (

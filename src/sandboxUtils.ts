@@ -143,13 +143,13 @@ export async function wrapSandbox(): Promise<void> {
                         portToBackground?.postMessage({
                             type: 'debugger.attach'
                         });
-                        analytics.fireEvent('debugger.attach');
+                        analytics.fireEvent('debugger_attach');
                         break;
                     case 'debugger.detach':
                         portToBackground?.postMessage({
                             type: 'debugger.detach'
                         });
-                        analytics.fireEvent('debugger.detach');
+                        analytics.fireEvent('debugger_detach');
                         break;
                     case 'debugger.getStatus':
                         portToBackground?.postMessage({
@@ -382,9 +382,7 @@ async function debuggerEvaluate(
 
 function analyticsError(data: string) {
     const { message, stack } = JSON.parse(data);
-    const error = new Error(message);
-    error.stack = stack;
-    analytics.fireErrorEvent(error);
+    analytics.fireErrorEvent({ message, stack });
 }
 
 async function analyticsInit(id: string, type: EventName) {

@@ -48,7 +48,6 @@ const globalStyles = {
 
 export const Options: FC = () => {
     const { settings, setSettings } = useSettings();
-    console.log('settings', settings);
 
     useEffect(() => {
         i18n.locale = settings.language;

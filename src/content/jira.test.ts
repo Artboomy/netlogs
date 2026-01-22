@@ -19,7 +19,8 @@ type Port = chrome.runtime.Port;
 const mockChrome = {
     storage: {
         local: {
-            get: vi.fn()
+            get: vi.fn(),
+            set: vi.fn()
         }
     },
     debugger: {
@@ -63,6 +64,8 @@ global.console = {
 describe('jira.ts', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+        // Mock chrome.storage.local.set to resolve successfully
+        mockChrome.storage.local.set.mockResolvedValue(undefined);
     });
 
     afterEach(() => {
@@ -2147,9 +2150,41 @@ describe('jira.ts', () => {
                 }
             };
 
-            mockChrome.storage.local.get.mockResolvedValue({
-                settings: JSON.stringify(cacheTestSettings)
-            });
+            const cachedFieldsData = {
+                baseUrl: 'https://cache-test.atlassian.net',
+                projectKey: 'CACHE',
+                issueType: 'Bug',
+                fields: [
+                    {
+                        key: 'priority',
+                        name: 'Priority',
+                        type: 'priority',
+                        required: true,
+                        hasDefaultValue: false
+                    }
+                ],
+                values: {}
+            };
+
+            const cacheTestSettingsWithCache = {
+                ...cacheTestSettings,
+                jira: {
+                    ...cacheTestSettings.jira,
+                    cachedFields: cachedFieldsData
+                }
+            };
+
+            // First call returns settings without cache, second call returns with cache
+            mockChrome.storage.local.get
+                .mockResolvedValueOnce({
+                    settings: JSON.stringify(cacheTestSettings)
+                })
+                .mockResolvedValueOnce({
+                    settings: JSON.stringify(cacheTestSettings)
+                })
+                .mockResolvedValueOnce({
+                    settings: JSON.stringify(cacheTestSettingsWithCache)
+                });
 
             const mockFetch = global.fetch as any;
             mockFetch

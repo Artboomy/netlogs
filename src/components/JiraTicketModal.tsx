@@ -413,11 +413,6 @@ export const JiraTicketModal: FC = () => {
     const [dynamicFields, setDynamicFields] = useState<JiraFieldMetadata[]>([]);
     const [allFields, setAllFields] = useState<JiraFieldMetadata[]>([]);
     const [fieldValues, setFieldValues] = useState<Record<string, unknown>>({});
-    const cacheMatches = isJiraCacheMatch(cachedFields, {
-        baseUrl: jiraSettings.baseUrl,
-        projectKey: jiraSettings.projectKey,
-        issueType: jiraSettings.issueType
-    });
 
     const refreshMetadata = useCallback(
         async (useCache = true) => {
@@ -810,7 +805,7 @@ export const JiraTicketModal: FC = () => {
                             />
                         </SettingsRow>
                         <SettingsActions>
-                            {cacheMatches && (
+                            {cachedFields && (
                                 <SmallButton
                                     type='button'
                                     onClick={handleResetCachedFields}>
