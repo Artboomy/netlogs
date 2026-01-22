@@ -103,6 +103,34 @@ class Network {
         return entry;
     }
 
+    /** Remove a pending item by its request ID */
+    private removePendingItemById(requestId: string): void {
+        const { list } = useListStore.getState();
+        const filteredList = list.filter((item) => {
+            if (item instanceof PendingItem && item.requestId === requestId) {
+                // Found the item to remove - also clean up its timer
+                const key = this.getPendingKey(item.getMethod(), item.getUrl());
+                const queue = this.pendingTimers.get(key);
+                if (queue) {
+                    const index = queue.findIndex((entry) => entry.item === item);
+                    if (index !== -1) {
+                        window.clearTimeout(queue[index].timer);
+                        queue.splice(index, 1);
+                        if (queue.length === 0) {
+                            this.pendingTimers.delete(key);
+                        }
+                    }
+                }
+                return false; // Remove this item
+            }
+            return true; // Keep this item
+        });
+
+        if (filteredList.length !== list.length) {
+            useListStore.setState({ list: filteredList });
+        }
+    }
+
     constructor() {
         // NOTE: looks like this isn't needed anymore
         /*Settings.addListener(function recomputeFieldsOnSettingsChangeNetwork()  {
@@ -200,6 +228,13 @@ class Network {
                 }
             }
         });
+
+        // Subscribe to pending request completion messages from inject script
+        subscribeParent('pendingRequestComplete', (data) => {
+            const requestId = typeof data === 'string' ? data : String(data);
+            this.removePendingItemById(requestId);
+        });
+
         network.onNavigated.addListener(function networkOnNavigated(url) {
             const { list, isPreserve } = useListStore.getState();
             useListStore.setState({

@@ -94,7 +94,6 @@
     "jiraTicketModal_issueCreated": "Jira課題が作成されました",
     "jiraTicketModal_notReadyHint": "課題を作成する前に、オプションページでJiraの設定を入力してください。",
     "jiraTicketModal_pending": "Jira課題を作成中...",
-    "jiraTicketModal_summary": "要約",
     "jiraTicketModal_resetCachedFields": "キャッシュ済みフィールドをリセット",
     "reset": "設定をデフォルト値にリセット",
     "jira_checkSettings": "設定を確認",
@@ -118,5 +117,7 @@
     "import": "HARファイルをインポート",
     "interceptRequests": "保留中のリクエストを表示",
     "interceptRequestsHelp": "fetch/XHRリクエストを傍受してレスポンス到着前に表示",
-    "jiraSettings_user": "担当者のメールアドレス"
+    "jiraSettings_user": "担当者のメールアドレス",
+    "jiraTicketModal_settingsTitle": "Jira設定",
+    "jiraTicketModal_summary": "タイトル"
 }

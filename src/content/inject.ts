@@ -25,6 +25,7 @@ declare global {
             method: string;
             url: string;
             headers: Array<{ name: string; value: string }>;
+            requestId?: string;
         };
     }
 }
@@ -145,6 +146,24 @@ function safePostPendingRequest(data: PendingRequestData): void {
 }
 
 /**
+ * Safely post a pending request completion message.
+ * Signals that a request has completed (successfully, failed, or cancelled).
+ */
+function safePostPendingComplete(requestId: string): void {
+    try {
+        window.postMessage(
+            {
+                type: 'PENDING_REQUEST_COMPLETE',
+                requestId: requestId
+            },
+            '*'
+        );
+    } catch (_e) {
+        // console.error('[NETLOGS:inject] Failed to post PENDING_REQUEST_COMPLETE:', e);
+    }
+}
+
+/**
  * Install fetch/XHR interceptors to capture request starts.
  * Safe wrappers that never break original functionality.
  */
@@ -159,13 +178,32 @@ function installInterceptors(): void {
         input: RequestInfo | URL,
         init?: RequestInit
     ): Promise<Response> {
+        let requestId: string | undefined;
         try {
             const pendingRequest = createPendingRequestFromFetch(input, init);
+            requestId = pendingRequest.id;
             safePostPendingRequest(pendingRequest);
         } catch {
             // Silently ignore interception errors
         }
-        return originalFetch(input, init);
+
+        const promise = originalFetch(input, init);
+
+        // Track completion (success, error, or cancellation) while passing through result
+        if (requestId) {
+            const id = requestId;
+            return promise
+                .then((response) => {
+                    safePostPendingComplete(id);
+                    return response; // Pass the response through to caller
+                })
+                .catch((error) => {
+                    safePostPendingComplete(id);
+                    throw error; // Re-throw so caller gets the error
+                });
+        }
+
+        return promise;
     };
 
     // Wrap XHR.open to capture method and URL
@@ -222,7 +260,20 @@ function installInterceptors(): void {
                     this.__netlogs.headers,
                     body
                 );
+                this.__netlogs.requestId = pendingRequest.id;
                 safePostPendingRequest(pendingRequest);
+
+                // Track completion via XHR events
+                const requestId = pendingRequest.id;
+                const completeHandler = () => {
+                    safePostPendingComplete(requestId);
+                };
+
+                // Listen for any completion event (success, error, abort, timeout)
+                this.addEventListener('load', completeHandler, { once: true });
+                this.addEventListener('error', completeHandler, { once: true });
+                this.addEventListener('abort', completeHandler, { once: true });
+                this.addEventListener('timeout', completeHandler, { once: true });
             }
         } catch {
             // Silently ignore

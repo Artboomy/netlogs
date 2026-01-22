@@ -31,5 +31,5 @@ export const defaultSettings: ISettings = {
         user: '',
         cachedFields: null
     },
-    interceptRequests: true
+    interceptRequests: false
 };

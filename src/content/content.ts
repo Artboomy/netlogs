@@ -148,6 +148,17 @@ function sendPendingRequest(data: unknown) {
     }
 }
 
+// Send pending request completion notification
+function sendPendingComplete(requestId: string) {
+    if (portToSend && connectionReady) {
+        portToSend.postMessage({
+            type: 'pendingRequestComplete',
+            data: requestId
+        });
+    }
+    // No need to cache - if connection not ready, pending item wasn't shown anyway
+}
+
 window.addEventListener(
     'message',
     (event) => {
@@ -165,6 +176,13 @@ window.addEventListener(
         if (event.data.type && event.data.type === 'PENDING_REQUEST') {
             if (event.data.data) {
                 sendPendingRequest(event.data.data);
+            }
+        }
+
+        // Handle pending request completion messages from inject script
+        if (event.data.type && event.data.type === 'PENDING_REQUEST_COMPLETE') {
+            if (event.data.requestId) {
+                sendPendingComplete(event.data.requestId);
             }
         }
     },

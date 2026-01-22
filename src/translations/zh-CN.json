@@ -94,7 +94,6 @@
     "jiraTicketModal_issueCreated": "Jira 问题已创建",
     "jiraTicketModal_notReadyHint": "在创建问题之前，请在“选项”页面中填写 Jira 设置。",
     "jiraTicketModal_pending": "正在创建 Jira 问题...",
-    "jiraTicketModal_summary": "摘要",
     "jiraTicketModal_resetCachedFields": "重置缓存字段",
     "reset": "将设置重置为默认值",
     "jira_checkSettings": "检查设置",
@@ -118,5 +117,7 @@
     "import": "导入HAR文件",
     "interceptRequests": "显示待处理请求",
     "interceptRequestsHelp": "拦截fetch/XHR请求，在响应到达前显示",
-    "jiraSettings_user": "负责人邮箱"
+    "jiraSettings_user": "负责人邮箱",
+    "jiraTicketModal_settingsTitle": "Jira设置",
+    "jiraTicketModal_summary": "标题"
 }

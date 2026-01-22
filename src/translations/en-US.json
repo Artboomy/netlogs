@@ -94,7 +94,6 @@
     "jiraTicketModal_issueCreated": "Jira issue created",
     "jiraTicketModal_notReadyHint": "Fill in Jira settings in the Options page before creating an issue.",
     "jiraTicketModal_pending": "Creating Jira issue...",
-    "jiraTicketModal_summary": "Summary",
     "jiraTicketModal_resetCachedFields": "Reset cached fields",
     "reset": "Reset settings to default values",
     "jira_checkSettings": "Check settings",
@@ -118,5 +117,7 @@
     "import": "Import HAR file",
     "interceptRequests": "Show pending requests",
     "interceptRequestsHelp": "Intercepts fetch/XHR requests to show them before response arrives",
-    "jiraSettings_user": "Assignee email"
+    "jiraSettings_user": "Assignee email",
+    "jiraTicketModal_settingsTitle": "Jira Settings",
+    "jiraTicketModal_summary": "Title"
 }

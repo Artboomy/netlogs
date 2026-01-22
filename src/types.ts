@@ -30,6 +30,7 @@ type CustomEventName =
     | 'setHost'
     | 'cachedNetworkRequest'
     | 'pendingRequest'
+    | 'pendingRequestComplete'
     | 'jira.createIssue'
     | 'jira.getMetadata'
     | 'jira.testSettings'

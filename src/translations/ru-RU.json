@@ -94,7 +94,6 @@
     "jiraTicketModal_issueCreated": "Задача в Jira создана",
     "jiraTicketModal_notReadyHint": "Заполните настройки Jira на странице опций перед созданием задачи.",
     "jiraTicketModal_pending": "Создание задачи в Jira...",
-    "jiraTicketModal_summary": "Резюме",
     "jiraTicketModal_resetCachedFields": "Сбросить кешированные поля",
     "reset": "Сбросить настройки до значений по умолчанию",
     "jira_checkSettings": "Проверить настройки",
@@ -118,5 +117,7 @@
     "import": "Импортировать HAR файл",
     "interceptRequests": "Показывать ожидающие запросы",
     "interceptRequestsHelp": "Перехватывает fetch/XHR запросы для отображения до получения ответа",
-    "jiraSettings_user": "Электронная почта исполнителя"
+    "jiraSettings_user": "Электронная почта исполнителя",
+    "jiraTicketModal_settingsTitle": "Настройки Jira",
+    "jiraTicketModal_summary": "Заголовок"
 }

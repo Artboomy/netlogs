@@ -94,7 +94,6 @@
     "jiraTicketModal_issueCreated": "Jira-Ticket erstellt",
     "jiraTicketModal_notReadyHint": "Füllen Sie die Jira-Einstellungen auf der Optionsseite aus, bevor Sie ein Ticket erstellen.",
     "jiraTicketModal_pending": "Jira-Ticket wird erstellt...",
-    "jiraTicketModal_summary": "Zusammenfassung",
     "jiraTicketModal_resetCachedFields": "Zwischengespeicherte Felder zurücksetzen",
     "reset": "Einstellungen auf Standardwerte zurücksetzen",
     "jira_checkSettings": "Einstellungen prüfen",
@@ -118,5 +117,7 @@
     "import": "HAR-Datei importieren",
     "interceptRequests": "Ausstehende Anfragen anzeigen",
     "interceptRequestsHelp": "Fängt fetch/XHR-Anfragen ab, um sie vor dem Eintreffen der Antwort anzuzeigen",
-    "jiraSettings_user": "E-Mail des Bearbeiters"
+    "jiraSettings_user": "E-Mail des Bearbeiters",
+    "jiraTicketModal_settingsTitle": "Jira-Einstellungen",
+    "jiraTicketModal_summary": "Titel"
 }

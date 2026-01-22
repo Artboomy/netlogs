@@ -18,7 +18,7 @@ interface PendingDurationProps {
 
 /**
  * Animated duration display for pending requests.
- * Updates every 50ms to show elapsed time since request started.
+ * Updates every 200ms starting from 200ms to reduce render frequency.
  * Uses local state to prevent parent re-renders.
  */
 export const PendingDuration: React.FC<PendingDurationProps> = memo(
@@ -26,11 +26,24 @@ export const PendingDuration: React.FC<PendingDurationProps> = memo(
         const [elapsed, setElapsed] = useState(() => Date.now() - startTimestamp);
 
         useEffect(() => {
-            const interval = setInterval(() => {
-                setElapsed(Date.now() - startTimestamp);
-            }, 50);
+            let interval: number | undefined;
 
-            return () => clearInterval(interval);
+            // Start updating after 200ms delay
+            const timeout = window.setTimeout(() => {
+                setElapsed(Date.now() - startTimestamp);
+
+                // Then update every 200ms
+                interval = window.setInterval(() => {
+                    setElapsed(Date.now() - startTimestamp);
+                }, 200);
+            }, 200);
+
+            return () => {
+                window.clearTimeout(timeout);
+                if (interval !== undefined) {
+                    window.clearInterval(interval);
+                }
+            };
         }, [startTimestamp]);
 
         // Color coding based on duration

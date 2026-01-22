@@ -94,7 +94,6 @@
     "jiraTicketModal_issueCreated": "Jira इश्यू बनाया गया",
     "jiraTicketModal_notReadyHint": "इश्यू बनाने से पहले विकल्प पृष्ठ में Jira सेटिंग्स भरें।",
     "jiraTicketModal_pending": "Jira इश्यू बनाया जा रहा है...",
-    "jiraTicketModal_summary": "सारांश",
     "jiraTicketModal_resetCachedFields": "कैश किए गए फ़ील्ड रीसेट करें",
     "reset": "सेटिंग्स को डिफ़ॉल्ट मानों पर रीसेट करें",
     "jira_checkSettings": "सेटिंग्स जांचें",
@@ -118,5 +117,7 @@
     "import": "HAR फ़ाइल आयात करें",
     "interceptRequests": "लंबित अनुरोध दिखाएं",
     "interceptRequestsHelp": "प्रतिक्रिया आने से पहले दिखाने के लिए fetch/XHR अनुरोधों को रोकता है",
-    "jiraSettings_user": "असाइनी ईमेल"
+    "jiraSettings_user": "असाइनी ईमेल",
+    "jiraTicketModal_settingsTitle": "Jira सेटिंग्स",
+    "jiraTicketModal_summary": "शीर्षक"
 }
