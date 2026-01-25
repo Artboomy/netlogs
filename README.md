@@ -9,6 +9,26 @@
 
 Better filtering and less clicking than Chrome's Network tab. Built for debugging modern web apps with Next.js/GraphQL support and Jira integration.
 
+## 📖 Table of Contents
+
+- [💡 Features](#-features)
+- [🚀 Installation](#-installation)
+- [🎨 Presets](#-presets)
+  - [GraphQL](#graphql)
+  - [JSON-RPC](#json-rpc)
+- [🎫 Jira Integration](#-jira-integration)
+- [⛰️ Next.js and NuxtJS debugging](#️-nextjs-and-nuxtjs-debugging)
+- [💾 Saving and loading logs](#-saving-and-loading-logs)
+- [⛓️ Preserve log](#️-preserve-log)
+- [🦄 Custom events](#-custom-events)
+- [🛠️ Configuration](#️-configuration)
+- [🐜 Troubleshooting](#troubleshooting)
+- [🔐 Security & privacy](#-security--privacy)
+- [🤝 Permissions](#-permissions)
+- [🏗️ Development](#️-development)
+- [🤝 Attributions](#-attributions)
+- [🌐 Translations](#-translations)
+
 ## 💡 Features
 
 The extension will appear in devtools as a `📜 Net logs` tab.
