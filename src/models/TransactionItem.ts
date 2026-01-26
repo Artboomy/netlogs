@@ -3,8 +3,8 @@ import { IContentItem, IItemTransactionCfg, SearchConfig } from './types';
 import { PropTreeProps } from '../components/PropTree';
 import { Entry } from 'har-format';
 import { isVisible } from 'react-inspector';
-import { isMimeType } from '../components/InspectorWrapper';
 import { ItemType } from 'models/enums';
+import { isMimeType } from 'components/utils/IsMimeType';
 
 export abstract class TransactionItemAbstract implements IContentItem<unknown> {
     public readonly id: string = 'someId';

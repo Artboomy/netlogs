@@ -54,7 +54,7 @@ console.log('devtools loaded');
 let panelConnection: chrome.runtime.Port | null;
 function connectToPanel() {
     panelConnection = chrome.runtime.connect({
-        name: 'panel'
+        name: `panel-${chrome.devtools.inspectedWindow.tabId}`
     });
     panelConnection.onDisconnect.addListener(() => {
         panelConnection = null;

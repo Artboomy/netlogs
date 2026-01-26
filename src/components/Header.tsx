@@ -1,8 +1,7 @@
-import React, { FC, useCallback, useRef, useState } from 'react';
+import React, { FC, useCallback, useContext, useRef, useState } from 'react';
 import { toggleUnpack, useListStore } from 'controllers/network';
-import runtime from '../api/runtime';
+import { callParent, callParentVoid, isExtension, isMacOs } from 'utils';
 import { Har } from 'har-format';
-import { callParent, isExtension, isMacOs } from 'utils';
 import { IconButton, ICONS } from './IconButton';
 import { useHotkey } from 'hooks/useHotkey';
 import { MimetypeSelect } from './MimetypeSelect';
@@ -11,6 +10,15 @@ import { DebuggerButton } from './DebuggerButton';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
 import { useTempSettings } from 'hooks/useTempSettings';
+import { JiraTicketModal } from './JiraTicketModal';
+import { ModalContext } from './modal/Context';
+import { isFileSupported, parseFile } from 'controllers/file';
+import NetworkItem from '../models/NetworkItem';
+import ContentOnlyItem from '../models/ContentOnlyItem';
+import TransactionItem from '../models/TransactionItem';
+import WebSocketItem from '../models/WebSocketItem';
+import { ItemType } from 'models/enums';
+import { getFileName, getHarData } from '../utils/harUtils';
 
 const Root = styled.header(({ theme }) => ({
     borderBottom: `1px solid ${theme.borderColor}`,
@@ -24,12 +32,29 @@ const Row = styled.div(({ theme }) => ({
     boxSizing: 'border-box',
     height: '30px',
     alignItems: 'center',
-    gap: '8px'
+    gap: '6px'
 }));
 
 const HideUnrelated = styled.label({
     display: 'flex'
 });
+
+const JiraButton = styled.button(({ theme }) => ({
+    backgroundColor: theme.name === 'light' ? '#0052CC' : '#172B4D',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '0 12px',
+    height: '26px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    '&:hover': {
+        backgroundColor: theme.name === 'light' ? '#0747A6' : '#0747A6'
+    }
+}));
 
 interface IProps {
     className?: string;
@@ -41,28 +66,8 @@ interface IProps {
     onCaseSensitiveChange: (value: boolean) => void;
 }
 
-function getFileName(): string {
-    const now = new Date();
-    return now.toISOString().replace(/:/g, '-');
-}
-
 const doExport = () => {
-    const { version, name } = runtime.getManifest();
-    const { list } = useListStore.getState();
-    const entries = list
-        .filter((i) => i.shouldShow())
-        .map((item) => item.toJSON());
-    const fileData: Har = {
-        log: {
-            version: '1.2',
-            creator: {
-                name,
-                version
-            },
-            entries,
-            comment: 'Format: http://www.softwareishard.com/blog/har-12-spec/'
-        }
-    };
+    const fileData = getHarData();
     toast.promise(
         callParent(
             'download',
@@ -79,6 +84,68 @@ const doExport = () => {
     );
 };
 
+const handleFileUpload = async (file: File) => {
+    const { setList } = useListStore.getState();
+
+    if (!isFileSupported(file.name)) {
+        toast.error(i18n.t<string>('onlyJSONSupported'));
+        return;
+    }
+
+    let log: Har | null = null;
+    const toastId = toast(i18n.t<string>('loadingFile'));
+
+    try {
+        log = await parseFile<Har>(file);
+        toast.dismiss(toastId);
+    } catch (_e) {
+        toast.dismiss(toastId);
+        toast.error(i18n.t<string>('errorParsingFile'));
+        return;
+    }
+
+    if (!log?.log?.entries) {
+        toast.error(i18n.t<string>('invalidHAR'));
+        return;
+    }
+
+    try {
+        setList(
+            [
+                new ContentOnlyItem({
+                    timestamp: new Date().getTime(),
+                    tag: 'NET LOGS',
+                    content: i18n.t<string>('fileOpened', {
+                        name: file.name
+                    })
+                }),
+                ...log.log.entries.map((request) => {
+                    let ItemConstructor;
+                    switch (request.comment) {
+                        case ItemType.ContentOnly:
+                            ItemConstructor = ContentOnlyItem;
+                            break;
+                        case ItemType.Transaction:
+                            ItemConstructor = TransactionItem;
+                            break;
+                        case ItemType.WebSocket:
+                            ItemConstructor = WebSocketItem;
+                            break;
+                        default:
+                            ItemConstructor = NetworkItem;
+                    }
+                    return ItemConstructor.fromJSON(request);
+                })
+            ],
+            false
+        );
+        callParentVoid('analytics.fileOpen', String(log.log.entries.length));
+    } catch (e) {
+        console.log('Error occurred:', e);
+        toast.error(i18n.t<string>('invalidHAR'));
+    }
+};
+
 export const Header: FC<IProps> = ({
     className,
     searchValue,
@@ -92,6 +159,8 @@ export const Header: FC<IProps> = ({
     const isPreserve = useListStore((state) => state.isPreserve);
     const isUnpack = useListStore((state) => state.isUnpack);
     const [secondRowVisible, setSecondRowVisible] = useState(false);
+    const { setValue } = useContext(ModalContext);
+    const keyRef = useRef(1);
     const handlePreserveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         useListStore.setState({ isPreserve: e.target.checked });
     };
@@ -103,6 +172,20 @@ export const Header: FC<IProps> = ({
         }));
     }, []);
     const ref = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            handleFileUpload(file);
+            // Reset the input so the same file can be selected again
+            e.target.value = '';
+        }
+    };
     useHotkey(
         'focusSearch',
         () => {
@@ -177,12 +260,27 @@ export const Header: FC<IProps> = ({
                     icon={ICONS.rotateView}
                 />
                 {isExtension() && (
-                    <IconButton
-                        icon={ICONS.settings}
-                        onClick={() => runtime.openOptionsPage()}
-                        title={i18n.t('options')}
-                    />
+                    <JiraButton
+                        onClick={() => {
+                            keyRef.current = keyRef.current + 1;
+                            setValue(<JiraTicketModal key={keyRef.current} />);
+                        }}
+                        title='Create Jira issue'>
+                        Jira
+                    </JiraButton>
                 )}
+                <input
+                    ref={fileInputRef}
+                    type='file'
+                    accept='.har,.json,.zip'
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                />
+                <IconButton
+                    icon={ICONS.import}
+                    onClick={handleImportClick}
+                    title={i18n.t('import')}
+                />
                 <IconButton
                     icon={ICONS.export}
                     onClick={doExport}

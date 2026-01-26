@@ -33,9 +33,8 @@ export interface IProfileWebSocket {
     isMatch: (request: IItemWebSocketCfg) => boolean;
 }
 
-export type IProfileSerialized = Omit<IProfile, 'functions'> & {
-    functions: Record<keyof IProfile['functions'], string>;
-};
+// IProfileSerialized and ISettingsSerialized types have been removed
+// They are no longer needed since we don't serialize/deserialize functions
 
 export type Host = string;
 export type FilteredMethod = string;
@@ -46,9 +45,7 @@ export interface ISettings {
     newFeatureFlags: {
         language: boolean;
     };
-    matcher: (request: NetworkRequest) => ProfileName;
     sendAnalytics: boolean;
-    profiles: Record<ProfileName, IProfile>;
     nextjsIntegration: boolean;
     nuxtjsIntegration: boolean;
     methodChecks: {
@@ -61,9 +58,29 @@ export interface ISettings {
     methodsSidebarVisible: boolean;
     hiddenTags: Record<string, string>;
     hiddenMimeTypes: string[];
+    jira: {
+        baseUrl: string;
+        apiToken: string;
+        projectKey: string;
+        issueType: string;
+        apiVersion: string;
+        template: string;
+        user: string;
+        attachScreenshot: boolean;
+        openTicketInNewTab: boolean;
+        cachedFields: {
+            baseUrl: string;
+            projectKey: string;
+            issueType: string;
+            fields: {
+                key: string;
+                name: string;
+                type: string;
+                required?: boolean;
+                hasDefaultValue?: boolean;
+                allowedValues?: { id: string; value: string }[];
+            }[];
+            values: Record<string, unknown>;
+        } | null;
+    };
 }
-
-export type ISettingsSerialized = Omit<ISettings, 'matcher' | 'profiles'> & {
-    matcher: string;
-    profiles: Record<keyof ISettings['profiles'], IProfileSerialized>;
-};

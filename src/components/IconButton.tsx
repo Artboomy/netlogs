@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import largeIcons from '../icons/largeIcons.svg';
 import { google } from 'base16';
 import styled from '@emotion/styled';
+import { isExtension } from '../utils';
 
 const Button = styled.button<{ activeText: boolean }>(
     ({ theme, activeText }) => ({
@@ -22,10 +23,14 @@ const Button = styled.button<{ activeText: boolean }>(
     })
 );
 
+// In production build (Chrome extension), icons are in js/ folder
+// In Ladle/dev, use the import path directly
+const iconPath = isExtension() ? `js/${largeIcons}` : largeIcons;
+
 const Icon = styled.div<{ icon: string; variant: '' | 'active' | 'red' }>(
     ({ theme, icon, variant }) => ({
         WebkitMaskPosition: icon,
-        WebkitMaskImage: `url(js/${largeIcons})`,
+        WebkitMaskImage: `url(${iconPath})`,
         width: '21px',
         height: '24px',
         ...(!variant && {
@@ -87,7 +92,8 @@ export const IconButton: FC<IconButtonProps> = ({
 export const ICONS: Record<string, IconButtonProps['icon']> = {
     clear: '-4px 144px',
     brackets: '-60px 48px',
-    settings: '-168px 168px',
+    settings: '-172px 168px',
+    import: '52px -96px',
     export: '-199px 144px',
     cross: '-84px 216px',
     filter: '-56px 120px',
@@ -99,5 +105,5 @@ export const ICONS: Record<string, IconButtonProps['icon']> = {
     debugOn: '-88px 24px',
     inspect: '136px -72px',
     drop: '52px -72px',
-    rotateView: '-168px 192px'
+    rotateView: '-172px 192px'
 } as const;

@@ -1,19 +1,11 @@
 // NOTE: no non-type imports in this file or build will FAIL!
 import { ISettings } from 'controllers/settings/types';
-import { NetworkRequest } from 'models/types';
 // same as src/controllers/settings/base.ts
 const defaultSettings: ISettings = {
     theme: 'light',
     language: 'en-US',
     newFeatureFlags: {
         language: false
-    },
-    matcher: (_request: NetworkRequest) => {
-        return 'default';
-    },
-    profiles: {
-        /*default: defaultProfile,
-        jsonRpc: jsonRpcProfile*/
     },
     nextjsIntegration: true,
     nuxtjsIntegration: true,
@@ -27,7 +19,19 @@ const defaultSettings: ISettings = {
     },
     hiddenMimeTypes: [],
     tagsToolbarVisible: true,
-    methodsSidebarVisible: false
+    methodsSidebarVisible: false,
+    jira: {
+        baseUrl: '',
+        apiToken: '',
+        projectKey: '',
+        issueType: '',
+        apiVersion: '2',
+        attachScreenshot: true,
+        openTicketInNewTab: true,
+        template: ``,
+        user: '',
+        cachedFields: null
+    }
 };
 
 function injectScript(path: string): Promise<void> {

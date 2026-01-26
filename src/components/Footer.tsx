@@ -7,6 +7,7 @@ import { Link } from './Link';
 import runtime from '../api/runtime';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
+import { isExtension } from 'utils';
 
 const Container = styled.footer(({ theme }) => ({
     backgroundColor: theme.panelColor,
@@ -105,6 +106,13 @@ export const Footer: FC<{
                     title={i18n.t('changeTheme')}>
                     {theme === 'light' ? '🌞' : '🌑'}
                 </ThemeButton>
+                {isExtension() && (
+                    <IconButton
+                        icon={ICONS.settings}
+                        onClick={() => runtime.openOptionsPage()}
+                        title={i18n.t('options')}
+                    />
+                )}
                 <Version>v.{version}</Version>
                 <Link
                     text='Github'

@@ -9,10 +9,10 @@ import {
     postSandbox
 } from './utils';
 import runtime from './api/runtime';
-import JSZip from 'jszip';
 import analytics from './api/analytics';
 import { EventName } from 'types';
 import { ISettings } from 'controllers/settings/types';
+import { generateZip } from 'utils/generateZip';
 import AreaName = chrome.storage.AreaName;
 // DO NOT MOVE ANY FUNCTIONS IN THIS FILE OR CIRCULAR DEPENDENCY WILL OCCUR
 
@@ -143,13 +143,13 @@ export async function wrapSandbox(): Promise<void> {
                         portToBackground?.postMessage({
                             type: 'debugger.attach'
                         });
-                        analytics.fireEvent('debugger.attach');
+                        analytics.fireEvent('debugger_attach');
                         break;
                     case 'debugger.detach':
                         portToBackground?.postMessage({
                             type: 'debugger.detach'
                         });
-                        analytics.fireEvent('debugger.detach');
+                        analytics.fireEvent('debugger_detach');
                         break;
                     case 'debugger.getStatus':
                         portToBackground?.postMessage({
@@ -191,6 +191,48 @@ export async function wrapSandbox(): Promise<void> {
                     case 'analytics.searchOnPage':
                         analytics.fireEvent('searchOnPage');
                         break;
+                    case 'analytics.jiraTicketCreated':
+                        analytics.fireEvent('jiraTicketCreated');
+                        break;
+                    case 'jira.createIssue':
+                        createJiraIssue(data, id).then((response) => {
+                            postSandbox({
+                                id,
+                                type,
+                                data: response
+                            });
+                        });
+                        break;
+                    case 'jira.getMetadata':
+                        getJiraMetadata(id).then((response) => {
+                            postSandbox({
+                                id,
+                                type,
+                                data: response
+                            });
+                        });
+                        break;
+                    case 'debugger.evaluate':
+                        debuggerEvaluate(data, id).then((response) => {
+                            postSandbox({
+                                id,
+                                type,
+                                data: response
+                            });
+                        });
+                        break;
+                    case 'chrome.permissions.request':
+                        chrome.permissions.request(
+                            JSON.parse(data),
+                            (granted) => {
+                                postSandbox({
+                                    id,
+                                    type,
+                                    data: String(granted)
+                                });
+                            }
+                        );
+                        break;
                     default:
                         console.warn(`Unrecognized type ${type}`);
                 }
@@ -200,6 +242,9 @@ export async function wrapSandbox(): Promise<void> {
 }
 
 let portToBackground: chrome.runtime.Port;
+const jiraRequests = new Map<string, (data: string) => void>();
+const jiraMetadataRequests = new Map<string, (data: string) => void>();
+const evaluateRequests = new Map<string, (data: string) => void>();
 
 let cache: { type: string; value: string | undefined }[] = [];
 if (isExtension()) {
@@ -215,6 +260,25 @@ if (isExtension()) {
     }
 
     portToBackground.onMessage.addListener((message) => {
+        if (message.type === 'jira.response') {
+            const resolver =
+                jiraRequests.get(message.requestId) ||
+                jiraMetadataRequests.get(message.requestId);
+            if (resolver) {
+                jiraRequests.delete(message.requestId);
+                jiraMetadataRequests.delete(message.requestId);
+                resolver(message.data);
+            }
+            return;
+        }
+        if (message.type === 'debugger.evaluateResponse') {
+            const resolver = evaluateRequests.get(message.requestId);
+            if (resolver) {
+                evaluateRequests.delete(message.requestId);
+                resolver(JSON.stringify(message.result));
+            }
+            return;
+        }
         if (!isIframeReady) {
             cache.push(message);
             return;
@@ -243,11 +307,81 @@ function processMessage(message: { type: string; value: string | undefined }) {
     }
 }
 
+async function createJiraIssue(
+    data: string,
+    requestId: string
+): Promise<string> {
+    if (!portToBackground) {
+        return JSON.stringify({
+            ok: false,
+            error: 'Background connection is not available.'
+        });
+    }
+
+    let payload = data;
+    try {
+        const parsed = JSON.parse(data);
+        const tabId = window.chrome.devtools.inspectedWindow.tabId;
+        if (tabId) {
+            parsed.tabId = tabId;
+            payload = JSON.stringify(parsed);
+        }
+    } catch (e) {
+        console.error('Failed to parse Jira payload', e);
+    }
+
+    return new Promise((resolve) => {
+        jiraRequests.set(requestId, resolve);
+        portToBackground.postMessage({
+            type: 'jira.createIssue',
+            requestId,
+            data: payload
+        });
+    });
+}
+
+async function getJiraMetadata(requestId: string): Promise<string> {
+    if (!portToBackground) {
+        return JSON.stringify({
+            ok: false,
+            error: 'Background connection is not available.'
+        });
+    }
+
+    return new Promise((resolve) => {
+        jiraMetadataRequests.set(requestId, resolve);
+        portToBackground.postMessage({
+            type: 'jira.getMetadata',
+            requestId
+        });
+    });
+}
+
+async function debuggerEvaluate(
+    data: string,
+    requestId: string
+): Promise<string> {
+    if (!portToBackground) {
+        return JSON.stringify({
+            error: 'Background connection is not available.'
+        });
+    }
+
+    const { expression } = JSON.parse(data);
+
+    return new Promise((resolve) => {
+        evaluateRequests.set(requestId, resolve);
+        portToBackground.postMessage({
+            type: 'debugger.evaluate',
+            requestId,
+            expression
+        });
+    });
+}
+
 function analyticsError(data: string) {
     const { message, stack } = JSON.parse(data);
-    const error = new Error(message);
-    error.stack = stack;
-    analytics.fireErrorEvent(error);
+    analytics.fireErrorEvent({ message, stack });
 }
 
 async function analyticsInit(id: string, type: EventName) {
@@ -283,19 +417,8 @@ function openTab(data: string) {
 
 function downloadAsZip(dataString: string): Promise<unknown> {
     const { fileName, data } = JSON.parse(dataString);
-    // const blob = new Blob([data], { type: 'application/json' });
-    const zip = new JSZip();
-    zip.file(`${fileName}.har`, data);
     analytics.fireEvent('download', {});
-    return zip
-        .generateAsync({
-            type: 'blob',
-            compression: 'DEFLATE',
-            compressionOptions: {
-                level: 9
-            }
-        })
-        .then((content) => {
-            download(`${fileName}.netlogs.zip`, content);
-        });
+    return generateZip(fileName, data).then((content) => {
+        download(`${fileName}.netlogs.zip`, content);
+    });
 }

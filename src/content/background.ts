@@ -7,6 +7,14 @@ import {
 import { IItemWebSocketCfg } from 'models/types';
 import { defaultSettings } from 'controllers/settings/base';
 import Port = chrome.runtime.Port;
+import {
+    handleJiraCreateIssue,
+    handleJiraGetMetadata,
+    handleJiraTestSettings,
+    JiraCreateMessage,
+    JiraGetMetadataMessage,
+    JiraTestMessage
+} from './jira';
 
 chrome.runtime.onInstalled.addListener(async () => {
     chrome.contextMenus.create({
@@ -135,9 +143,9 @@ function subscribeToSettingsFlag() {
 
     chrome.storage.local.onChanged.addListener((changes) => {
         if (changes.settings) {
-            const newEnabled = JSON.parse(
-                changes.settings.newValue
-            ).debuggerEnabled;
+            const newEnabled = changes.settings.newValue
+                ? JSON.parse(changes.settings.newValue).debuggerEnabled
+                : false;
             if (newEnabled) {
                 subscribeToDebugger();
             } else if (newEnabled !== isDebuggerEnabled) {
@@ -168,9 +176,7 @@ function unsubscribeFromDebugger() {
         return;
     }
     chrome.debugger.onEvent.removeListener(handleDebuggerEvent);
-    chrome.debugger.onDetach.removeListener(function (source, _reason) {
-        cleanup(source.tabId);
-    });
+    chrome.debugger.onDetach.removeListener(handleDetach);
     Object.keys(ports).forEach((id) => {
         detachDebugger(Number(id));
     });
@@ -195,6 +201,14 @@ chrome.runtime.onConnect.addListener(function (port) {
     }
 });
 
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message.type === 'jira.testSettings') {
+        handleJiraTestSettings(message, sendResponse);
+        return true; // Keep message channel open for async response
+    }
+    return false;
+});
+
 function portMessageHandler(message: { type: string }, port: Port) {
     const tabId = Number(port.name.split('-')[1]);
     if (!tabId) {
@@ -212,6 +226,39 @@ function portMessageHandler(message: { type: string }, port: Port) {
             type: 'debugger.status',
             value: String(debuggerAttachedMap[tabId])
         });
+    } else if (message.type === 'jira.createIssue') {
+        console.log('jira.createIssue');
+        handleJiraCreateIssue(
+            port,
+            message as JiraCreateMessage,
+            debuggerAttachedMap,
+            tabId
+        );
+    } else if (message.type === 'jira.getMetadata') {
+        console.log('jira.getMetadata');
+        handleJiraGetMetadata(message as JiraGetMetadataMessage, port);
+    } else if (message.type === 'jira.testSettings') {
+        console.log('jira.testSettings');
+        handleJiraTestSettings(message as JiraTestMessage, undefined, port);
+    } else if (message.type === 'debugger.evaluate') {
+        const { expression, requestId } = message as unknown as {
+            expression: string;
+            requestId: string;
+        };
+        if (tabId) {
+            chrome.debugger.sendCommand(
+                { tabId },
+                'Runtime.evaluate',
+                { expression, returnByValue: true },
+                (result) => {
+                    port.postMessage({
+                        type: 'debugger.evaluateResponse',
+                        requestId,
+                        result
+                    });
+                }
+            );
+        }
     } else {
         // ignore
     }
