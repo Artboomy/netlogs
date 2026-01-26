@@ -122,7 +122,7 @@ const jiraOptionKeys: Array<keyof JiraEditableSettings> = [
     'apiToken',
     'projectKey',
     'issueType',
-    'apiVersion',
+    // 'apiVersion',
     'attachScreenshot',
     'openTicketInNewTab',
     'template',
@@ -295,62 +295,59 @@ export const JiraOptions: FC = () => {
                 )}
                 {jiraOptionKeys.map((key) => (
                     <React.Fragment key={key}>
-                            <label htmlFor={`jira-${key}`}>
-                                {i18n.t(`jiraSettings_${key}`)}
-                                {key === 'apiToken' && (
-                                    <a
-                                        href='https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html#UsingPersonalAccessTokens-CreatingPATsintheapplication'
-                                        target='_blank'
-                                        rel='noreferrer'
-                                        style={{ marginLeft: '8px' }}>
-                                        ?
-                                    </a>
-                                )}
-                            </label>
-                            {key === 'template' ? (
-                                <textarea
-                                    id={`jira-${key}`}
-                                    value={
-                                        (localJira[key] as string) ||
-                                        getDefaultTemplate()
-                                    }
-                                    onChange={(e) =>
-                                        handleChange(key, e.target.value)
-                                    }
-                                />
-                            ) : key === 'attachScreenshot' ||
-                              key === 'openTicketInNewTab' ? (
-                                <input
-                                    id={`jira-${key}`}
-                                    type='checkbox'
-                                    checked={localJira[key] as boolean}
-                                    onChange={(e) =>
-                                        handleChange(key, e.target.checked)
-                                    }
-                                />
-                            ) : key === 'apiToken' ? (
-                                <PasswordInput
-                                    id={`jira-${key}`}
-                                    placeholder={placeholders[key]}
-                                    value={localJira[key] as string}
-                                    onChange={(value) =>
-                                        handleChange(key, value)
-                                    }
-                                />
-                            ) : (
-                                <input
-                                    id={`jira-${key}`}
-                                    type='text'
-                                    placeholder={placeholders[key]}
-                                    value={localJira[key] as string}
-                                    onChange={(e) =>
-                                        handleChange(key, e.target.value)
-                                    }
-                                />
+                        <label htmlFor={`jira-${key}`}>
+                            {i18n.t(`jiraSettings_${key}`)}
+                            {key === 'apiToken' && (
+                                <a
+                                    href='https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html#UsingPersonalAccessTokens-CreatingPATsintheapplication'
+                                    target='_blank'
+                                    rel='noreferrer'
+                                    style={{ marginLeft: '8px' }}>
+                                    ?
+                                </a>
                             )}
-                        </React.Fragment>
-                    )
-                )}
+                        </label>
+                        {key === 'template' ? (
+                            <textarea
+                                id={`jira-${key}`}
+                                value={
+                                    (localJira[key] as string) ||
+                                    getDefaultTemplate()
+                                }
+                                onChange={(e) =>
+                                    handleChange(key, e.target.value)
+                                }
+                            />
+                        ) : key === 'attachScreenshot' ||
+                          key === 'openTicketInNewTab' ? (
+                            <input
+                                id={`jira-${key}`}
+                                type='checkbox'
+                                checked={localJira[key] as boolean}
+                                onChange={(e) =>
+                                    handleChange(key, e.target.checked)
+                                }
+                            />
+                        ) : key === 'apiToken' ? (
+                            <PasswordInput
+                                id={`jira-${key}`}
+                                placeholder={placeholders[key]}
+                                value={localJira[key] as string}
+                                onChange={(value) => handleChange(key, value)}
+                            />
+                        ) : (
+                            <input
+                                id={`jira-${key}`}
+                                type='text'
+                                placeholder={placeholders[key]}
+                                value={localJira[key] as string}
+                                onChange={(e) =>
+                                    handleChange(key, e.target.value)
+                                }
+                            />
+                        )}
+                    </React.Fragment>
+                ))}
             </Grid>
         </Block>
     );

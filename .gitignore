@@ -7,6 +7,7 @@ node_modules/
 roadmap.md
 yarn-error.log
 src/secrets.json
+src/secrets.json.backup
 stats-*.html
 .cache
 stats

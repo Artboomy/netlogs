@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const portToContent = window.chrome.tabs.connect(tabId);
             portToContent.postMessage({ type: 'connectionTest' });
             portToContent.onDisconnect.addListener(() => {
-                console.log('onDisconnect');
+                console.log('onDisconnect', tabId);
                 const lastError = window.chrome.runtime.lastError;
                 if (lastError) {
                     console.log('lastError', lastError);
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
             portToContent.onMessage.addListener(messageHandler);
 
             chrome.runtime.onConnect.addListener((port) => {
-                if (port.name === 'panel') {
+                if (port.name === `panel-${tabId}`) {
                     port.onMessage.addListener((message) => {
                         if (message.type === 'cachedRequest') {
                             postSandbox(
@@ -79,6 +79,9 @@ const messageHandler = (
 };
 if (isExtension()) {
     window.chrome.runtime.onConnect.addListener((port) => {
+        if (port.name !== `panel-${tabId}`) {
+            return;
+        }
         port.onDisconnect.addListener(() => {
             port.onMessage.removeListener(messageHandler);
         });

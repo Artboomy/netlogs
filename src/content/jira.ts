@@ -107,7 +107,8 @@ const toBasicAuth = (usernameOrEmail: string, apiToken: string): string => {
 
 const getAuthFields = (
     method: 'GET' | 'POST',
-    jiraSettings: ISettings['jira']
+    jiraSettings: ISettings['jira'],
+    contentType?: string
 ): RequestInit => {
     const useBasic = isJiraCloud(jiraSettings.baseUrl);
 
@@ -123,7 +124,7 @@ const getAuthFields = (
         headers: {
             Authorization: authorization,
             'X-Atlassian-Token': 'no-check',
-            'Content-Type': 'application/json'
+            ...(contentType && { 'Content-Type': contentType })
         }
     };
 };
@@ -145,7 +146,7 @@ async function resolveAssigneeAccountId(
         // Jira API v2: use user/picker endpoint
         const url = `${baseUrl}/rest/api/2/user/picker?query=${query}`;
         const response = await fetch(url, {
-            ...getAuthFields('GET', jiraSettings)
+            ...getAuthFields('GET', jiraSettings, 'application/json')
         });
 
         if (!response.ok) {
@@ -175,7 +176,7 @@ async function resolveAssigneeAccountId(
     const project = encodeURIComponent(projectKey);
     const url = `${baseUrl}/rest/api/3/user/assignable/multiProjectSearch?projectKeys=${project}&query=${query}`;
     const response = await fetch(url, {
-        ...getAuthFields('GET', jiraSettings)
+        ...getAuthFields('GET', jiraSettings, 'application/json')
     });
 
     if (!response.ok) {
@@ -213,13 +214,13 @@ export async function handleJiraCreateIssue(
     const baseUrl = jiraSettings.baseUrl
         ? normalizeBaseUrl(jiraSettings.baseUrl)
         : '';
-    const endpoint = `${baseUrl}/rest/api/${apiVersion}/issue`;
+    const createIssueEndpoint = `${baseUrl}/rest/api/${apiVersion}/issue`;
     const issueType = payload.issueType || jiraSettings.issueType || 'Task';
     const project = jiraSettings.projectKey;
     const tabId = payload.tabId ?? incomingTabId;
 
     const details: JiraIssueResponse['details'] = {
-        url: endpoint,
+        url: createIssueEndpoint,
         project,
         issueType
     };
@@ -332,8 +333,8 @@ export async function handleJiraCreateIssue(
         }
     };
     try {
-        const response = await fetch(endpoint, {
-            ...getAuthFields('POST', jiraSettings),
+        const response = await fetch(createIssueEndpoint, {
+            ...getAuthFields('POST', jiraSettings, 'application/json'),
             body: JSON.stringify(body)
         });
 
@@ -558,7 +559,7 @@ export async function handleJiraTestSettings(
     try {
         // 1. Test Authentication
         const response = await fetch(endpoint, {
-            ...getAuthFields('GET', jiraSettings)
+            ...getAuthFields('GET', jiraSettings, 'application/json')
         });
 
         const responseBody = await response.json().catch(() => ({}));
@@ -585,7 +586,7 @@ export async function handleJiraTestSettings(
         if (projectKey) {
             const projectEndpoint = `${baseUrl}/rest/api/${apiVersion}/project/${projectKey}`;
             const projectResponse = await fetch(projectEndpoint, {
-                ...getAuthFields('GET', jiraSettings)
+                ...getAuthFields('GET', jiraSettings, 'application/json')
             });
 
             if (!projectResponse.ok) {
@@ -609,7 +610,7 @@ export async function handleJiraTestSettings(
         const issueType = jiraSettings.issueType || 'Task';
         const issueTypeEndpoint = `${baseUrl}/rest/api/${apiVersion}/issuetype`;
         const issueTypeResponse = await fetch(issueTypeEndpoint, {
-            ...getAuthFields('GET', jiraSettings)
+            ...getAuthFields('GET', jiraSettings, 'application/json')
         });
 
         if (issueTypeResponse.ok) {
@@ -704,7 +705,7 @@ export async function handleJiraGetMetadata(
         const projectResponse = await fetch(
             `${baseUrl}/rest/api/${apiVersion}/project/${projectKey}`,
             {
-                ...getAuthFields('GET', jiraSettings)
+                ...getAuthFields('GET', jiraSettings, 'application/json')
             }
         );
 
@@ -741,7 +742,7 @@ export async function handleJiraGetMetadata(
         // 2. Get Metadata for the specific project and issue type
         const metaUrl = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta/${projectKey}/issuetypes/${issueTypeId}`;
         const metaResponse = await fetch(metaUrl, {
-            ...getAuthFields('GET', jiraSettings)
+            ...getAuthFields('GET', jiraSettings, 'application/json')
         });
 
         const metaBody = await metaResponse.json().catch(() => ({}));
