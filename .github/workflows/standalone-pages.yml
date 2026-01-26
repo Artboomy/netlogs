@@ -23,11 +23,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    env:
-      NODE_ENV: production
-      PAGES_BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
-      VITE_GA_API_SECRET: ${{ vars.GA_API_SECRET }}
-      VITE_GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,6 +41,11 @@ jobs:
 
       - name: Build standalone site
         run: yarn run build:standalone
+        env:
+          NODE_ENV: production
+          PAGES_BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          VITE_GA_API_SECRET: ${{ vars.GA_API_SECRET }}
+          VITE_GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
 
       - name: Ensure standalone output exists
         run: |
