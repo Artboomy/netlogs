@@ -117,5 +117,6 @@
     "import": "Importar archivo HAR",
     "jiraSettings_user": "Correo del asignado",
     "jiraTicketModal_settingsTitle": "Configuración de Jira",
-    "jiraTicketModal_summary": "Título"
+    "jiraTicketModal_summary": "Título",
+    "noItemsStandalone": "Suelta *.har o *.har.zip aquí"
 }

@@ -8,6 +8,7 @@ import runtime from '../api/runtime';
 import { i18n } from 'translations/i18n';
 import styled from '@emotion/styled';
 import { isExtension } from 'utils';
+import { LanguageSelect } from './LanguageSelect';
 
 const Container = styled.footer(({ theme }) => ({
     backgroundColor: theme.panelColor,
@@ -61,7 +62,6 @@ const handleSidebarVisibleChange = () => {
             !useSettings.getState().settings.methodsSidebarVisible
     });
 };
-
 export const Footer: FC<{
     value: string;
     onValueChange: (newValue: string) => void;
@@ -101,6 +101,7 @@ export const Footer: FC<{
                     {visibleCount} / {totalCount} {i18n.t('requests')}
                     {isPreserve && `, ${i18n.t('log preserved')}`}
                 </CountWrapper>
+                {!isExtension() && <LanguageSelect />}
                 <ThemeButton
                     onClick={handleThemeChange}
                     title={i18n.t('changeTheme')}>

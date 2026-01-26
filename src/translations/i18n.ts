@@ -17,4 +17,14 @@ const translations = {
     'ja-JP': jaJP
 };
 
+export const LANGUAGES: Record<string, string> = {
+    'en-US': 'English',
+    'ru-RU': 'Русский',
+    'es-ES': 'Español',
+    'zh-CN': '中文',
+    hi: 'हिन्दी',
+    'de-DE': 'Deutsch',
+    'ja-JP': '日本語'
+};
+
 export const i18n = new I18n(translations);

@@ -1,4 +1,4 @@
-import { test, expect } from '../helpers/coverage';
+import { test, expect, EMPTY_STATE_TEXT } from '../helpers/coverage';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -82,7 +82,7 @@ test.describe('HAR File Import', () => {
         ).toBeVisible({ timeout: 5000 });
 
         // Verify no requests added
-        await expect(page.locator('text=No items')).toBeVisible();
+        await expect(page.locator(`text=${EMPTY_STATE_TEXT}`)).toBeVisible();
     });
 
     test('should show error for malformed HAR file', async ({ page }) => {
@@ -100,7 +100,7 @@ test.describe('HAR File Import', () => {
         ).toBeVisible({ timeout: 5000 });
 
         // Verify no requests added
-        await expect(page.locator('text=No items')).toBeVisible();
+        await expect(page.locator(`text=${EMPTY_STATE_TEXT}`)).toBeVisible();
     });
 
     test('should handle empty HAR file', async ({ page }) => {

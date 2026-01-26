@@ -52,3 +52,5 @@ export const test = base.extend({
 
 export { expect } from '@playwright/test';
 export type { Page } from '@playwright/test';
+
+export const EMPTY_STATE_TEXT = 'Drop *.har or *.har.zip here';

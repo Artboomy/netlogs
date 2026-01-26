@@ -117,5 +117,6 @@
     "import": "导入HAR文件",
     "jiraSettings_user": "负责人邮箱",
     "jiraTicketModal_settingsTitle": "Jira设置",
-    "jiraTicketModal_summary": "标题"
+    "jiraTicketModal_summary": "标题",
+    "noItemsStandalone": "将 *.har 或 *.har.zip 拖放到此处"
 }

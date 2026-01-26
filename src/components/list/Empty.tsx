@@ -32,7 +32,7 @@ const fixedLinePointer = (theme: Theme, direction: 'top' | 'bottom') =>
         borderRight: '8px solid transparent'
     }) as const;
 
-const Section = styled.section({
+const StyledSection = styled.section({
     marginTop: '36px'
 });
 
@@ -141,8 +141,12 @@ const url =
 export const Empty: FC = () => {
     const modifierKey = isMacOs() ? '⌘' : 'Ctrl';
     return (
-        <Section>
-            <NoItemsLine>👀 {i18n.t('noItems')} 👀</NoItemsLine>
+        <StyledSection>
+            <NoItemsLine>
+                {isExtension()
+                    ? `👀 ${i18n.t('noItems')} 👀`
+                    : `📦 ${i18n.t('noItemsStandalone')} 📦`}
+            </NoItemsLine>
             <Columns>
                 <Column css={hotkeysStyle}>
                     <KbdLine>
@@ -157,10 +161,12 @@ export const Empty: FC = () => {
                         {i18n.t('toggleUnrelated')}: <kbd>{modifierKey}</kbd>+
                         <kbd>Shift</kbd>+<kbd>U</kbd>
                     </KbdLine>
-                    <KbdLine>
-                        {i18n.t('togglePreserve')}: <kbd>{modifierKey}</kbd>+
-                        <kbd>P</kbd>
-                    </KbdLine>
+                    {isExtension() && (
+                        <KbdLine>
+                            {i18n.t('togglePreserve')}: <kbd>{modifierKey}</kbd>
+                            +<kbd>P</kbd>
+                        </KbdLine>
+                    )}
                     <KbdLine>
                         <NewBlock>New</NewBlock>
                         {i18n.t('recursiveToggle')}: <kbd>{modifierKey}</kbd>+
@@ -188,9 +194,14 @@ export const Empty: FC = () => {
                             text={i18n.t('here')}
                         />
                     </Line>
-                    <Line>
-                        📦 {i18n.t('dropHelper', { name: 'HAR/netlogs.zip' })}
-                    </Line>
+                    {isExtension() && (
+                        <Line>
+                            📦{' '}
+                            {i18n.t('dropHelper', {
+                                name: '*.har/*.har.zip/*.netlogs.zip'
+                            })}
+                        </Line>
+                    )}
                     <Line>
                         ❤️ {i18n.t('shareHelper')} -{' '}
                         <Link href={url} text={i18n.t('share')} />{' '}
@@ -203,6 +214,6 @@ export const Empty: FC = () => {
             {isExtension() && (
                 <WebsocketLine>🔴 {i18n.t('webSocketHelper')}</WebsocketLine>
             )}
-        </Section>
+        </StyledSection>
     );
 };

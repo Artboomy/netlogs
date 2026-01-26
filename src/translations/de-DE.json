@@ -117,5 +117,6 @@
     "import": "HAR-Datei importieren",
     "jiraSettings_user": "E-Mail des Bearbeiters",
     "jiraTicketModal_settingsTitle": "Jira-Einstellungen",
-    "jiraTicketModal_summary": "Titel"
+    "jiraTicketModal_summary": "Titel",
+    "noItemsStandalone": "*.har oder *.har.zip hier ablegen"
 }

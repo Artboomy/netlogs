@@ -1,4 +1,4 @@
-import { test, expect } from '../helpers/coverage';
+import { test, expect, EMPTY_STATE_TEXT } from '../helpers/coverage';
 
 test.describe('Application Loading & Initialization', () => {
     test('should load page successfully', async ({ page }) => {
@@ -13,8 +13,10 @@ test.describe('Application Loading & Initialization', () => {
         // Check that footer is visible
         await expect(page.locator('footer')).toBeVisible();
 
-        // Check that "No items" message is displayed
-        await expect(page.locator('text=No items')).toBeVisible();
+        // Check that empty state message is displayed
+        await expect(
+            page.locator(`text=${EMPTY_STATE_TEXT}`)
+        ).toBeVisible();
     });
 
     test('should load all static assets correctly', async ({ page }) => {

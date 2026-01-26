@@ -1,4 +1,4 @@
-import { test, expect } from '../helpers/coverage';
+import { test, expect, EMPTY_STATE_TEXT } from '../helpers/coverage';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -98,7 +98,7 @@ test.describe('Export Functionality', () => {
         await page.goto('/');
 
         // Verify no items
-        await expect(page.locator('text=No items')).toBeVisible();
+        await expect(page.locator(`text=${EMPTY_STATE_TEXT}`)).toBeVisible();
 
         // Set up download listener
         const downloadPromise = page.waitForEvent('download');

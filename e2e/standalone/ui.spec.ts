@@ -1,4 +1,4 @@
-import { test, expect } from '../helpers/coverage';
+import { test, expect, EMPTY_STATE_TEXT } from '../helpers/coverage';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -27,7 +27,7 @@ test.describe('UI Interactions & Controls', () => {
         await clearButton.click();
 
         // Verify all requests removed
-        await expect(page.locator('text=No items')).toBeVisible();
+        await expect(page.locator(`text=${EMPTY_STATE_TEXT}`)).toBeVisible();
         await expect(page.locator('text=/0.*\\/.*0.*requests/i')).toBeVisible();
     });
 

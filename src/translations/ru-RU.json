@@ -117,5 +117,6 @@
     "import": "Импортировать HAR файл",
     "jiraSettings_user": "Электронная почта исполнителя",
     "jiraTicketModal_settingsTitle": "Настройки Jira",
-    "jiraTicketModal_summary": "Заголовок"
+    "jiraTicketModal_summary": "Заголовок",
+    "noItemsStandalone": "Перетащите *.har или *.har.zip сюда"
 }

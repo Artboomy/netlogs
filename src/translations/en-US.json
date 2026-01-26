@@ -117,5 +117,6 @@
     "import": "Import HAR file",
     "jiraSettings_user": "Assignee email",
     "jiraTicketModal_settingsTitle": "Jira Settings",
-    "jiraTicketModal_summary": "Title"
+    "jiraTicketModal_summary": "Title",
+    "noItemsStandalone": "Drop *.har or *.har.zip here"
 }

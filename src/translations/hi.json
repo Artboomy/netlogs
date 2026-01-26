@@ -117,5 +117,6 @@
     "import": "HAR फ़ाइल आयात करें",
     "jiraSettings_user": "असाइनी ईमेल",
     "jiraTicketModal_settingsTitle": "Jira सेटिंग्स",
-    "jiraTicketModal_summary": "शीर्षक"
+    "jiraTicketModal_summary": "शीर्षक",
+    "noItemsStandalone": "*.har या *.har.zip यहाँ छोड़ें"
 }
