@@ -7,6 +7,8 @@
 
 [Install for Chrome/Edge](https://chrome.google.com/webstore/detail/net-logs/cjdmhjppaehhblekcplokfdhikmalnaf)
 
+[Web-version to view HAR logs](https://artboomy.github.io/netlogs/)
+
 Better filtering and less clicking than Chrome's Network tab. Built for debugging modern web apps with Next.js/GraphQL support and Jira integration.
 
 ## 📖 Table of Contents
