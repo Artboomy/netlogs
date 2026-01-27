@@ -3,7 +3,14 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { fileURLToPath } from 'node:url';
 import { resolve as pathResolve } from 'node:path';
-import { existsSync, rmSync, writeFileSync, readFileSync, cpSync, mkdirSync } from 'node:fs';
+import {
+    existsSync,
+    rmSync,
+    writeFileSync,
+    readFileSync,
+    cpSync,
+    mkdirSync
+} from 'node:fs';
 import istanbul from 'vite-plugin-istanbul';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -30,7 +37,10 @@ const plugins: Plugin[] = [
         enforce: 'post',
         closeBundle() {
             const currentDir = fileURLToPath(new URL('.', import.meta.url));
-            const templatePath = pathResolve(currentDir, 'templates/standalone.html');
+            const templatePath = pathResolve(
+                currentDir,
+                'templates/standalone.html'
+            );
             const htmlPath = pathResolve(currentDir, 'standalone/index.html');
             const htmlContent = readFileSync(templatePath, 'utf-8');
             writeFileSync(htmlPath, htmlContent);
@@ -136,6 +146,7 @@ export default defineConfig({
         assetsInlineLimit: 8192 // Inline assets smaller than 8KB
     },
     define: {
-        'process.env': process.env
+        'process.env': process.env,
+        'import.meta.env.VITE_STANDALONE': true
     }
 });

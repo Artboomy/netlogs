@@ -30,8 +30,10 @@ class LocalRuntime {
     }
 }
 
-export default isSandbox()
-    ? sandboxRuntime
-    : window.chrome?.runtime
-      ? window.chrome.runtime
-      : new LocalRuntime();
+export default import.meta.env.VITE_STANDALONE
+    ? new LocalRuntime()
+    : isSandbox()
+      ? sandboxRuntime
+      : window.chrome?.runtime
+        ? window.chrome.runtime
+        : new LocalRuntime();

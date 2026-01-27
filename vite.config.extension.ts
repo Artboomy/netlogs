@@ -204,6 +204,7 @@ export default defineConfig({
         assetsInlineLimit: 8192 // Inline assets smaller than 8KB
     },
     define: {
-        'process.env': process.env
+        'process.env': process.env,
+        'import.meta.env.VITE_STANDALONE': false
     }
 });

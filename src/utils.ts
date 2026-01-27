@@ -89,7 +89,7 @@ export function subscribeParent(
 }
 
 export function isExtension(): boolean {
-    return Boolean(window.chrome?.devtools);
+    return !import.meta.env.VITE_STANDALONE;
 }
 
 export function postSandbox(payload: IframeEvent): void {
