@@ -140,19 +140,19 @@ export async function wrapSandbox(): Promise<void> {
                         });
                         break;
                     case 'debugger.attach':
-                        portToBackground?.postMessage({
+                        postMessageToBackground({
                             type: 'debugger.attach'
                         });
                         analytics.fireEvent('debugger_attach');
                         break;
                     case 'debugger.detach':
-                        portToBackground?.postMessage({
+                        postMessageToBackground({
                             type: 'debugger.detach'
                         });
                         analytics.fireEvent('debugger_detach');
                         break;
                     case 'debugger.getStatus':
-                        portToBackground?.postMessage({
+                        postMessageToBackground({
                             type: 'debugger.getStatus'
                         });
                         break;
@@ -241,22 +241,52 @@ export async function wrapSandbox(): Promise<void> {
     });
 }
 
-let portToBackground: chrome.runtime.Port;
+let portToBackground: chrome.runtime.Port | null = null;
 const jiraRequests = new Map<string, (data: string) => void>();
 const jiraMetadataRequests = new Map<string, (data: string) => void>();
 const evaluateRequests = new Map<string, (data: string) => void>();
 
-let cache: { type: string; value: string | undefined }[] = [];
-if (isExtension()) {
-    console.log('created backport');
+function postMessageToBackground(
+    message: {
+        type: string;
+        requestId?: string;
+        data?: string;
+        expression?: string;
+    },
+    retriesLeft = 1
+) {
+    if (!isExtension()) {
+        console.warn('Unhandled message in non-extension environment', message);
+        return;
+    }
+    let port = portToBackground;
+    if (!port) {
+        port = prepareBackgroundPort();
+    }
+    try {
+        port.postMessage(message);
+    } catch (e) {
+        if (retriesLeft > 0) {
+            console.log('retrying send');
+            postMessageToBackground(message, retriesLeft - 1);
+        } else {
+            throw new Error(
+                `Unable to complete action: ${e instanceof Error ? e.message : String(e)}`
+            );
+        }
+    }
+}
+
+function prepareBackgroundPort(): chrome.runtime.Port {
     const tabId = window.chrome.devtools.inspectedWindow.tabId;
     portToBackground = window.chrome.runtime.connect({
         name: `netlogs-${tabId}`
     });
+    console.log('portToBackground connected', tabId);
 
     const lastError = chrome.runtime.lastError;
     if (lastError) {
-        console.error('lastError', lastError);
+        console.error('chrome.runtime lastError', lastError);
     }
 
     portToBackground.onMessage.addListener((message) => {
@@ -285,15 +315,15 @@ if (isExtension()) {
         }
         processMessage(message);
     });
-    portToBackground.onDisconnect.addListener(() => {
+    const handleDisconnect = () => {
         console.log('portToBackground disconnected', tabId);
-        portToBackground = window.chrome.runtime.connect({
-            name: `netlogs-${tabId}`
-        });
-    });
-} else {
-    console.log('no portToBackground');
+        portToBackground?.onDisconnect.removeListener(handleDisconnect);
+        portToBackground = null;
+    };
+    portToBackground.onDisconnect.addListener(handleDisconnect);
+    return portToBackground;
 }
+let cache: { type: string; value: string | undefined }[] = [];
 
 function processMessage(message: { type: string; value: string | undefined }) {
     if (message.type === 'searchOnPage') {
@@ -332,7 +362,7 @@ async function createJiraIssue(
 
     return new Promise((resolve) => {
         jiraRequests.set(requestId, resolve);
-        portToBackground.postMessage({
+        postMessageToBackground({
             type: 'jira.createIssue',
             requestId,
             data: payload
@@ -341,16 +371,9 @@ async function createJiraIssue(
 }
 
 async function getJiraMetadata(requestId: string): Promise<string> {
-    if (!portToBackground) {
-        return JSON.stringify({
-            ok: false,
-            error: 'Background connection is not available.'
-        });
-    }
-
     return new Promise((resolve) => {
         jiraMetadataRequests.set(requestId, resolve);
-        portToBackground.postMessage({
+        postMessageToBackground({
             type: 'jira.getMetadata',
             requestId
         });
@@ -371,7 +394,7 @@ async function debuggerEvaluate(
 
     return new Promise((resolve) => {
         evaluateRequests.set(requestId, resolve);
-        portToBackground.postMessage({
+        postMessageToBackground({
             type: 'debugger.evaluate',
             requestId,
             expression
