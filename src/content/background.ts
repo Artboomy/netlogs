@@ -227,7 +227,6 @@ function portMessageHandler(message: { type: string }, port: Port) {
             value: String(debuggerAttachedMap[tabId])
         });
     } else if (message.type === 'jira.createIssue') {
-        console.log('jira.createIssue');
         handleJiraCreateIssue(
             port,
             message as JiraCreateMessage,
@@ -235,10 +234,8 @@ function portMessageHandler(message: { type: string }, port: Port) {
             tabId
         );
     } else if (message.type === 'jira.getMetadata') {
-        console.log('jira.getMetadata');
         handleJiraGetMetadata(message as JiraGetMetadataMessage, port);
     } else if (message.type === 'jira.testSettings') {
-        console.log('jira.testSettings');
         handleJiraTestSettings(message as JiraTestMessage, undefined, port);
     } else if (message.type === 'debugger.evaluate') {
         const { expression, requestId } = message as unknown as {
