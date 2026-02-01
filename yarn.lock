@@ -6245,9 +6245,9 @@ react-inspector@^6.0.2:
   resolved "https://registry.yarnpkg.com/react-inspector/-/react-inspector-6.0.2.tgz#aa3028803550cb6dbd7344816d5c80bf39d07e9d"
   integrity sha512-x+b7LxhmHXjHoU/VrFAzw5iutsILRoYyDq97EDYdFpPLcvqtEzk4ZSZSQjnFPbr5T57tLXnHcqFYoN1pI6u8uQ==
 
-"react-inspector@https://github.com/Artboomy/react-inspector/releases/download/v5.4.0/react-inspector-5.4.0.tgz":
-  version "5.4.0"
-  resolved "https://github.com/Artboomy/react-inspector/releases/download/v5.4.0/react-inspector-5.4.0.tgz#fa02da9e0d149eb465b8499ec2a351214dfce3e2"
+"react-inspector@https://github.com/Artboomy/react-inspector/releases/download/v5.4.1/react-inspector-5.4.1.tgz":
+  version "5.4.1"
+  resolved "https://github.com/Artboomy/react-inspector/releases/download/v5.4.1/react-inspector-5.4.1.tgz#ff65da7775005a47273a33281a7f65b6330e94ee"
   dependencies:
     "@babel/runtime" "^7.0.0"
     is-dom "^1.0.0"
