@@ -17,7 +17,6 @@ type Params = {
     engagement_time_msec?: number;
     [key: string]: unknown;
 };
-
 class Analytics {
     debug = false;
     noSend = false;
