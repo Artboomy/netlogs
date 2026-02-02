@@ -40,6 +40,7 @@ const netlogs = function (cfg: TransactionOptional | ContentOptional | any) {
         event.timestamp = event.timestamp || new Date().getTime();
     }
     event.tag = event.tag || 'PAGE';
+    // TODO: chunking
     window.postMessage(
         { type: 'FROM_PAGE', event: JSON.stringify(event) },
         '*'

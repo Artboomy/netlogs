@@ -36,7 +36,8 @@ const Row = styled.div(({ theme }) => ({
 }));
 
 const HideUnrelated = styled.label({
-    display: 'flex'
+    display: 'flex',
+    lineHeight: '1em'
 });
 
 const JiraButton = styled.button(({ theme }) => ({

@@ -48,6 +48,9 @@ type AnalyticsEventName =
     | 'analytics.searchOnPage'
     | 'analytics.copyObject'
     | 'analytics.jiraTicketCreated'
+    | 'analytics.jiraTicketCreationFailed'
+    | 'analyticsEnabled'
+    | 'analyticsDisabled'
     | AnalyticsDurationEventName;
 
 type DebuggerEventName =

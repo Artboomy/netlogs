@@ -661,7 +661,16 @@ export const JiraTicketModal: FC = () => {
                 setSummary('');
                 setDescription(template || getDefaultTemplate());
             })
-            .catch(() => null);
+            .catch(() => {
+                if (lastError?.details?.status) {
+                    callParent(
+                        'analytics.jiraTicketCreationFailed',
+                        String(lastError.details.status)
+                    );
+                } else {
+                    callParent('analytics.jiraTicketCreationFailed', 'unknown');
+                }
+            });
     };
 
     const errorDetails = useMemo(() => {

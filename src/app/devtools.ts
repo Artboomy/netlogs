@@ -1,12 +1,21 @@
 const title = navigator.userAgent.includes('Edg') ? 'Net logs' : '📜 Net logs';
 
+const isDebug = false;
+function logger(...args: unknown[]) {
+    if (!isDebug) {
+        return;
+    }
+    console.log(...args);
+}
+
 function cleanup() {
     chrome.devtools.network.onRequestFinished.removeListener(
         networkOnRequestFinished
     );
     chrome.devtools.network.onNavigated.removeListener(networkOnNavigated);
     cache = [];
-    console.log('Cleanup called');
+    customEventsCache = [];
+    logger('Cleanup called');
 }
 chrome.devtools.panels.create(
     title,
@@ -14,17 +23,17 @@ chrome.devtools.panels.create(
     'panel.html',
     function (panel) {
         const listener = () => {
-            console.log('Panel shown');
+            logger('Panel shown');
             panel.onShown.removeListener(listener);
             connectToPanel();
             sendCachedRequests();
-            cleanup();
         };
         panel.onShown.addListener(listener);
     }
 );
 
 let cache: chrome.devtools.network.Request[] = [];
+let customEventsCache: unknown[] = [];
 let cacheId = 1;
 function networkOnRequestFinished(request: chrome.devtools.network.Request) {
     if ('getContent' in request) {
@@ -42,6 +51,7 @@ function networkOnRequestFinished(request: chrome.devtools.network.Request) {
 
 function networkOnNavigated() {
     cache = [];
+    customEventsCache = [];
     cacheId += 1;
 }
 
@@ -49,7 +59,7 @@ chrome.devtools.network.onRequestFinished.addListener(networkOnRequestFinished);
 
 chrome.devtools.network.onNavigated.addListener(networkOnNavigated);
 
-console.log('devtools loaded');
+logger('devtools loaded');
 
 let panelConnection: chrome.runtime.Port | null;
 function connectToPanel() {
@@ -61,9 +71,43 @@ function connectToPanel() {
     });
 }
 
+let portToContent: chrome.runtime.Port | null;
+function handleConnectionFromContent() {
+    const messageHandler = (message: unknown) => {
+        logger('message from content', message);
+        // TODO: chunking
+        customEventsCache.push(message);
+        sendCachedRequests();
+    };
+    chrome.runtime.onConnect.addListener((port) => {
+        logger('attempt to connect from port', port.name);
+        if (
+            port.name ===
+            `contentScript-${chrome.devtools.inspectedWindow.tabId}`
+        ) {
+            logger('port from content script connected');
+            portToContent = port;
+            portToContent.onMessage.addListener(messageHandler);
+            portToContent.onDisconnect.addListener(() => {
+                logger('port from content script disconnected');
+                portToContent = null;
+            });
+            portToContent.postMessage({
+                type: 'pong'
+            });
+        }
+    });
+}
+
+handleConnectionFromContent();
+
 // Send all cached requests to the panel
 function sendCachedRequests() {
-    if (panelConnection && cache.length > 0) {
+    if (panelConnection && (cache.length > 0 || customEventsCache.length > 0)) {
+        customEventsCache.forEach((message) => {
+            panelConnection?.postMessage(message);
+        });
+        logger(`Sent ${customEventsCache.length} custom messages`);
         cache.forEach((request, idx) => {
             panelConnection?.postMessage({
                 type: 'cachedRequest',
@@ -74,6 +118,8 @@ function sendCachedRequests() {
                 }
             });
         });
+        logger(`Sent ${cache.length} requests`);
+        cleanup();
     }
 }
 

@@ -199,6 +199,12 @@ chrome.runtime.onConnect.addListener(function (port) {
             // console.log('disconnected', port.name);
         });
     }
+    if (port.name === 'contentScript') {
+        port.postMessage({
+            type: 'pong',
+            tabId: port.sender?.tab?.id
+        });
+    }
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

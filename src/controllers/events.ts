@@ -17,9 +17,19 @@ function isContentOnlyItemCfg(cfg: unknown) {
     return cfg && typeof cfg === 'object' && 'content' in cfg;
 }
 
+const isDebug = false;
+function logger(...args: unknown[]) {
+    if (!isDebug) {
+        return;
+    }
+    console.log(...args);
+}
+
 class EventsController {
     subscribe() {
+        logger('EventsController subscribe');
         subscribeParent('newItem', (data) => {
+            logger('newItem', data);
             const { list, isDynamic } = useListStore.getState();
             try {
                 const cfg = JSON.parse(data);

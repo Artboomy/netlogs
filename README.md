@@ -43,7 +43,11 @@ The extension will appear in devtools as a `📜 Net logs` tab.
 * 🤝 **Collaboration**: Export and share logs for team debugging.
 * 🎫 **Jira Integration**: Create detailed bug tickets in one click with HAR files and screenshots.
 
-![main.gif](./img/main.gif)
+
+
+https://github.com/user-attachments/assets/b5fe746d-671c-434a-8a02-ac2f26f2ed82
+
+
 
 ## 🚀 Installation
 
