@@ -1,5 +1,5 @@
-import { isExtension } from 'utils';
 import secrets from '../secrets.json';
+import { isExtension } from 'utils';
 
 const GA_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 const GA_DEBUG_ENDPOINT = 'https://www.google-analytics.com/debug/mp/collect';
@@ -17,7 +17,6 @@ type Params = {
     engagement_time_msec?: number;
     [key: string]: unknown;
 };
-
 class Analytics {
     debug = false;
     noSend = false;
@@ -113,7 +112,7 @@ class Analytics {
         if (this.debug) {
             params.debug_mode = true;
         }
-
+        // ci trigger
         const payload = {
             client_id: await this.getOrCreateClientId(),
             events: [
@@ -150,7 +149,10 @@ class Analytics {
                         body: JSON.stringify(payload)
                     }
                 );
-                console.log('[GA4 Debug] Event sent to production endpoint');
+                console.log(
+                    '[GA4 Debug] Event sent to production endpoint',
+                    payload
+                );
             } else {
                 // Production mode: just send to real endpoint
                 await fetch(

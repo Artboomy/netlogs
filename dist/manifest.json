@@ -1,6 +1,6 @@
 {
     "name": "Net logs",
-    "version": "2.12.0",
+    "version": "2.12.1",
     "default_locale": "en",
     "manifest_version": 3,
     "minimum_chrome_version": "88",
@@ -40,7 +40,7 @@
             "js": [
                 "js/content.mjs"
             ],
-            "run_at": "document_idle"
+            "run_at": "document_end"
         }
     ],
     "web_accessible_resources": [

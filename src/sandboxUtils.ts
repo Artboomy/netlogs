@@ -194,6 +194,11 @@ export async function wrapSandbox(): Promise<void> {
                     case 'analytics.jiraTicketCreated':
                         analytics.fireEvent('jiraTicketCreated');
                         break;
+                    case 'analytics.jiraTicketCreationFailed':
+                        analytics.fireEvent('jiraTicketCreationFailed', {
+                            status: data
+                        });
+                        break;
                     case 'jira.createIssue':
                         createJiraIssue(data, id).then((response) => {
                             postSandbox({
@@ -316,7 +321,7 @@ function prepareBackgroundPort(): chrome.runtime.Port {
         processMessage(message);
     });
     const handleDisconnect = () => {
-        console.log('portToBackground disconnected', tabId);
+        logger('portToBackground disconnected', tabId);
         portToBackground?.onDisconnect.removeListener(handleDisconnect);
         portToBackground = null;
     };
@@ -424,7 +429,8 @@ async function analyticsInit(id: string, type: EventName) {
     // fire event with payload flag
     analytics.fireEvent('matcherTypeDefault', {
         lang: settings.language,
-        browserLang: navigator?.languages?.join(',') || 'unknown'
+        browserLang: navigator?.languages?.join(',') || 'unknown',
+        version: runtime.getManifest().version
     });
     postSandbox({
         id,

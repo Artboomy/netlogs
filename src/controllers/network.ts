@@ -123,9 +123,13 @@ class Network {
             }
             this.cachedTimer = window.setTimeout(() => {
                 const newState: Pick<TStore, 'mimeTypes' | 'list'> = {
-                    list: this.cachedData.map(
-                        (request) => new NetworkItem({ request })
-                    ),
+                    list: [
+                        // preserving any custom events first
+                        ...useListStore.getState().list,
+                        ...this.cachedData.map(
+                            (request) => new NetworkItem({ request })
+                        )
+                    ],
                     mimeTypes: new Set(
                         this.cachedData.map(
                             (request) => request.response.content.mimeType

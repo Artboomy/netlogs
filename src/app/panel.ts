@@ -4,21 +4,10 @@ import analytics from '../api/analytics';
 import Port = chrome.runtime.Port;
 
 const tabId = isExtension() && window.chrome.devtools.inspectedWindow.tabId;
+
 document.addEventListener('DOMContentLoaded', () => {
     wrapSandbox().then(() => {
         if (tabId) {
-            const portToContent = window.chrome.tabs.connect(tabId);
-            portToContent.postMessage({ type: 'connectionTest' });
-            portToContent.onDisconnect.addListener(() => {
-                console.log('onDisconnect', tabId);
-                const lastError = window.chrome.runtime.lastError;
-                if (lastError) {
-                    console.log('lastError', lastError);
-                }
-                portToContent.onMessage.removeListener(messageHandler);
-            });
-            portToContent.onMessage.addListener(messageHandler);
-
             chrome.runtime.onConnect.addListener((port) => {
                 if (port.name === `panel-${tabId}`) {
                     port.onMessage.addListener((message) => {
@@ -29,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     JSON.stringify(message.data)
                                 )
                             );
+                        } else if (message.type === 'fromContent') {
+                            // TODO: chunking
+                            messageHandler(message, port);
                         }
                     });
                 }
@@ -50,23 +42,34 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const messageHandler = (
-    e: { type: string; data: string },
-    port: Port
+    e: { type: string; data: string; tabId: number },
+    _port: Port
 ): void => {
+    if (!tabId) {
+        return;
+    }
     const type = e.type;
-    if (tabId === port.sender?.tab?.id) {
+    if (tabId === e.tabId) {
         if (type === 'fromContent') {
             postSandbox(createEventPayload('newItem', e.data));
             try {
                 const d = JSON.parse(e.data);
-                if (!['NEXT', 'NUXT'].includes(d.tag)) {
-                    analytics.fireEvent('customEvent');
+                if (d.tag === 'NEXT') {
+                    analytics.fireEvent('NEXT_state');
+                } else if (d.tag === 'NUXT') {
+                    analytics.fireEvent('NUXT_state');
+                } else {
+                    analytics.fireEvent('customEvent', { tag: d.tag });
                 }
-            } catch (_e) {
-                // pass
+            } catch (e) {
+                analytics.fireEvent('customEventUnparsableError', {
+                    error:
+                        e && typeof e === 'object' && 'message' in e
+                            ? e.message
+                            : String(e)
+                });
             }
         } else if (type === 'connectionTest') {
-            console.log('message', type, e.data);
             const data = e.data as unknown as { host: string };
             postSandbox(
                 createEventPayload(
@@ -77,15 +80,3 @@ const messageHandler = (
         }
     }
 };
-if (isExtension()) {
-    window.chrome.runtime.onConnect.addListener((port) => {
-        if (port.name !== `panel-${tabId}`) {
-            return;
-        }
-        port.onDisconnect.addListener(() => {
-            port.onMessage.removeListener(messageHandler);
-        });
-        port.onMessage.addListener(messageHandler);
-        port.postMessage({ type: 'connectionTest' });
-    });
-}

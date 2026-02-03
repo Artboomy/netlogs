@@ -7,6 +7,7 @@ import { Global } from '@emotion/react';
 import styled from '@emotion/styled';
 import Inspector from 'react-inspector';
 import { Block } from 'components/options/Block';
+import analytics from 'api/analytics';
 
 const TitleRow = styled.section({
     padding: '0 8px 8px 24px',
@@ -167,12 +168,17 @@ export const Options: FC = () => {
                             type='checkbox'
                             name='sendAnalytics'
                             checked={settings.sendAnalytics}
-                            onChange={(e) =>
+                            onChange={(e) => {
                                 setSettings({
                                     ...settings,
                                     sendAnalytics: e.target.checked
-                                })
-                            }
+                                });
+                                if (e.target.checked) {
+                                    analytics.fireEvent('analyticsEnabled');
+                                } else {
+                                    analytics.fireEvent('analyticsDisabled');
+                                }
+                            }}
                         />
                         {i18n.t('sendAnalytics')}
                     </label>
