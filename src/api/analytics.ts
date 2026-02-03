@@ -112,7 +112,7 @@ class Analytics {
         if (this.debug) {
             params.debug_mode = true;
         }
-
+        // ci trigger
         const payload = {
             client_id: await this.getOrCreateClientId(),
             events: [
