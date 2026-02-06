@@ -6,6 +6,7 @@ import zhCN from './zh-CN.json';
 import hi from './hi.json';
 import deDE from './de-DE.json';
 import jaJP from './ja-JP.json';
+import frFR from './fr-FR.json';
 
 const translations = {
     'en-US': enUS,
@@ -14,7 +15,8 @@ const translations = {
     'zh-CN': zhCN,
     hi: hi,
     'de-DE': deDE,
-    'ja-JP': jaJP
+    'ja-JP': jaJP,
+    'fr-FR': frFR
 };
 
 export const LANGUAGES: Record<string, string> = {
@@ -24,7 +26,8 @@ export const LANGUAGES: Record<string, string> = {
     'zh-CN': '中文',
     hi: 'हिन्दी',
     'de-DE': 'Deutsch',
-    'ja-JP': '日本語'
+    'ja-JP': '日本語',
+    'fr-FR': 'Français'
 };
 
 export const i18n = new I18n(translations);
