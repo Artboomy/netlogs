@@ -1,0 +1,103 @@
+name: E2E Coverage Comment
+run-name: ${{ github.actor }} reported E2E coverage 💬
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  comment:
+    name: Comment E2E Coverage on PR
+    if: ${{ github.event.workflow_run.event == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download E2E coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: e2e-coverage
+          path: coverage-e2e
+
+      - name: Read E2E coverage summary
+        id: e2e-coverage
+        run: |
+          if [ -f coverage-e2e/coverage-summary.json ]; then
+            STATEMENTS=$(jq '.total.statements.pct' coverage-e2e/coverage-summary.json)
+            BRANCHES=$(jq '.total.branches.pct' coverage-e2e/coverage-summary.json)
+            FUNCTIONS=$(jq '.total.functions.pct' coverage-e2e/coverage-summary.json)
+            LINES=$(jq '.total.lines.pct' coverage-e2e/coverage-summary.json)
+            echo "statements=$STATEMENTS" >> $GITHUB_OUTPUT
+            echo "branches=$BRANCHES" >> $GITHUB_OUTPUT
+            echo "functions=$FUNCTIONS" >> $GITHUB_OUTPUT
+            echo "lines=$LINES" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment E2E Coverage on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const statements = '${{ steps.e2e-coverage.outputs.statements }}';
+            const branches = '${{ steps.e2e-coverage.outputs.branches }}';
+            const functions = '${{ steps.e2e-coverage.outputs.functions }}';
+            const lines = '${{ steps.e2e-coverage.outputs.lines }}';
+
+            if (!statements) {
+              console.log('No E2E coverage data found');
+              return;
+            }
+
+            const pullRequests = context.payload.workflow_run.pull_requests;
+            if (!pullRequests || pullRequests.length === 0) {
+              console.log('No pull request associated with this workflow run.');
+              return;
+            }
+
+            const marker = '<!-- e2e-coverage-report -->';
+            const body = `${marker}
+            ## E2E Test Coverage Report
+
+            | Metric | Coverage | Threshold |
+            |--------|----------|-----------|
+            | Statements | ${statements}% | 5% |
+            | Branches | ${branches}% | 5% |
+            | Functions | ${functions}% | 5% |
+            | Lines | ${lines}% | 5% |
+
+            ${statements >= 5 && branches >= 5 && functions >= 5 && lines >= 5 ? '✅ Coverage thresholds met!' : '⚠️ Coverage below thresholds'}
+
+            [View detailed report in artifacts]`;
+
+            const issue_number = pullRequests[0].number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number
+            });
+
+            const existingComment = comments.find(comment => comment.body.includes(marker));
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body
+              });
+              console.log('Updated existing E2E coverage comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number,
+                body
+              });
+              console.log('Created new E2E coverage comment');
+            }
