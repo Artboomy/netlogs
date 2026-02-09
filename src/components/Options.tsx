@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
 import Inspector from 'react-inspector';
 import { Block } from 'components/options/Block';
 import analytics from 'api/analytics';
+import { LanguageSelect } from 'components/LanguageSelect';
 
 const TitleRow = styled.section({
     padding: '0 8px 8px 24px',
@@ -81,23 +82,7 @@ export const Options: FC = () => {
             </Block>
             <Block>
                 <h2>{i18n.t('language')}</h2>
-                <select
-                    id='language'
-                    onChange={(e) => {
-                        setSettings({
-                            ...settings,
-                            language: e.target.value
-                        });
-                    }}
-                    value={settings.language}>
-                    <option value='en-US'>English</option>
-                    <option value='de-DE'>Deutsch</option>
-                    <option value='ru-RU'>Русский</option>
-                    <option value='es-ES'>Español</option>
-                    <option value='hi'>हिंदी</option>
-                    <option value='zh-CN'>中文</option>
-                    <option value='ja-JP'>日本語</option>
-                </select>
+                <LanguageSelect />
             </Block>
 
             <Block>
