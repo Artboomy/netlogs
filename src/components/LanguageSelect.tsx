@@ -22,6 +22,7 @@ export const LanguageSelect: FC = () => {
     const language = useSettings((state) => state.settings.language);
     return (
         <StyledSelect
+            id={'language'}
             value={language}
             onChange={handleChange}
             title={i18n.t('language')}>
