@@ -276,7 +276,10 @@ function postMessageToBackground(
             postMessageToBackground(message, retriesLeft - 1);
         } else {
             throw new Error(
-                `Unable to complete action: ${e instanceof Error ? e.message : String(e)}`
+                `Unable to complete action: ${e instanceof Error ? e.message : String(e)}`,
+                {
+                    cause: e
+                }
             );
         }
     }

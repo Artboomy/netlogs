@@ -93,7 +93,7 @@ const handleFileUpload = async (file: File) => {
         return;
     }
 
-    let log: Har | null = null;
+    let log: Har;
     const toastId = toast(i18n.t<string>('loadingFile'));
 
     try {
