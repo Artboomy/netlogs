@@ -1,6 +1,6 @@
 {
     "name": "netlogs",
-    "version": "2.14.0",
+    "version": "2.15.0",
     "description": "Web extension for custom network logs representation",
     "main": "index.js",
     "author": "artboomy",
@@ -68,7 +68,7 @@
         "react-inspector": "https://github.com/Artboomy/react-inspector/releases/download/v5.4.1/react-inspector-5.4.1.tgz",
         "react-multi-select-component": "^4.3.4",
         "react-toastify": "^10.0.5",
-        "react-use": "17.5.0",
+        "react-use": "^17.6.0",
         "zustand": "^4.5.2"
     },
     "devDependencies": {
@@ -97,7 +97,7 @@
         "eslint-config-prettier": "10.1.8",
         "eslint-plugin-prettier": "5.5.4",
         "eslint-plugin-react": "^7.37.5",
-        "happy-dom": "20.8.9",
+        "happy-dom": "20.9.0",
         "husky": "^9.1.7",
         "npm-run-all": "^4.1.5",
         "nyc": "^18.0.0",

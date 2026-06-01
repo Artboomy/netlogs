@@ -52,6 +52,213 @@ export type JiraIssueResponse = {
         response?: unknown;
     };
 };
+
+export type JiraDebugLogLevel = 'info' | 'warn' | 'error';
+
+export type JiraDebugLogger = (
+    level: JiraDebugLogLevel,
+    message: string,
+    details?: Record<string, unknown>
+) => void;
+
+const MASKED_PERSONAL_ACCESS_TOKEN = '<masked-personal-access-token>';
+
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function maskString(value: string, personalAccessToken?: string): string {
+    if (!personalAccessToken) {
+        return value;
+    }
+
+    const masks = [personalAccessToken, encodeURIComponent(personalAccessToken)]
+        .filter(Boolean)
+        .map(escapeRegExp);
+
+    if (!masks.length) {
+        return value;
+    }
+
+    return value.replace(
+        new RegExp(masks.join('|'), 'g'),
+        MASKED_PERSONAL_ACCESS_TOKEN
+    );
+}
+
+function maskPersonalAccessToken<T>(value: T, personalAccessToken?: string): T {
+    if (!personalAccessToken || value === undefined || value === null) {
+        return value;
+    }
+    if (typeof value === 'string') {
+        return maskString(value, personalAccessToken) as T;
+    }
+    if (Array.isArray(value)) {
+        return value.map((item) =>
+            maskPersonalAccessToken(item, personalAccessToken)
+        ) as T;
+    }
+    if (typeof value === 'object') {
+        return Object.entries(value).reduce<Record<string, unknown>>(
+            (acc, [key, item]) => {
+                acc[key] = maskPersonalAccessToken(item, personalAccessToken);
+                return acc;
+            },
+            {}
+        ) as T;
+    }
+    return value;
+}
+
+function headersToRecord(
+    headers?: HeadersInit | Headers,
+    personalAccessToken?: string
+): Record<string, string> {
+    if (!headers) {
+        return {};
+    }
+
+    const result: Record<string, string> = {};
+    const addHeader = (key: string, value: unknown) => {
+        result[key] =
+            key.toLowerCase() === 'authorization'
+                ? '<redacted>'
+                : maskString(String(value), personalAccessToken);
+    };
+
+    if (headers instanceof Headers) {
+        headers.forEach((value, key) => addHeader(key, value));
+    } else if (Array.isArray(headers)) {
+        headers.forEach(([key, value]) => addHeader(key, value));
+    } else {
+        Object.entries(headers).forEach(([key, value]) =>
+            addHeader(key, value)
+        );
+    }
+
+    return result;
+}
+
+function serializeRequestBody(body: BodyInit | null | undefined): unknown {
+    if (!body) {
+        return undefined;
+    }
+    if (typeof body === 'string') {
+        try {
+            return JSON.parse(body);
+        } catch {
+            return body;
+        }
+    }
+    if (body instanceof FormData) {
+        const entries: Array<{
+            key: string;
+            value: string | { name: string; type: string; size: number };
+        }> = [];
+        body.forEach((value, key) => {
+            entries.push({
+                key,
+                value:
+                    value instanceof File
+                        ? {
+                              name: value.name,
+                              type: value.type,
+                              size: value.size
+                          }
+                        : String(value)
+            });
+        });
+        return entries;
+    }
+    if (body instanceof Blob) {
+        return { type: body.type, size: body.size };
+    }
+    return Object.prototype.toString.call(body);
+}
+
+async function readResponseBody(response: Response): Promise<unknown> {
+    const text = await response
+        .clone()
+        .text()
+        .catch(() => '');
+    if (!text) {
+        return undefined;
+    }
+    try {
+        return JSON.parse(text);
+    } catch {
+        return text;
+    }
+}
+
+async function jiraFetch(
+    url: string,
+    init: RequestInit,
+    debugLogger: JiraDebugLogger | undefined,
+    label: string,
+    personalAccessToken?: string
+): Promise<Response> {
+    const startedAt = Date.now();
+    debugLogger?.('info', `Jira API request: ${label}`, {
+        url: maskString(url, personalAccessToken),
+        method: init.method || 'GET',
+        headers: headersToRecord(init.headers, personalAccessToken),
+        body: maskPersonalAccessToken(
+            serializeRequestBody(init.body),
+            personalAccessToken
+        )
+    });
+
+    try {
+        const response = await fetch(url, init);
+        debugLogger?.(
+            response.ok ? 'info' : 'warn',
+            `Jira API response: ${label}`,
+            {
+                url: maskString(url, personalAccessToken),
+                method: init.method || 'GET',
+                request: {
+                    headers: headersToRecord(init.headers, personalAccessToken),
+                    body: maskPersonalAccessToken(
+                        serializeRequestBody(init.body),
+                        personalAccessToken
+                    )
+                },
+                status: response.status,
+                statusText: maskString(
+                    response.statusText,
+                    personalAccessToken
+                ),
+                headers: headersToRecord(response.headers, personalAccessToken),
+                body: maskPersonalAccessToken(
+                    await readResponseBody(response),
+                    personalAccessToken
+                ),
+                durationMs: Date.now() - startedAt
+            }
+        );
+        return response;
+    } catch (error) {
+        debugLogger?.('error', `Jira API error: ${label}`, {
+            url: maskString(url, personalAccessToken),
+            method: init.method || 'GET',
+            request: {
+                headers: headersToRecord(init.headers, personalAccessToken),
+                body: maskPersonalAccessToken(
+                    serializeRequestBody(init.body),
+                    personalAccessToken
+                )
+            },
+            durationMs: Date.now() - startedAt,
+            error: maskString(
+                error instanceof Error ? error.message : String(error),
+                personalAccessToken
+            )
+        });
+        throw error;
+    }
+}
+
 export function normalizeBaseUrl(baseUrl: string): string {
     return baseUrl.replace(/\/+$/, '');
 }
@@ -132,7 +339,8 @@ const getAuthFields = (
 async function resolveAssigneeAccountId(
     jiraSettings: ISettings['jira'],
     baseUrl: string,
-    projectKey: string
+    projectKey: string,
+    debugLogger?: JiraDebugLogger
 ): Promise<{ name: string } | { id: string } | undefined> {
     const assigneeEmail = jiraSettings.user?.trim();
     if (!assigneeEmail) {
@@ -145,9 +353,15 @@ async function resolveAssigneeAccountId(
     if (apiVersion === '2') {
         // Jira API v2: use user/picker endpoint
         const url = `${baseUrl}/rest/api/2/user/picker?query=${query}`;
-        const response = await fetch(url, {
-            ...getAuthFields('GET', jiraSettings, 'application/json')
-        });
+        const response = await jiraFetch(
+            url,
+            {
+                ...getAuthFields('GET', jiraSettings, 'application/json')
+            },
+            debugLogger,
+            'resolve assignee (API v2 user picker)',
+            jiraSettings.apiToken
+        );
 
         if (!response.ok) {
             return undefined;
@@ -175,9 +389,15 @@ async function resolveAssigneeAccountId(
     // Jira API v3: use multiProjectSearch endpoint
     const project = encodeURIComponent(projectKey);
     const url = `${baseUrl}/rest/api/3/user/assignable/multiProjectSearch?projectKeys=${project}&query=${query}`;
-    const response = await fetch(url, {
-        ...getAuthFields('GET', jiraSettings, 'application/json')
-    });
+    const response = await jiraFetch(
+        url,
+        {
+            ...getAuthFields('GET', jiraSettings, 'application/json')
+        },
+        debugLogger,
+        'resolve assignee (API v3 assignable users)',
+        jiraSettings.apiToken
+    );
 
     if (!response.ok) {
         return undefined;
@@ -205,10 +425,20 @@ export async function handleJiraCreateIssue(
     port: Port,
     message: JiraCreateMessage,
     debuggerAttachedMap: Record<number, boolean>,
-    incomingTabId?: number
+    incomingTabId?: number,
+    debugLogger?: JiraDebugLogger
 ) {
     const payload = JSON.parse(message.data) as JiraIssuePayload;
     const jiraSettings = await getJiraSettings();
+
+    debugLogger?.('info', 'Jira create issue started', {
+        requestId: message.requestId,
+        projectKey: jiraSettings.projectKey,
+        issueType: payload.issueType || jiraSettings.issueType || 'Task',
+        hasHarAttachment: !!payload.harZipData,
+        attachScreenshot: !!payload.attachScreenshot,
+        hasCustomFields: !!payload.fields
+    });
 
     const apiVersion = jiraSettings.apiVersion || '2';
     const baseUrl = jiraSettings.baseUrl
@@ -226,6 +456,11 @@ export async function handleJiraCreateIssue(
     };
 
     if (!baseUrl || !jiraSettings.apiToken || !project) {
+        debugLogger?.('error', 'Jira create issue aborted: missing settings', {
+            hasBaseUrl: !!baseUrl,
+            hasApiToken: !!jiraSettings.apiToken,
+            hasProject: !!project
+        });
         port.postMessage({
             type: 'jira.response',
             requestId: message.requestId,
@@ -240,6 +475,9 @@ export async function handleJiraCreateIssue(
     let description = payload.description;
 
     if (tabId !== undefined) {
+        debugLogger?.('info', 'Collecting tab state for Jira ticket', {
+            tabId
+        });
         let stateData: Record<string, string> = {};
         const wasAttached = !!debuggerAttachedMap[tabId];
         try {
@@ -305,6 +543,14 @@ export async function handleJiraCreateIssue(
                 await chrome.debugger.detach({ tabId });
             }
         } catch (e) {
+            debugLogger?.(
+                'error',
+                'Failed to gather tab state for Jira ticket',
+                {
+                    tabId,
+                    error: e instanceof Error ? e.message : String(e)
+                }
+            );
             console.error('Failed to gather state data', e);
             if (!wasAttached) {
                 try {
@@ -316,10 +562,12 @@ export async function handleJiraCreateIssue(
         }
     }
 
+    debugLogger?.('info', 'Resolving Jira assignee');
     const assignee = await resolveAssigneeAccountId(
         jiraSettings,
         baseUrl,
-        project
+        project,
+        debugLogger
     );
     const assigneeField = assignee ? { assignee } : {};
     const body = {
@@ -333,10 +581,16 @@ export async function handleJiraCreateIssue(
         }
     };
     try {
-        const response = await fetch(createIssueEndpoint, {
-            ...getAuthFields('POST', jiraSettings, 'application/json'),
-            body: JSON.stringify(body)
-        });
+        const response = await jiraFetch(
+            createIssueEndpoint,
+            {
+                ...getAuthFields('POST', jiraSettings, 'application/json'),
+                body: JSON.stringify(body)
+            },
+            debugLogger,
+            'create issue',
+            jiraSettings.apiToken
+        );
 
         const responseBody = await response.json().catch(() => ({}));
 
@@ -417,12 +671,15 @@ export async function handleJiraCreateIssue(
                 const formData = new FormData();
                 formData.append('file', screenshotBlob, 'screenshot.png');
 
-                await fetch(
+                await jiraFetch(
                     `${baseUrl}/rest/api/${apiVersion}/issue/${issueKey}/attachments`,
                     {
                         ...getAuthFields('POST', jiraSettings),
                         body: formData
-                    }
+                    },
+                    debugLogger,
+                    'attach screenshot',
+                    jiraSettings.apiToken
                 );
             } catch (cdpError) {
                 console.error('Failed to capture screenshot via CDP', cdpError);
@@ -455,12 +712,15 @@ export async function handleJiraCreateIssue(
                     payload.harFileName || `netlogs_${issueKey}.har.zip`
                 );
 
-                await fetch(
+                await jiraFetch(
                     `${baseUrl}/rest/api/${apiVersion}/issue/${issueKey}/attachments`,
                     {
                         ...getAuthFields('POST', jiraSettings),
                         body: formData
-                    }
+                    },
+                    debugLogger,
+                    'attach HAR zip',
+                    jiraSettings.apiToken
                 );
             } catch (attachError) {
                 console.error('Failed to attach HAR', attachError);
@@ -477,17 +737,25 @@ export async function handleJiraCreateIssue(
                 const formData = new FormData();
                 formData.append('file', metaBlob, 'meta.txt');
 
-                await fetch(
+                await jiraFetch(
                     `${baseUrl}/rest/api/${apiVersion}/issue/${issueKey}/attachments`,
                     {
                         ...getAuthFields('POST', jiraSettings),
                         body: formData
-                    }
+                    },
+                    debugLogger,
+                    'attach page metadata',
+                    jiraSettings.apiToken
                 );
             } catch (metaError) {
                 console.error('Failed to attach meta.txt', metaError);
             }
         }
+
+        debugLogger?.('info', 'Jira issue created successfully', {
+            issueKey,
+            issueUrl
+        });
 
         const successResponse: JiraIssueResponse = {
             ok: true,
@@ -507,6 +775,9 @@ export async function handleJiraCreateIssue(
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : 'Jira request failed';
+        debugLogger?.('error', 'Jira create issue threw an exception', {
+            error: errorMessage
+        });
         port.postMessage({
             type: 'jira.response',
             requestId: message.requestId,
@@ -518,9 +789,15 @@ export async function handleJiraCreateIssue(
 export async function handleJiraTestSettings(
     message: JiraTestMessage,
     sendResponse?: (response: JiraResponseMessage['data']) => void,
-    port?: Port
+    port?: Port,
+    debugLogger?: JiraDebugLogger
 ) {
     const jiraSettings = await getJiraSettings();
+    debugLogger?.('info', 'Jira settings test started', {
+        requestId: message.requestId,
+        projectKey: jiraSettings.projectKey,
+        issueType: jiraSettings.issueType || 'Task'
+    });
 
     const apiVersion = jiraSettings.apiVersion || '2';
     const baseUrl = jiraSettings.baseUrl
@@ -547,6 +824,10 @@ export async function handleJiraTestSettings(
     };
 
     if (!baseUrl || !jiraSettings.apiToken) {
+        debugLogger?.('error', 'Jira settings test aborted: missing settings', {
+            hasBaseUrl: !!baseUrl,
+            hasApiToken: !!jiraSettings.apiToken
+        });
         respond(
             createJiraError(
                 'Missing Jira settings. Check base URL and token.',
@@ -558,9 +839,15 @@ export async function handleJiraTestSettings(
 
     try {
         // 1. Test Authentication
-        const response = await fetch(endpoint, {
-            ...getAuthFields('GET', jiraSettings, 'application/json')
-        });
+        const response = await jiraFetch(
+            endpoint,
+            {
+                ...getAuthFields('GET', jiraSettings, 'application/json')
+            },
+            debugLogger,
+            'test authentication',
+            jiraSettings.apiToken
+        );
 
         const responseBody = await response.json().catch(() => ({}));
 
@@ -585,9 +872,15 @@ export async function handleJiraTestSettings(
         const projectKey = jiraSettings.projectKey;
         if (projectKey) {
             const projectEndpoint = `${baseUrl}/rest/api/${apiVersion}/project/${projectKey}`;
-            const projectResponse = await fetch(projectEndpoint, {
-                ...getAuthFields('GET', jiraSettings, 'application/json')
-            });
+            const projectResponse = await jiraFetch(
+                projectEndpoint,
+                {
+                    ...getAuthFields('GET', jiraSettings, 'application/json')
+                },
+                debugLogger,
+                'test project',
+                jiraSettings.apiToken
+            );
 
             if (!projectResponse.ok) {
                 const projectBody = await projectResponse
@@ -609,9 +902,15 @@ export async function handleJiraTestSettings(
         // 3. Check Issue Type existence
         const issueType = jiraSettings.issueType || 'Task';
         const issueTypeEndpoint = `${baseUrl}/rest/api/${apiVersion}/issuetype`;
-        const issueTypeResponse = await fetch(issueTypeEndpoint, {
-            ...getAuthFields('GET', jiraSettings, 'application/json')
-        });
+        const issueTypeResponse = await jiraFetch(
+            issueTypeEndpoint,
+            {
+                ...getAuthFields('GET', jiraSettings, 'application/json')
+            },
+            debugLogger,
+            'test issue types',
+            jiraSettings.apiToken
+        );
 
         if (issueTypeResponse.ok) {
             const issueTypes = await issueTypeResponse.json().catch(() => []);
@@ -633,17 +932,27 @@ export async function handleJiraTestSettings(
             }
         }
 
+        debugLogger?.('info', 'Jira settings test completed successfully');
         respond(JSON.stringify({ ok: true }));
     } catch (e) {
+        debugLogger?.('error', 'Jira settings test threw an exception', {
+            error: e instanceof Error ? e.message : String(e)
+        });
         respond(createJiraError(String(e), details));
     }
 }
 
 export async function handleJiraGetMetadata(
     message: JiraGetMetadataMessage,
-    port: Port
+    port: Port,
+    debugLogger?: JiraDebugLogger
 ) {
     const jiraSettings = await getJiraSettings();
+    debugLogger?.('info', 'Jira metadata request started', {
+        requestId: message.requestId,
+        projectKey: jiraSettings.projectKey,
+        issueType: jiraSettings.issueType || 'Task'
+    });
 
     const apiVersion = jiraSettings.apiVersion || '2';
     const baseUrl = jiraSettings.baseUrl
@@ -661,6 +970,15 @@ export async function handleJiraGetMetadata(
     };
 
     if (!baseUrl || !jiraSettings.apiToken || !projectKey) {
+        debugLogger?.(
+            'error',
+            'Jira metadata request aborted: missing settings',
+            {
+                hasBaseUrl: !!baseUrl,
+                hasApiToken: !!jiraSettings.apiToken,
+                hasProjectKey: !!projectKey
+            }
+        );
         respond(createJiraError('Missing Jira settings.'));
         return;
     }
@@ -690,6 +1008,10 @@ export async function handleJiraGetMetadata(
                 );
             }
         );
+        debugLogger?.('info', 'Jira metadata returned from cache', {
+            fieldCount: cachedFields.fields.length,
+            requiredFieldCount: initialFields.length
+        });
         respond(
             JSON.stringify({
                 ok: true,
@@ -702,11 +1024,14 @@ export async function handleJiraGetMetadata(
 
     try {
         // 1. Get Project to find issueTypeId
-        const projectResponse = await fetch(
+        const projectResponse = await jiraFetch(
             `${baseUrl}/rest/api/${apiVersion}/project/${projectKey}`,
             {
                 ...getAuthFields('GET', jiraSettings, 'application/json')
-            }
+            },
+            debugLogger,
+            'metadata project',
+            jiraSettings.apiToken
         );
 
         if (!projectResponse.ok) {
@@ -741,9 +1066,15 @@ export async function handleJiraGetMetadata(
 
         // 2. Get Metadata for the specific project and issue type
         const metaUrl = `${baseUrl}/rest/api/${apiVersion}/issue/createmeta/${projectKey}/issuetypes/${issueTypeId}`;
-        const metaResponse = await fetch(metaUrl, {
-            ...getAuthFields('GET', jiraSettings, 'application/json')
-        });
+        const metaResponse = await jiraFetch(
+            metaUrl,
+            {
+                ...getAuthFields('GET', jiraSettings, 'application/json')
+            },
+            debugLogger,
+            'metadata createmeta fields',
+            jiraSettings.apiToken
+        );
 
         const metaBody = await metaResponse.json().catch(() => ({}));
 
@@ -824,6 +1155,10 @@ export async function handleJiraGetMetadata(
             );
         });
 
+        debugLogger?.('info', 'Jira metadata request completed successfully', {
+            fieldCount: mappedFields.length,
+            requiredFieldCount: initialFields.length
+        });
         respond(
             JSON.stringify({
                 ok: true,
@@ -832,6 +1167,9 @@ export async function handleJiraGetMetadata(
             })
         );
     } catch (e) {
+        debugLogger?.('error', 'Jira metadata request threw an exception', {
+            error: e instanceof Error ? e.message : String(e)
+        });
         respond(createJiraError(String(e)));
     }
 }

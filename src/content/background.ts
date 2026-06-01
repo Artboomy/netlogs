@@ -12,6 +12,7 @@ import {
     handleJiraGetMetadata,
     handleJiraTestSettings,
     JiraCreateMessage,
+    JiraDebugLogger,
     JiraGetMetadataMessage,
     JiraTestMessage
 } from './jira';
@@ -116,6 +117,108 @@ function sendCache(id: number) {
     delete cache[id];
 }
 
+type JiraDebugEntry = {
+    timestamp: number;
+    level: 'info' | 'warn' | 'error';
+    message: string;
+    details?: Record<string, unknown>;
+};
+
+function createJiraDebugLogger(): {
+    logger: JiraDebugLogger;
+    ready: Promise<void>;
+    disconnect: () => void;
+} {
+    let port: chrome.runtime.Port | null = null;
+    let isAcked = false;
+    const pendingEntries: JiraDebugEntry[] = [];
+    const sessionId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    let resolveReady: () => void = () => undefined;
+    const ready = new Promise<void>((resolve) => {
+        resolveReady = resolve;
+    });
+    const readyTimeout = setTimeout(resolveReady, 300);
+
+    const flush = () => {
+        if (!port || !isAcked) {
+            return;
+        }
+        while (pendingEntries.length) {
+            const entry = pendingEntries.shift();
+            if (entry) {
+                port.postMessage({ type: 'jira.debugLog', entry });
+            }
+        }
+    };
+
+    const postEntry = (entry: JiraDebugEntry) => {
+        if (!port) {
+            return;
+        }
+        pendingEntries.push(entry);
+        try {
+            flush();
+        } catch (_e) {
+            // Options page is not open or the debug component is unavailable.
+        }
+    };
+
+    const logger: JiraDebugLogger = (level, message, details) => {
+        postEntry({ timestamp: Date.now(), level, message, details });
+    };
+
+    try {
+        port = chrome.runtime.connect({ name: 'jira-debug' });
+        const handleMessage = (message: {
+            type?: string;
+            sessionId?: string;
+        }) => {
+            if (
+                message.type === 'jira.debugAck' &&
+                message.sessionId === sessionId
+            ) {
+                isAcked = true;
+                clearTimeout(readyTimeout);
+                logger('info', 'Jira debug port acknowledged by options page', {
+                    sessionId
+                });
+                flush();
+                resolveReady();
+            }
+        };
+        port.onMessage.addListener(handleMessage);
+        port.onDisconnect.addListener(() => {
+            port?.onMessage.removeListener(handleMessage);
+            port = null;
+            resolveReady();
+        });
+        port.postMessage({ type: 'jira.debugPing', sessionId });
+    } catch (_e) {
+        port = null;
+        resolveReady();
+    }
+
+    logger('info', 'Jira debug session started in background page', {
+        sessionId
+    });
+
+    return {
+        logger,
+        ready,
+        disconnect: () => {
+            logger('info', 'Jira debug session finished', { sessionId });
+            try {
+                clearTimeout(readyTimeout);
+                flush();
+                port?.disconnect();
+            } catch (_e) {
+                // ignore
+            }
+            port = null;
+        }
+    };
+}
+
 function cleanup(id?: number) {
     if (!id) {
         return;
@@ -209,7 +312,17 @@ chrome.runtime.onConnect.addListener(function (port) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.type === 'jira.testSettings') {
-        handleJiraTestSettings(message, sendResponse);
+        const debug = createJiraDebugLogger();
+        debug.ready
+            .then(() =>
+                handleJiraTestSettings(
+                    message,
+                    sendResponse,
+                    undefined,
+                    debug.logger
+                )
+            )
+            .finally(debug.disconnect);
         return true; // Keep message channel open for async response
     }
     return false;
@@ -233,16 +346,41 @@ function portMessageHandler(message: { type: string }, port: Port) {
             value: String(debuggerAttachedMap[tabId])
         });
     } else if (message.type === 'jira.createIssue') {
-        handleJiraCreateIssue(
-            port,
-            message as JiraCreateMessage,
-            debuggerAttachedMap,
-            tabId
-        );
+        const debug = createJiraDebugLogger();
+        debug.ready
+            .then(() =>
+                handleJiraCreateIssue(
+                    port,
+                    message as JiraCreateMessage,
+                    debuggerAttachedMap,
+                    tabId,
+                    debug.logger
+                )
+            )
+            .finally(debug.disconnect);
     } else if (message.type === 'jira.getMetadata') {
-        handleJiraGetMetadata(message as JiraGetMetadataMessage, port);
+        const debug = createJiraDebugLogger();
+        debug.ready
+            .then(() =>
+                handleJiraGetMetadata(
+                    message as JiraGetMetadataMessage,
+                    port,
+                    debug.logger
+                )
+            )
+            .finally(debug.disconnect);
     } else if (message.type === 'jira.testSettings') {
-        handleJiraTestSettings(message as JiraTestMessage, undefined, port);
+        const debug = createJiraDebugLogger();
+        debug.ready
+            .then(() =>
+                handleJiraTestSettings(
+                    message as JiraTestMessage,
+                    undefined,
+                    port,
+                    debug.logger
+                )
+            )
+            .finally(debug.disconnect);
     } else if (message.type === 'debugger.evaluate') {
         const { expression, requestId } = message as unknown as {
             expression: string;
