@@ -1,9 +1,14 @@
-import { test, expect } from '../helpers/coverage';
+import { test, expect, type Page } from '../helpers/coverage';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const requestCount = (page: Page, visible: number, total: number) =>
+    page.locator('footer').getByText(
+        new RegExp(`^\\s*${visible}\\s*\\/\\s*${total}\\s+requests\\s*$`, 'i')
+    );
 
 test.describe('Filtering & Display', () => {
     test.beforeEach(async ({ page }) => {
@@ -18,8 +23,8 @@ test.describe('Filtering & Display', () => {
             path.join(__dirname, '../fixtures/filtering-test.har')
         );
 
-        // Wait for data to load (5 requests + 1 "Opened file" message = 6 items, but footer shows 5 requests)
-        await expect(page.locator('text=/5.*requests/i')).toBeVisible({
+        // Wait for data to load (5 requests + 1 "Opened file" message = 6 items)
+        await expect(requestCount(page, 6, 6)).toBeVisible({
             timeout: 10000
         });
     });
@@ -33,7 +38,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show user-related requests (4 HAR entries + 1 synthetic = 5 out of 6 total)
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Verify filtered requests are visible (URL displays as "/users")
         await expect(page.locator('text=/\\/users/').first()).toBeVisible();
@@ -43,7 +48,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // All requests should be visible again (5 HAR + 1 synthetic = 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
     });
 
     test('should filter by URL segments in sidebar (REST)', async ({
@@ -67,7 +72,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show 4 users requests + 1 synthetic = 5 / 6
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Re-check posts
         const postsCheckboxAgain = page
@@ -77,7 +82,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // All requests visible again (6 / 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
     });
 
     test('should filter by JSON-RPC methods in sidebar', async ({ page }) => {
@@ -88,7 +93,7 @@ test.describe('Filtering & Display', () => {
         );
 
         // Wait for data to load (3 RPC requests + 1 synthetic = 4 total)
-        await expect(page.locator('text=/4.*requests/i')).toBeVisible({
+        await expect(requestCount(page, 4, 4)).toBeVisible({
             timeout: 10000
         });
 
@@ -109,7 +114,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show 2 user methods + 1 synthetic = 3 / 4 total
-        await expect(page.locator('text=/3.*\\/.*4.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 3, 4)).toBeVisible();
 
         // Re-check product
         const productCheckboxAgain = page
@@ -119,7 +124,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // All requests visible again (3 RPC + 1 synthetic = 4 / 4)
-        await expect(page.locator('text=/4.*\\/.*4.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 4, 4)).toBeVisible();
     });
 
     test('should filter by GraphQL operations with dot notation in sidebar', async ({
@@ -132,7 +137,7 @@ test.describe('Filtering & Display', () => {
         );
 
         // Wait for data to load (3 GraphQL requests + 1 synthetic = 4 total)
-        await expect(page.locator('text=/4.*requests/i')).toBeVisible({
+        await expect(requestCount(page, 4, 4)).toBeVisible({
             timeout: 10000
         });
 
@@ -153,7 +158,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show 2 User operations + 1 synthetic = 3 / 4 total
-        await expect(page.locator('text=/3.*\\/.*4.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 3, 4)).toBeVisible();
 
         // Re-check Product
         const productCheckboxAgain = page
@@ -163,7 +168,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // All requests visible again (3 GraphQL + 1 synthetic = 4 / 4)
-        await expect(page.locator('text=/4.*\\/.*4.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 4, 4)).toBeVisible();
     });
 
     // TODO: Implement sidebar tree parsing for GraphQL operations without dot notation
@@ -179,7 +184,7 @@ test.describe('Filtering & Display', () => {
             );
 
             // Wait for data to load (3 GraphQL requests + 1 synthetic = 4 total)
-            await expect(page.locator('text=/4.*requests/i')).toBeVisible({
+            await expect(requestCount(page, 4, 4)).toBeVisible({
                 timeout: 10000
             });
 
@@ -201,7 +206,7 @@ test.describe('Filtering & Display', () => {
 
             // Should show 2 operations + 1 synthetic = 3 / 4 total
             await expect(
-                page.locator('text=/3.*\\/.*4.*requests/i')
+                requestCount(page, 3, 4)
             ).toBeVisible();
         }
     );
@@ -216,7 +221,7 @@ test.describe('Filtering & Display', () => {
         );
 
         // Wait for data to load (3 GraphQL requests + 1 synthetic = 4 total)
-        await expect(page.locator('text=/4.*requests/i')).toBeVisible({
+        await expect(requestCount(page, 4, 4)).toBeVisible({
             timeout: 10000
         });
 
@@ -227,8 +232,9 @@ test.describe('Filtering & Display', () => {
         // Wait for sidebar to open
         await expect(page.locator('input#methodSearch')).toBeVisible();
 
-        // Without operationName, requests should fall back to URL-based filtering
-        // All 3 requests go to /graphql, so "graphql" should appear in sidebar
+        // Anonymous queries without an operation type fall back to URL-based filtering.
+        // The anonymous mutation is still recognized as GQL, so unchecking "graphql"
+        // hides the two fallback URL entries and leaves the synthetic entry + mutation.
         const graphqlCheckbox = page
             .locator('div:has-text("graphql") > input[type="checkbox"]')
             .first();
@@ -237,8 +243,8 @@ test.describe('Filtering & Display', () => {
         // Wait for filter to apply
         await page.waitForTimeout(200);
 
-        // Should show only synthetic entry = 1 / 4 total
-        await expect(page.locator('text=/1.*\\/.*4.*requests/i')).toBeVisible();
+        // Should show synthetic entry + anonymous mutation = 2 / 4 total
+        await expect(requestCount(page, 2, 4)).toBeVisible();
 
         // Re-check graphql
         const graphqlCheckboxAgain = page
@@ -248,7 +254,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // All requests visible again (3 GraphQL + 1 synthetic = 4 / 4)
-        await expect(page.locator('text=/4.*\\/.*4.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 4, 4)).toBeVisible();
     });
 
     test('should apply combined filters (URL + footer tag)', async ({
@@ -264,7 +270,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show: GET /users, GET /posts, PUT /users/1, DELETE/204 /users/1 + synthetic = 5 / 6
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Apply URL filter for "users"
         const filterInput = page.locator('input[placeholder*="Filter by url"]');
@@ -272,21 +278,21 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show: GET /users, PUT /users/1, DELETE/204 /users/1 + synthetic (bypasses URL filter) = 4 / 6
-        await expect(page.locator('text=/4.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 4, 6)).toBeVisible();
 
         // Re-enable POST/201 tag
         await postTag.click();
         await page.waitForTimeout(200);
 
         // Should show all users requests + synthetic = 5 / 6
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Clear URL filter
         await filterInput.clear();
         await page.waitForTimeout(200);
 
         // All requests visible again (6 / 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
     });
 
     test('should filter by MIME type', async ({ page }) => {
@@ -310,8 +316,8 @@ test.describe('Filtering & Display', () => {
         await page.keyboard.press('Escape');
         await page.waitForTimeout(100);
 
-        // Should show 4 JSON requests + 1 synthetic = 5 / 6
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        // Should show 4 JSON requests; the synthetic entry is text/plain too
+        await expect(requestCount(page, 4, 6)).toBeVisible();
 
         // Re-open dropdown and re-check text/plain
         await mimeDropdown.click();
@@ -324,7 +330,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(100);
 
         // All requests visible again (6 / 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
     });
 
     test('should filter by HTTP method using footer tags', async ({ page }) => {
@@ -343,7 +349,7 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show 3 non-GET requests + 1 synthetic = 4 / 6
-        await expect(page.locator('text=/4.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 4, 6)).toBeVisible();
 
         // Also hide PUT requests
         const putTag = page.locator('button:has-text("PUT")');
@@ -351,21 +357,21 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Should show 2 requests (POST + DELETE) + 1 synthetic = 3 / 6
-        await expect(page.locator('text=/3.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 3, 6)).toBeVisible();
 
         // Re-enable GET
         await getTag.click();
         await page.waitForTimeout(200);
 
         // Should show 4 requests + 1 synthetic = 5 / 6
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Re-enable PUT
         await putTag.click();
         await page.waitForTimeout(200);
 
         // All requests visible again (6 / 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
     });
 
     test('should clear all filters', async ({ page }) => {
@@ -378,14 +384,14 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Verify filtered: 4 users requests + 1 synthetic = 5 / 6
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Clear URL filter
         await filterInput.clear();
         await page.waitForTimeout(200);
 
         // All requests visible again (6 / 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
 
         // 2. Apply footer tag filter (hide POST)
         const postTag = page.locator('button:has-text("POST/201")');
@@ -393,14 +399,14 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Verify filtered: 5 / 6 (POST hidden)
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Clear footer tag filter (re-enable POST)
         await postTag.click();
         await page.waitForTimeout(200);
 
         // All requests visible again (6 / 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
 
         // 3. Apply sidebar URL segment filter
         const sidebarButton = page.locator('button[title*="visible URLs"]');
@@ -415,13 +421,13 @@ test.describe('Filtering & Display', () => {
         await page.waitForTimeout(200);
 
         // Verify filtered: 5 / 6 (posts hidden)
-        await expect(page.locator('text=/5.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 5, 6)).toBeVisible();
 
         // Clear sidebar filter (re-check posts)
         await postsCheckbox.check();
         await page.waitForTimeout(200);
 
         // All requests visible again (6 / 6)
-        await expect(page.locator('text=/6.*\\/.*6.*requests/i')).toBeVisible();
+        await expect(requestCount(page, 6, 6)).toBeVisible();
     });
 });
