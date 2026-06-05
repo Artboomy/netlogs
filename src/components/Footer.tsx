@@ -99,7 +99,7 @@ export const Footer: FC<{
                 />
                 <CountWrapper>
                     {visibleCount} / {totalCount} {i18n.t('requests')}
-                    {isPreserve && `, ${i18n.t('log preserved')}`}
+                    {isPreserve && `, ${i18n.t('preserveLog')} ✔`}
                 </CountWrapper>
                 {!isExtension() && <LanguageSelect />}
                 <ThemeButton
