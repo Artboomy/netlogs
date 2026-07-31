@@ -8,7 +8,7 @@ afterEach(() => {
         useSettings.getState().deinit();
         useSettings.setState({ settings: defaultSettings });
     });
-    window.localStorage.clear();
+    globalThis.localStorage?.clear();
 });
 
 describe('useSettings', () => {

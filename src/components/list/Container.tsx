@@ -4,6 +4,8 @@ import { List } from '../List';
 import { SearchContext, useSearchParams } from 'react-inspector';
 import { FilterContext } from 'context/FilterContext';
 import { useSettings } from 'hooks/useSettings';
+import { useTempSettings } from 'hooks/useTempSettings';
+import { isTagVisible } from '../tagFilter';
 import { useShallow } from 'zustand/react/shallow';
 import { isTransactionItem } from 'models/utils';
 import { ISettings } from 'controllers/settings/types';
@@ -12,6 +14,7 @@ import Host from 'controllers/host';
 const computeVisibility = ({
     i,
     hiddenTags,
+    selectedTag,
     hiddenMimeTypesArray,
     marker,
     searchValue,
@@ -20,6 +23,7 @@ const computeVisibility = ({
 }: {
     i: AnyItem;
     hiddenTags: Record<string, string>;
+    selectedTag: string | null;
     hiddenMimeTypesArray: string[];
     marker: ReturnType<typeof useSearchParams>['marker'];
     searchValue: string;
@@ -43,7 +47,7 @@ const computeVisibility = ({
         }
     }
     return (
-        !hiddenTags[i.getTag()] &&
+        isTagVisible(i.getTag(), { hiddenTags, selectedTag }) &&
         !hiddenMimeTypesArray.includes(i.toJSON().response?.content.mimeType) &&
         i.shouldShow({
             marker,
@@ -73,6 +77,7 @@ export const ListContainer: FC = () => {
     const hiddenTags = useSettings(
         useShallow((state) => state.settings.hiddenTags)
     );
+    const selectedTag = useTempSettings((state) => state.selectedTag);
     // recalculate the map entirely on new filter values
     useEffect(() => {
         const currentList = useListStore.getState().list;
@@ -81,6 +86,7 @@ export const ListContainer: FC = () => {
             const shouldShow = computeVisibility({
                 i,
                 hiddenTags,
+                selectedTag,
                 hiddenMimeTypesArray,
                 marker,
                 searchValue,
@@ -100,6 +106,7 @@ export const ListContainer: FC = () => {
         searchValue,
         marker,
         hiddenTags,
+        selectedTag,
         hiddenMimeTypesArray,
         methodChecks
     ]);
@@ -115,6 +122,7 @@ export const ListContainer: FC = () => {
                 computedVisibility = computeVisibility({
                     i,
                     hiddenTags,
+                    selectedTag,
                     hiddenMimeTypesArray,
                     marker,
                     searchValue,

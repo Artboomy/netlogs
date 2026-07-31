@@ -5,6 +5,8 @@ import React, {
     useRef,
     useState
 } from 'react';
+import { useTempSettings } from 'hooks/useTempSettings';
+import { isTagVisible } from './tagFilter';
 import { useSettings } from 'hooks/useSettings';
 import styled from '@emotion/styled';
 import { useListStore } from 'controllers/network';
@@ -234,19 +236,25 @@ export const MethodsSidebar = () => {
         (state) => state.settings.methodsSidebarVisible
     );
     const [searchTerm, setSearchTerm] = useState('');
+    const hiddenTags = useSettings(
+        useShallow((state) => state.settings.hiddenTags)
+    );
+    const hiddenMimeTypesArray = useSettings(
+        useShallow((state) => state.settings.hiddenMimeTypes)
+    );
+    const selectedTag = useTempSettings((state) => state.selectedTag);
 
-    // build the raw list excluding ContentOnlyItem
     const rawList = useListStore(
         useShallow((state) => {
-            const hiddenTags = useSettings.getState().settings.hiddenTags;
-            const hiddenMimeTypesArray =
-                useSettings.getState().settings.hiddenMimeTypes;
             return state.list.filter((i) => {
                 if (i instanceof ContentOnlyItem) {
                     return false;
                 }
                 return (
-                    !hiddenTags[i.getTag()] &&
+                    isTagVisible(i.getTag(), {
+                        hiddenTags,
+                        selectedTag
+                    }) &&
                     !hiddenMimeTypesArray.includes(
                         i.toJSON().response?.content.mimeType
                     ) &&

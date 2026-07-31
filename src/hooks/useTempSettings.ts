@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 
-export const useTempSettings = create<{
+export interface TempSettingsState {
     isVerticalView: boolean;
-}>(() => ({
-    isVerticalView: false
+    selectedTag: string | null;
+}
+
+export const useTempSettings = create<TempSettingsState>(() => ({
+    isVerticalView: false,
+    selectedTag: null
 }));
