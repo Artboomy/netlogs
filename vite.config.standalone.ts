@@ -1,6 +1,5 @@
 import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { fileURLToPath } from 'node:url';
 import { resolve as pathResolve } from 'node:path';
 import {
@@ -13,8 +12,7 @@ import {
 } from 'node:fs';
 import istanbul from 'vite-plugin-istanbul';
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
-
+const rootDir = import.meta.dirname;
 const plugins: Plugin[] = [
     // for some reason cleanOutDir does not work properly
     // @see https://github.com/vitejs/vite/issues/10696
@@ -64,7 +62,6 @@ const plugins: Plugin[] = [
         }
     } as Plugin,
 
-    tsconfigPaths(),
     react()
 ];
 
@@ -98,18 +95,19 @@ export default defineConfig({
     base: process.env.PAGES_BASE_PATH ?? './',
     plugins,
     resolve: {
+        tsconfigPaths: true,
         alias: {
             'react-inspector': pathResolve(
-                __dirname,
+                rootDir,
                 'node_modules/react-inspector/dist/es/react-inspector.js'
             ),
             tslib: 'tslib/tslib.es6.js',
             'react/jsx-dev-runtime.js': pathResolve(
-                __dirname,
+                rootDir,
                 'node_modules/react/jsx-dev-runtime.js'
             ),
             'react/jsx-runtime.js': pathResolve(
-                __dirname,
+                rootDir,
                 'node_modules/react/jsx-runtime.js'
             )
         }
@@ -128,7 +126,6 @@ export default defineConfig({
                 standalone: './src/app/standalone.tsx'
             },
             output: {
-                inlineDynamicImports: false,
                 format: 'es',
                 dir: './standalone',
                 entryFileNames: '[name].mjs',
@@ -146,7 +143,6 @@ export default defineConfig({
         assetsInlineLimit: 8192 // Inline assets smaller than 8KB
     },
     define: {
-        'process.env': process.env,
         'import.meta.env.VITE_STANDALONE': true
     }
 });
