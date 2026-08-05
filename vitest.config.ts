@@ -1,10 +1,11 @@
-import { defineConfig } from 'vitest/config';
 import path from 'node:path';
+import { defineConfig } from 'vitest/config';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
     cacheDir: '.cache',
+    plugins: [tsconfigPaths()],
     resolve: {
-        tsconfigPaths: true,
         alias: {
             'react-inspector': path.resolve(
                 import.meta.dirname,

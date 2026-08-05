@@ -35,12 +35,14 @@ const plugins: Plugin[] = [
         enforce: 'post',
         closeBundle() {
             const currentDir = fileURLToPath(new URL('.', import.meta.url));
+            const standalonePath = pathResolve(currentDir, 'standalone');
             const templatePath = pathResolve(
                 currentDir,
                 'templates/standalone.html'
             );
-            const htmlPath = pathResolve(currentDir, 'standalone/index.html');
+            const htmlPath = pathResolve(standalonePath, 'index.html');
             const htmlContent = readFileSync(templatePath, 'utf-8');
+            mkdirSync(standalonePath, { recursive: true });
             writeFileSync(htmlPath, htmlContent);
             console.log('✨ Generated index.html for standalone build');
         }
@@ -65,8 +67,8 @@ const plugins: Plugin[] = [
     react()
 ];
 
-// Add Istanbul coverage instrumentation for E2E tests
-if (process.env.NODE_ENV === 'test') {
+// Add Istanbul coverage instrumentation only for explicit coverage runs.
+if (process.env.E2E_COVERAGE === 'true') {
     plugins.push(
         istanbul({
             include: 'src/*',
