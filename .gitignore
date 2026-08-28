@@ -2,7 +2,7 @@ dist/js/*
 /standalone/
 node_modules/
 .idea
-.husky
+.husky/_
 *.zip
 roadmap.md
 yarn-error.log

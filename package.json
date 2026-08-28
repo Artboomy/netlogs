@@ -13,6 +13,7 @@
         "lint:tsc": "tsc --noEmit --incremental --tsBuildInfoFile ./.cache/.tsbuildinfo-noEmit",
         "lint:eslint": "eslint -c eslint.config.js --cache --cache-location ./.cache/.eslintcache --max-warnings=0 ./src",
         "mockSecrets": "node scripts/mock-secrets.cjs",
+        "strip:dev-version": "node scripts/strip-manifest-timestamp.cjs",
         "lint:ci": "yarn run mockSecrets && yarn run lint",
         "build": "cross-env NODE_ENV=development vite build --config vite.config.extension.ts --mode development",
         "build:prod": "yarn run lint && vite build --config vite.config.extension.ts --mode production",

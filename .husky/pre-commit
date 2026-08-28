@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+yarn run strip:dev-version
+git add dist/manifest.json src/api/runtime.ts
+yarn run lint:ci
+yarn test:coverage --run
