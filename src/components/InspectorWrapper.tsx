@@ -9,6 +9,7 @@ import { useListStore } from 'controllers/network';
 import { Webm } from './render/Webm';
 import {
     callParentVoid,
+    isMacOs,
     isSerializedFormData,
     isSerializedMultipartFormData,
     isSerializedObject
@@ -239,7 +240,10 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
     }
     const handleMouseDown: NonNullable<InspectorAsTreeProps['onMouseDown']> =
         useCallback((event, data) => {
-            if (event.button === 1 || event.buttons === 4) {
+            const isMiddleClick = event.button === 1 || event.buttons === 4;
+            const isMacOptionClick =
+                isMacOs() && event.altKey && event.button === 0;
+            if (isMiddleClick || isMacOptionClick) {
                 try {
                     if (data !== undefined && data !== null) {
                         copy(
@@ -263,12 +267,23 @@ export const InspectorWrapper: FC<InspectorWrapperProps> = ({
                 }
             }
         }, []);
+    const handleClickCapture = useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            if (isMacOs() && event.altKey && event.button === 0) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        },
+        []
+    );
     return (
-        <Inspector
-            name={name}
-            data={unwrappedDataWithTextConverted}
-            theme={customTheme}
-            onMouseDown={handleMouseDown}
-        />
+        <div onClickCapture={handleClickCapture}>
+            <Inspector
+                name={name}
+                data={unwrappedDataWithTextConverted}
+                theme={customTheme}
+                onMouseDown={handleMouseDown}
+            />
+        </div>
     );
 };

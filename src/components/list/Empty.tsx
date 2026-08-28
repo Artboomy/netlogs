@@ -175,6 +175,12 @@ export const Empty: FC = () => {
                     <KbdLine>
                         {i18n.t('nodeCopyToClipboard')}:{' '}
                         <MouseImg src={middleClick} alt='Middle click' />
+                        {isMacOs() ? (
+                            <>
+                                {' / macOS: '}
+                                <kbd>⌥</kbd>+<MouseImg src={leftClick} alt='Left click' />
+                            </>
+                        ) : null}
                     </KbdLine>
                 </Column>
                 <HelpColumn>
