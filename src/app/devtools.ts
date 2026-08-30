@@ -8,6 +8,8 @@ function logger(...args: unknown[]) {
     console.log(...args);
 }
 
+export {};
+
 function cleanup() {
     chrome.devtools.network.onRequestFinished.removeListener(
         networkOnRequestFinished

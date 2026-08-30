@@ -1,13 +1,12 @@
 import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { PluginVisualizerOptions, visualizer } from 'rollup-plugin-visualizer';
 import circleDependency from 'vite-plugin-circular-dependency';
 import { fileURLToPath } from 'node:url';
 import { resolve as pathResolve } from 'node:path';
 import { existsSync, rmSync, readFileSync, writeFileSync } from 'node:fs';
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const rootDir = import.meta.dirname;
 
 const plugins: Plugin[] = [
     // for some reason cleanOutDir does not work properly
@@ -107,7 +106,6 @@ const plugins: Plugin[] = [
     } as Plugin,
 
     circleDependency(),
-    tsconfigPaths(),
     react()
 ];
 
@@ -128,18 +126,19 @@ export default defineConfig({
     },
     plugins,
     resolve: {
+        tsconfigPaths: true,
         alias: {
             'react-inspector': pathResolve(
-                __dirname,
+                rootDir,
                 'node_modules/react-inspector/dist/es/react-inspector.js'
             ),
             tslib: 'tslib/tslib.es6.js',
             'react/jsx-dev-runtime.js': pathResolve(
-                __dirname,
+                rootDir,
                 'node_modules/react/jsx-dev-runtime.js'
             ),
             'react/jsx-runtime.js': pathResolve(
-                __dirname,
+                rootDir,
                 'node_modules/react/jsx-runtime.js'
             )
         }
@@ -165,7 +164,6 @@ export default defineConfig({
                 background: './src/content/background.ts'
             },
             output: {
-                inlineDynamicImports: false,
                 format: 'es',
                 dir: './dist/js',
                 entryFileNames: '[name].mjs',
@@ -204,7 +202,6 @@ export default defineConfig({
         assetsInlineLimit: 8192 // Inline assets smaller than 8KB
     },
     define: {
-        'process.env': process.env,
         'import.meta.env.VITE_STANDALONE': false
     }
 });

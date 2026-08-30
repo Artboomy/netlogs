@@ -16,7 +16,8 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
-        "baseUrl": "src"
+        "baseUrl": "src",
+        "moduleDetection": "force"
     },
     "include": ["src/**/*"],
     "references": [{ "path": "./tsconfig.node.json" }],

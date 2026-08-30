@@ -19,6 +19,9 @@ import AreaName = chrome.storage.AreaName;
 // TODO: split into multiple handlers
 
 let isIframeReady = false;
+function logger(...args: unknown[]) {
+    console.log(...args);
+}
 
 export async function wrapSandbox(): Promise<void> {
     return new Promise((resolve) => {
