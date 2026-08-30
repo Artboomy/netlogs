@@ -43,15 +43,30 @@ jobs:
 
       - name: Comment E2E Coverage on PR
         uses: actions/github-script@v8
+        env:
+          STATEMENTS: ${{ steps.e2e-coverage.outputs.statements }}
+          BRANCHES: ${{ steps.e2e-coverage.outputs.branches }}
+          FUNCTIONS: ${{ steps.e2e-coverage.outputs.functions }}
+          LINES: ${{ steps.e2e-coverage.outputs.lines }}
         with:
           script: |
-            const statements = '${{ steps.e2e-coverage.outputs.statements }}';
-            const branches = '${{ steps.e2e-coverage.outputs.branches }}';
-            const functions = '${{ steps.e2e-coverage.outputs.functions }}';
-            const lines = '${{ steps.e2e-coverage.outputs.lines }}';
 
-            if (!statements) {
+            const statementsRaw = process.env.STATEMENTS;
+            if (!statementsRaw) {
               console.log('No E2E coverage data found');
+              return;
+            }
+
+            const branchesRaw = process.env.BRANCHES;
+            const functionsRaw = process.env.FUNCTIONS;
+            const linesRaw = process.env.LINES;
+            const statements = Number(statementsRaw);
+            const branches = Number(branchesRaw);
+            const functions = Number(functionsRaw);
+            const lines = Number(linesRaw);
+
+            if ([statements, branches, functions, lines].some(value => !Number.isFinite(value))) {
+              core.setFailed('Invalid E2E coverage data found in artifact output.');
               return;
             }
 
